@@ -3,7 +3,7 @@
 
 
 ## Fixing `viewHelp`
-The problem with wsl in Ubuntu 20.04 is that that the `wslview` command does not properly translate paths all the time, so we have to update it to the more modern wslu package which contains the new `wslview` command with the following code:
+Viewing MAcaulay2 documentation in a terminal is not recommended because of the way it shows up on the screen. This is why a better way to view documentation is to open the html files of the documentation in a browser. wsl originally comes with its own way of visualizing files, but the problem with wsl in Ubuntu 20.04 is that that the `wslview` command does not properly translate paths all the time, so we have to update it to the more modern wslu package which contains the new `wslview` command with the following code:
 
 ```
 $ sudo add-apt-repository ppa:wslutilities/wslu
@@ -22,3 +22,15 @@ $ echo "export WWWBROWSER=wslview" >> ~/.bashrc
 ```
 
 Now if you go to the terminal or emacs, the Macualy2 command `viewHelp` should open a browser in your Windows parent operating system.
+
+## Setting up Github
+
+
+
+
+## HashTables VS MutableHashTables
+A hash table consists of: a class type, a parent type, and a set of key-value pairs. The keys and values can be anything. The access functions below accept a key and return the corresponding value.
+
+Main difference is that MutableHashTables are basically HashTables whose entries can be modified (changed, deleted, added).
+
+Which one is better for implementing power series as objects? Would a user want to be able to modify polynomials as an example? Probably not, since they can just make a new one and work with that one. So it does make sense to make it immutable, but in what scenarios do we need to be able to manipulate the values. 

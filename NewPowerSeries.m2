@@ -1,3 +1,8 @@
+--*************************************************
+--*************************************************
+-- 
+--*************************************************
+--*************************************************
 newPackage(
         "NewPowerSeries",
         Version => "2.0", 
@@ -22,7 +27,11 @@ newPackage(
 	     Email => "u1304541@utah.edu",
 	     HomePage => "https://github.com/annie-giokas"} },
 
-        Headline => "computations involving power series",
+        Headline => "A package for implementing power series and its calculations",
         DebuggingMode => true,
-        Reload => true
+        Reload => true,
+        AuxiliaryFiles=>true,
+        PackageExports=>{"Depth"}
         )
+
+        
