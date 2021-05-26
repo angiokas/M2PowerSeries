@@ -31,20 +31,22 @@ newPackage(
         DebuggingMode => true,
         Reload => true,
         AuxiliaryFiles=>true,
-        PackageExports=>{"Depth"}
+        PackageExports=>{"Depth"} --exports all the functions from a package automatically
         )
 
 
 load "./NewPowerSeries/PowerSeriesFunctions.m2"
-
 export{
 --PowerSeriesFunctions (PowerSeriesFunctions.m2)
     "toPolynomial",
     "setDegree",
-    "series"
+    "series",
+    "polynomial", 
+    "maxDegree",
+    "computedDegree",
+    "displayedDegree"
 
 }
-
 
 
 --DOCUMENTATION
@@ -58,3 +60,4 @@ export{
 
 
 end
+loadPackage "NewPowerSeries"
