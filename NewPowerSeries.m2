@@ -34,4 +34,27 @@ newPackage(
         PackageExports=>{"Depth"}
         )
 
-        
+
+load "./NewPowerSeries/PowerSeriesFunctions.m2"
+
+export{
+--PowerSeriesFunctions (PowerSeriesFunctions.m2)
+    "toPolynomial",
+    "setDegree",
+    "series"
+
+}
+
+
+
+--DOCUMENTATION
+
+--beginDocumentation()
+
+--load "./NewPowerSeries/PowerSeriesFunctionsDoc.m2"
+
+
+-- TESTS
+
+
+end

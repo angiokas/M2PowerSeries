@@ -23,14 +23,10 @@ $ echo "export WWWBROWSER=wslview" >> ~/.bashrc
 
 Now if you go to the terminal or emacs, the Macualy2 command `viewHelp` should open a browser in your Windows parent operating system.
 
-## Setting up Github
-
-
-
 
 ## HashTables VS MutableHashTables
 A hash table consists of: a class type, a parent type, and a set of key-value pairs. The keys and values can be anything. The access functions below accept a key and return the corresponding value.
 
 Main difference is that MutableHashTables are basically HashTables whose entries can be modified (changed, deleted, added).
 
-Which one is better for implementing power series as objects? Would a user want to be able to modify polynomials as an example? Probably not, since they can just make a new one and work with that one. So it does make sense to make it immutable, but in what scenarios do we need to be able to manipulate the values. 
+We will be using HashTables because a user wouldn't want to modify a polynomial anyway. It is better to just make a new one. 
