@@ -1,6 +1,9 @@
 # Notes
 
-
+## In case of Visual Studio Code error
+Most likely, you have to reset wsl so you can type this in your terminal:
+$ wsl --shutdown
+Afterwards, just start a new WSL window in Visual Code and it should work. 
 
 ## Fixing `viewHelp`
 Viewing MAcaulay2 documentation in a terminal is not recommended because of the way it shows up on the screen. This is why a better way to view documentation is to open the html files of the documentation in a browser. wsl originally comes with its own way of visualizing files, but the problem with wsl in Ubuntu 20.04 is that that the `wslview` command does not properly translate paths all the time, so we have to update it to the more modern wslu package which contains the new `wslview` command with the following code:
