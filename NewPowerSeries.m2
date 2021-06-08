@@ -44,7 +44,8 @@ export{
     "polynomial", 
     "maxDegree",
     "computedDegree",
-    "displayedDegree"
+    "displayedDegree",
+    "lazySeries"
 
 }
 
@@ -60,4 +61,3 @@ export{
 
 
 end
-loadPackage "NewPowerSeries"

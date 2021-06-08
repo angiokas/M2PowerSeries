@@ -18,22 +18,84 @@ series = method(Options => {Degree => 5})
 -- computedDegree - Highest power that has been computed
 -- 
 
-
+export{"setPrecision", "applyList"}
 series(ZZ, RingElement) := Series => opts -> (n,f) -> (
-     new Series from {degree => n, --we want to change this to disaplyedDegree
+     new Series from {displayedDegree => n, --we want to change this to disaplyedDegree
       maxDegree => max((first degree f), n), -- here degree is a method for polynomials
       computedDegree => max((first degree f), n), 
       polynomial => f,
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree))}
-     );
-
-series(RingElement) := Series => opts -> f -> (
-     new Series from {degree => opts.Degree,
-      maxDegree => max((first degree f), opts.Degree), 
-      computedDegree => max((first degree f), opts.Degree), 
-      polynomial => f}
+	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree)), -- Does not do anything really
+      setPrecision => (newDisplayedDegree)-> series(newDisplayedDegree, f)} -- added new method
      );
 -- note: opts -> is needed because series method has options
+--DOES NOT WORK
+series(RingElement) := Series => opts -> f -> ( 
+     new Series from {degree => opts.Degree,
+                      maxDegree => max((first degree f), opts.Degree), 
+                      computedDegree => max((first degree f), opts.Degree), 
+                      polynomial => f}
+     );
+
+lazySeries = method(Options => {Degree => 10})
+lazySeries(RingElement, Function) := Series => opts -> (X,f) -> (
+     -- Start with the zero polynomial.
+     s:=0;
+     -- add opts.Degree terms to s.
+     for i from 0 to opts.Degree do s = s + (f i)*X^i;
+     
+     -- now make a new series.
+     new Series from {displayedDegree => opts.Degree,
+        maxDegree => infinity,
+        computedDegree => opts.Degree,
+        polynomial => s, 
+        -- setDegree takes an old polynomial, the old computed degree, and a new degree, and needs
+	      -- to know how to tack on the new terms to the old polynomial.
+	      setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (newPolynomial := oldPolynomial;
+		              for i from oldComputedDegree + 1 to newDegree do newPolynomial = newPolynomial + (f i)*X^i;
+			      (newPolynomial,max(oldComputedDegree,newDegree))
+		    ))});
+
+--MULTIVARIABLE EXPERIMENT
+
+--First let us add a method that enables us to apply a list to a list
+applyList = method()
+applyList(Function, List, List) := (f,l1,l2)->(
+    if (#l1 != #l2) then
+        error("lists not of equal length"); -- first checks that list lengths are equal
+    
+    l := {}; -- starting with an empty list
+    for i from 0 to (#l1-1) do
+        l = append(l,f(l1#i,l2#i));
+
+    return l;
+)
+
+lazySeries(List, Function) := Series => opts -> (variables,f) -> (
+    -- Start with the zero polynomial.
+    s:=0;
+    -- n is the number of variables
+    n:= #variables;
+    -- 
+    p:= (a,b)->a^b;
+    --
+    combinations := {};
+    for j from 0 to opts.Degree do
+        combinations = append(combinations, compositions (n,j));
+    combinations = flatten combinations;
+    
+     -- add opts.Degree terms to s.
+    for i from 0 to #combinations-1 do
+        s = s+ (f i)* product(applyList(p,variables, combinations#i));
+    
+     -- now make a new series.
+     new Series from {displayedDegree => opts.Degree,
+        maxDegree => infinity,
+        computedDegree => opts.Degree,
+        polynomial => s
+        }
+);
+
+
 --===================================================================================
 -- polynomial is the 
 -- computedDegree is
@@ -49,9 +111,11 @@ setDegree(ZZ, Series) := Series =>  (n,S) -> (
         new Series from {polynomial => f,
                         computedDegree => c,
                         maxDegree => S#maxDegree,
-                        degree => (min(n,S#maxDegree)),
+                        displayedDegree => (min(n,S#maxDegree)),
                         setDegree=> S#setDegree}
      );
+
+
 --===================================================================================
 
 -- Selects the terms of a polynomial up to degree specified
@@ -64,7 +128,7 @@ toPolynomial = method()
 -- Converts a Power series object into a polynomial by taking the part of the series up to default power 5
 -- n is the power you want to truncate it at
 
-toPolynomial(Series) := RingElement => s -> toPolynomial(s#degree,s);
+toPolynomial(Series) := RingElement => s -> toPolynomial(s#displayedDegree,s);
 toPolynomial(ZZ,Series) := RingElement => (n,s) -> truncate(n,(setDegree(n,s))#polynomial);
 
 --===================================================================================
@@ -72,8 +136,8 @@ pretty Series := s -> net new Sum from apply(
     apply(
         select(
             apply(
-                s#degree+2,
-                i -> part_i(truncate(s#degree, s#polynomial))
+                s#displayedDegree+2,
+                i -> part_i(truncate(s#displayedDegree, s#polynomial))
             ),
             p-> p!=0),
         expression
@@ -83,10 +147,11 @@ pretty Series := s -> net new Sum from apply(
         else e
 )
 
-expression Series := s -> pretty s + expression "O(" expression(s#degree+1) expression ")"
-net Series := s -> net pretty s + expression "O(" expression(s#degree+1) expression ")"
+expression Series := s -> pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
+net Series := s -> net pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 toString Series := s -> toString pretty s + expression "O(" expression(s#degree+1) expression ")"
-tex Series := s -> tex pretty s + expression "O(" expression(s#degree+1) expression ")"
-html Series := s -> html pretty s + expression "O(" expression(s#degree+1) expression ")"
+tex Series := s -> tex pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
+html Series := s -> html pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 
 --===================================================================================
+--MULTIVARIABLE 
