@@ -55,6 +55,7 @@ setDegree(ZZ, Series) := Series => (n,S) -> (if n > S.maxDegree then error conca
      new Series from {polynomial => f, computedDegree => c, maxDegree => S#maxDegree, degree => (min(n,S#maxDegree)), setDegree=> S#setDegree}
      );
 --===================================================================================
+--1st method
 series(ZZ, RingElement) := Series => opts -> (n,f) -> (
      new Series from {degree => n,
       maxDegree => max(first degree f,n), 
@@ -63,7 +64,7 @@ series(ZZ, RingElement) := Series => opts -> (n,f) -> (
 	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree))}
      );
 
-
+-- 2nd method
 series(RingElement, Function) := Series => opts -> (X,f) -> (
      -- Start with the zero polynomial.
      s:=0;
@@ -93,23 +94,22 @@ inverse(Series) := Series => F -> (
      if not isUnit(dominantTerm F) then error "This series is not invertible: its dominant term is not a unit.";
      G := ((dominantTerm F)^-1) * F;
      
-     new Series from {
-	  polynomial => (dominantTerm F)^-1 * recip(toPolynomial G,0,denominatorDegree,1_R),
-	  computedDegree => 2^(ceiling log(2,denominatorDegree+1))-1,
-	  degree => denominatorDegree,
-	  maxDegree => F.maxDegree,
-	  setDegree => (oldPolynomial,oldComputedDegree,newDegree) -> (
-               if newDegree < oldComputedDegree then (
-		    (oldPolynomial,oldComputedDegree)
-		    )
-	       else (
-		    newApprox := (dominantTerm F)^-1 * recip(((setDegree(newDegree,G)).polynomial),oldComputedDegree,newDegree,(dominantTerm F) * oldPolynomial);
+    new Series from {
+	    polynomial => (dominantTerm F)^-1 * recip(toPolynomial G,0,denominatorDegree,1_R),
+	    computedDegree => 2^(ceiling log(2,denominatorDegree+1))-1,
+	    degree => denominatorDegree,
+	    maxDegree => F.maxDegree,
+	    setDegree => (oldPolynomial,oldComputedDegree,newDegree) -> (
+        if newDegree < oldComputedDegree then (
+		      (oldPolynomial,oldComputedDegree)
+		    ) else (
+		      newApprox := (dominantTerm F)^-1 * recip(((setDegree(newDegree,G)).polynomial),oldComputedDegree,newDegree,(dominantTerm F) * oldPolynomial);
 	            (newApprox,newDegree)
-		    )
-	       )
-	  }
+	      )
+    )
+  }
           
-     )
+)
 
 recip = (denom,oldDegree,newDegree,oldApprox) -> (
      wts := (options ring oldApprox).Heft;
@@ -144,6 +144,7 @@ Series == Series := (M,N) -> (
      precision:= min(degree M, degree N);
      truncate(precision,M#polynomial) == truncate(precision,N#polynomial))
 
+--third method
 series(RingElement) := Series => opts -> f -> (
      -- To check whether this thing has a denominator or not, we ask its ring.
      -- If it has a denominator, we need to invert the denominator to form a 
@@ -174,7 +175,7 @@ series(Divide) := Series => opts -> f -> (
      	den := value denominator f;
 	num * inverse series den
 	)
-
+--4th method
 series(Function) := Series => opts -> f -> ( 
      	  s := f(opts.Degree+1);
 	   -- now make a new series.

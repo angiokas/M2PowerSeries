@@ -44,8 +44,7 @@ export{
     "polynomial", 
     "maxDegree",
     "computedDegree",
-    "displayedDegree",
-    "lazySeries"
+    "displayedDegree"
 
 }
 
