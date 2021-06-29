@@ -51,11 +51,14 @@ $ sudo pip3 install macaulay2-jupyter-kernel
 $ sudo python3 -m m2_kernel.install
 ```
 
-Then to make a new notebook, type:
+Then to make a new notebook, type: 
 ```
 jupyter notebook
 ```
 If you fixed the browser to work on wsl, it should redirect you to your chosen browser in Windows. Then you should be able to make an M2 file in jupyter. 
+
+If you are using wsl, the browser version might not work. Therefore, try using the vs code extension for jupyter: 
+https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
 
 ## HashTables VS MutableHashTables
 A hash table consists of: a class type, a parent type, and a set of key-value pairs. The keys and values can be anything. The access functions below accept a key and return the corresponding value.
@@ -66,10 +69,16 @@ We will be using HashTables because a user wouldn't want to modify a polynomial 
 
 ## Some useful commands in Macaulay2
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
+
 `
 $ loadPackage "pkgname"
 `
-If you want to reload the package in the same session without restarting macaulay2:
+
+If you want to reload the package in the same session without restarting macaulay2
+
 `
 $ loadPackage "pkgname", Reload => true
 `
+
+
+

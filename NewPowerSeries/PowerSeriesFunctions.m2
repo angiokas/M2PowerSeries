@@ -2,12 +2,110 @@
 --Basic functions of Power Series
 --*************************************************
 --===================================================================================
-
 Series = new Type of HashTable
 
 --===================================================================================
 -- CONSTRUCTING SERIES
 series = method(Options => {Degree => 5})
+
+export{"setPrecision","coefficientFunction", "getCoefficient", "termVariables", "variables","displayedPolynomial","seriesRing","formalTaylorSeries"}
+
+LazySeries = new Type of HashTable
+lazySeries = method(Options => {Degree => 2})
+--LAZY SERIES
+
+-- f is the function which has to have the same amount of inputs as there are variables
+lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
+  
+    ringVariables := gens R;
+    
+    try function (numgens R:0) then 1 -- checks to see if function was inputted correctly
+    else error "Number of inputs of given function does not match number of ring generators";
+
+    combinations := {};
+    for j from 0 to opts.Degree do
+        combinations = append(combinations, compositions (#ringVariables,j)); 
+    combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
+
+    s :=0;
+     -- add opts.Degree terms to s.
+    for j from 0 to #combinations-1 do 
+        s = s+ (function toSequence(combinations#j))* product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));
+    print s;
+     -- Making a new lazySeries
+     new LazySeries from {
+        displayedDegree => opts.Degree,
+        computedDegree => opts.Degree,
+        maxDegree => infinity,
+        displayedPolynomial => s,
+        coefficientFunction => function,
+        getCoefficient => (coefficientVector)-> function (toSequence coefficientVector),
+        termVariables => ringVariables,
+        seriesRing => R
+    }
+);
+
+-- Getting coefficient value
+
+getCoefficient = method()
+getCoefficient(LazySeries, List) := LazySeries =>  (S,coefficientVector) -> (
+    print S#coefficientFunction;
+    print S#coefficientFunction toSequence coefficientVector;
+);
+
+-- Adding lazySeries together
+
+formalTaylorSeries = method()
+formalTaylorSeries(RingElement) := series => (X)->(
+
+defaultDegree := 5;
+s := series(X,i->(-1)^i);
+--print "1/(1-X)=";
+s
+)
+
+
+--LazySeries Addition
+LazySeries + LazySeries := LazySeries => (A,B) -> (
+   -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
+    f := A#coefficientFunction;
+    g := B#coefficientFunction;
+    R := A#seriesRing;
+    variables := vars(1..(numgens R));
+    newFunction:= variables-> f variables + g variables;
+    lazySeries(R, newFunction);
+)
+
+LazySeries - LazySeries := LazySeries => (A,B) -> (
+   -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
+    f := A#coefficientFunction;
+    g := B#coefficientFunction;
+    R := A#seriesRing;
+    variables := vars(1..(numgens R));
+    newFunction:= variables-> f variables - g variables;
+    lazySeries(R, newFunction);
+)
+-- MULTIPLICATION
+LazySeries * LazySeries := LazySeries => (A,B) -> (
+   -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
+return 0;
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- method that creates a series using a ring element (basically treats the ring elements as a series with rest of the coefficients as 0)
 -- n is the amount of terms you want to compute for the series
@@ -15,9 +113,7 @@ series = method(Options => {Degree => 5})
 -- degree - Displayed degree
 -- maxDegree - maximum degree mathematically
 -- computedDegree - Highest power that has been computed
--- 
 
-export{"setPrecision", "applyList"}
 series(ZZ, RingElement) := Series => opts -> (n,f) -> (
      new Series from {displayedDegree => n, --we want to change this to disaplyedDegree
       maxDegree => max((first degree f), n), -- here degree is a method for polynomials
@@ -53,46 +149,7 @@ series(RingElement, Function) := Series => opts -> (X,f) -> (
 			      (newPolynomial,max(oldComputedDegree,newDegree))
 		    ))});
 
---MULTIVARIABLE EXPERIMENT - worked!
 
---First let us add a method that enables us to apply a list to a list
-applyList = method()
-applyList(Function, List, List) := (f,l1,l2)->(
-    if (#l1 != #l2) then
-        error("lists not of equal length"); -- first checks that list lengths are equal
-    
-    l := {}; -- starting with an empty list
-    for i from 0 to (#l1-1) do
-        l = append(l,f(l1#i,l2#i));
-
-    return l;
-)
-
-series(List, Function, ZZ) := Series => opts -> (variables,f, totalDeg) -> (
-    -- Start with the zero polynomial.
-    s:=0;
-    -- n is the number of variables
-    n:= #variables;
-    -- 
-    p:= (a,b)->a^b;
-    --
-    combinations := {};
-    for j from 0 to totalDeg do
-        combinations = append(combinations, compositions (n,j)); 
-    combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
-    
-     -- add opts.Degree terms to s.
-    for i from 0 to #combinations-1 do
-        s = s+ (f i)* product(applyList(p,variables, combinations#i));
-    
-     -- now make a new series.
-     new Series from {displayedDegree => totalDeg,
-        maxDegree => infinity,
-        computedDegree => totalDeg,
-        polynomial => s,
-        setPrecision => (newDeg)-> series(variables, f, newDeg )
-        }
-);
 
 
 --===================================================================================
@@ -105,15 +162,17 @@ series(List, Function, ZZ) := Series => opts -> (variables,f, totalDeg) -> (
 
 setDegree = method()
 setDegree(ZZ, Series) := Series =>  (n,S) -> (
-    if n > S.maxDegree then 
+    if n > S.maxDegree then
         error concatenate("Cannot exceed max degree ", toString S.maxDegree, " for this power series.");
-        (f,c) := S#setDegree (S#polynomial,S#computedDegree,n);
-        new Series from {polynomial => f,
-                        computedDegree => c,
-                        maxDegree => S#maxDegree,
-                        displayedDegree => (min(n,S#maxDegree)),
-                        setDegree=> S#setDegree}
-     );
+    (f,c) := S#setDegree (S#polynomial,S#computedDegree,n);
+    new Series from {
+        polynomial => f,
+        computedDegree => c,
+        maxDegree => S#maxDegree,
+        displayedDegree => (min(n,S#maxDegree)),
+        setDegree=> S#setDegree
+    }
+);
 
 
 --===================================================================================
@@ -179,7 +238,7 @@ Series + Series := Series => (A,B) -> (
 		    else (oldPolynomial, oldComputedDegree)
 		    )
 	       )}
-     );
+);
 -- SUBTRACTION
 Series - Series := Series => (A,B) -> (
      (A',B') := makeSeriesCompatible(A,B);
@@ -193,7 +252,7 @@ Series - Series := Series => (A,B) -> (
 		    else (oldPolynomial, oldComputedDegree)
 		    )
 	       )}
-     );
+);
 
 -- MULTIPLICATION
 Series * Series := Series => (A,B) -> (
@@ -210,7 +269,7 @@ Series * Series := Series => (A,B) -> (
 		    else (oldPolynomial, oldComputedDegree)
 		    )
 	       )}
-     );
+);
 
 
 
