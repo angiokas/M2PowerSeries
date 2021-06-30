@@ -73,7 +73,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
     variables := vars(1..(numgens R));
     newFunction:= variables-> f variables + g variables;
-    lazySeries(R, newFunction);
+    lazySeries(R, newFunction)
 )
 
 LazySeries - LazySeries := LazySeries => (A,B) -> (
@@ -83,12 +83,24 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
     variables := vars(1..(numgens R));
     newFunction:= variables-> f variables - g variables;
-    lazySeries(R, newFunction);
+    lazySeries(R, newFunction)
 )
 -- MULTIPLICATION
 LazySeries * LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
-return 0;
+    f := A#coefficientFunction;
+    g := B#coefficientFunction;
+    R := A#seriesRing;
+    ringZero := numgens R:0;
+    
+    newFunction := coefficientVector -> (
+        s := 0;
+        L := toList ringZero .. toList coefficientVector;
+        for i from 0 to #L-1 do
+            s = s + ((f toSequence(L#i)) * g toSequence(toList coefficientVector -  (L#i)));    
+        s
+    );
+    lazySeries(R, newFunction)
 )
 
 
