@@ -63,13 +63,6 @@ If you fixed the browser to work on wsl, it should redirect you to your chosen b
 If you are using wsl, the browser version might not work. Therefore, try using the vs code extension for jupyter: 
 https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
 
-## HashTables VS MutableHashTables
-A hash table consists of: a class type, a parent type, and a set of key-value pairs. The keys and values can be anything. The access functions below accept a key and return the corresponding value.
-
-Main difference is that MutableHashTables are basically HashTables whose entries can be modified (changed, deleted, added).
-
-We will be using HashTables because a user wouldn't want to modify a polynomial anyway. It is better to just make a new one. 
-
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 
@@ -82,5 +75,3 @@ If you want to reload the package in the same session without restarting macaula
 `
 $ loadPackage "pkgname", Reload => true
 `
-## Adding custom C++ modules
-Should avoid doing that.
