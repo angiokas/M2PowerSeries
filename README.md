@@ -74,7 +74,6 @@ If you want to reload the package in the same session without restarting macaula
 `
 $ loadPackage "pkgname", Reload => true
 `
-
 # Goals
 
 - [ ] Implement formal power series as an object
