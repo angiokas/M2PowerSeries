@@ -67,7 +67,7 @@ Main difference is that MutableHashTables are basically HashTables whose entries
 
 We will be using HashTables because a user wouldn't want to modify a polynomial anyway. It is better to just make a new one. 
 
-## Some useful commands in Macaulay2
+## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 
 `
