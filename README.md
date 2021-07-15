@@ -7,7 +7,6 @@ Power series rings implementation in Macaulay2
 Most likely, you have to reset wsl so you can type this in your terminal:
 ```
 $ wsl --shutdown
-
 ```
 Afterwards, just start a new WSL window in Visual Code and it should work. 
 
