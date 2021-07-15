@@ -7,7 +7,7 @@
     - [X] Works for multivariate rings
     - [X] saves the coefficient function
   - [ ] `LazySeries` using a ring and a polynomial as a function
-  - [ ] Polynomial/`RingElement` conversion to `LazySeries`
+  - [X] Polynomial/`RingElement` conversion to `LazySeries`
 
 - [ ] Basic Operations involving series
   - [X] Addition and substraction of two `LazySeries`
@@ -16,14 +16,15 @@
   - [ ] Multiplying and dividing a `LazySeries` by a Polynomial/`RingElement`
   - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
 
-- [ ] Division of two LazySeries
-  - [ ] inversion of a lazySeries
+- [X] Division of two LazySeries
+  - [X] inversion of a lazySeries
     - [X] Taking LazySeries up to nth power
       - [X] Multiplication of two `LazySeries`
-  - [ ] implement geometric series formula
+  - [X] implement geometric series formula
   
 
 - [ ] Implementation of p-adics
+  - [ ] base p conversion
   - [ ] 
 
 - [ ] Helper/Utility methods
@@ -31,7 +32,7 @@
   - [X] `oneSeries`
   - [ ] `isUnit` -
   - [X] `toBinary` - 
-  - [ ] ` `
+  - [X] `maclaurinSeries`
 
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index

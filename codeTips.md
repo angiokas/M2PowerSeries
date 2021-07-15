@@ -12,12 +12,11 @@ applyList(Function, List, List) := (f,l1,l2)->(
 
     return l;
 )
-
+applyList((x,y)->x^y,{x,y,z},{4,6,8})
 ```
 but there was an easier solution that is already build in Macaulay2:
 
 ```
-applyList((x,y)->x^y,{x,y,z},{4,6,8})
 L1 = {x,y,z}
 L2 = {3,6,8}
 apply(3, i -> (L1#i)^(L2#i))
@@ -141,6 +140,15 @@ f {457,24}
 
 This is why it is a safe practice to put `toSequence` in front of variables that are going to be plugged into these types of functions, because this will convert any other type of list into a sequence and sequences will be unchanged. 
 
+## Evaluating a polynomial by using `sub`
+Link to documentation: http://www.math.kobe-u.ac.jp/icms2006/icms2006-video/slides/grayson/share/doc/Macaulay2/Macaulay2/html/_substitute.html
+
+Example
+```
+p = x*y+x^2 +y^5
+f = (i,j)->sub(p, {x=>i, y=>j})
+f (4,5)
+```
 
 ## Some useful functions to look into for later
 
@@ -277,52 +285,6 @@ makeSeriesCompatible(Series,Series) := Sequence => (A,B) -> (
      
      
      );
--- SERIES ARITHMETIC
---ADDITION
-Series + Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial + B'.polynomial, 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree,newA.polynomial + newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
--- SUBTRACTION
-Series - Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial - B'.polynomial, 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree,newA.polynomial - newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
-
--- MULTIPLICATION
-Series * Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     newComputedDegree := A'.computedDegree;
-     -- newComputedDegree should be changed when we do Laurent Series
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => newComputedDegree, polynomial => truncate(newComputedDegree ,toPolynomial(A') * toPolynomial(B')), 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree, newA.polynomial * newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
 ```
 
 

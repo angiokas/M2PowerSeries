@@ -9,8 +9,8 @@ Series = new Type of HashTable
 series = method(Options => {Degree => 5})
 
 export{"setPrecision", "coefficientFunction", "getCoefficient", "termVariables", "constantTerm",
-       "variables", "displayedPolynomial","seriesRing","formalTaylorSeries",
-       "toBinary", "zeroSeries", "oneSeries",
+       "variables", "displayedPolynomial","seriesRing", "listPolynomial","formalTaylorSeries",
+       "toBinary", "zeroSeries", "oneSeries", "toLazySeries",
        "tempCalculations", "seriesCalculation", "binDigit", "newCalculation","maclaurinSeries"}
 
 LazySeries = new Type of HashTable
@@ -49,6 +49,28 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
     }
 );
 
+toLazySeries = method()
+toLazySeries(RingElement) := LazySeries => P -> (
+    listPolynomial := listForm P;
+    R := ring P;
+    variables := gens R;
+    print variables;
+
+    h := variables ->(
+    for i from 0 to #listPolynomial-1 do(
+        
+        if variables == (toSequence(listPolynomial#i)#0) then (
+            print variables;
+            print toSequence(listPolynomial#i)#0;
+            print "SUCCESS";
+            return (listPolynomial#i)#1;
+            )
+        );
+        0
+    );
+    lazySeries(R, h)
+
+)
 -- Zero series
 zeroSeries = method()
 zeroSeries(Ring) := LazySeries => R -> (
@@ -81,7 +103,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
-    variables := vars(1..(numgens R));
+    variables := vars(1..(numgens R)); -- why am I not using gens R????????????????????????!!!!
     newFunction:= variables-> f variables + g variables;
     lazySeries(R, newFunction)
 );
@@ -295,20 +317,6 @@ inverse(LazySeries,ZZ) := LazySeries => (S, deg) -> (
 LazySeries / LazySeries := LazySeries => (A,B)->(
     A* inverse(B)
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 --===================================================================================    
 -- Displays the series in a more organized way
