@@ -8,7 +8,8 @@ Series = new Type of HashTable
 -- CONSTRUCTING SERIES
 series = method(Options => {Degree => 5})
 
-export{"setPrecision","coefficientFunction", "getCoefficient", "termVariables", "variables","displayedPolynomial","seriesRing","formalTaylorSeries"}
+export{"setPrecision","coefficientFunction", "getCoefficient", "termVariables", "variables","displayedPolynomial","seriesRing","formalTaylorSeries",
+"toBinary"}
 
 LazySeries = new Type of HashTable
 lazySeries = method(Options => {Degree => 2})
@@ -53,16 +54,29 @@ getCoefficient(LazySeries, List) := LazySeries =>  (S,coefficientVector) -> (
     print S#coefficientFunction toSequence coefficientVector;
 );
 
--- Adding lazySeries together
+-- Converting to binary
+toBinary = method()
+toBinary(ZZ) := n ->(
+    b := "";
+    num := floor(log(2, n));
+    for i from 0 to num do(
+        print n;
+        b = concatenate{toString(n % 2), b};
+        n = (n//2);
+    );
+    b
+);
 
-formalTaylorSeries = method()
-formalTaylorSeries(RingElement) := series => (X)->(
+
+formalTaylorSeries(LazySeries) := LazySeries => (S)->(
 
 defaultDegree := 5;
-s := series(X,i->(-1)^i);
+s := series(S,i->(-1)^i);
 --print "1/(1-X)=";
 s
-)
+);
+
+
 
 
 --LazySeries Addition
@@ -74,7 +88,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     variables := vars(1..(numgens R));
     newFunction:= variables-> f variables + g variables;
     lazySeries(R, newFunction)
-)
+);
 
 LazySeries - LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
@@ -84,7 +98,7 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     variables := vars(1..(numgens R));
     newFunction:= variables-> f variables - g variables;
     lazySeries(R, newFunction)
-)
+);
 -- MULTIPLICATION
 LazySeries * LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
@@ -101,7 +115,8 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         s
     );
     lazySeries(R, newFunction)
-)
+);
+
 
 
 

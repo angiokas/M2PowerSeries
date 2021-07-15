@@ -79,6 +79,5 @@ If you want to reload the package in the same session without restarting macaula
 `
 $ loadPackage "pkgname", Reload => true
 `
-
-
-
+## Adding custom C++ modules
+Should avoid doing that.
