@@ -1,11 +1,3 @@
-# To-do
-- [X] make a lazy series that saves the coefficient function
-- [X] By using two lazy series, make a new lazy series that has its own coefficient function.
-- [X] same thing for addition, subtraction, scaling, etc.
-- [ ] polynomial * series as well, same idea, make lazy series
-- [ ] make method that spits out coefficient at specific index
-- [ ] implement geometric series formula
-
 ## `applyList`
 I was trying to figure out a way to make all of the combinations of the variables powers, so I wrote this code which works: 
 ```
@@ -31,6 +23,13 @@ L2 = {3,6,8}
 apply(3, i -> (L1#i)^(L2#i))
 
 ```
+## HashTables VS MutableHashTables
+A hash table consists of: a class type, a parent type, and a set of key-value pairs. The keys and values can be anything. The access functions below accept a key and return the corresponding value.
+
+Main difference is that MutableHashTables are basically HashTables whose entries can be modified (changed, deleted, added).
+
+We will be using HashTables because a user wouldn't want to modify a polynomial anyway. It is better to just make a new one. 
+
 ## Mutable vs Immutable variables
 Mutable example: `n = 5;` 
 
@@ -154,4 +153,3 @@ fastExp = (f,N) ->
 link: http://www.math.utah.edu/~schwede/M2/PosChar.m2
 
 - isANumber()
-- 

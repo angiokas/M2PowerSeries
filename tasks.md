@@ -17,26 +17,40 @@
   - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
 
 - [ ] Division of two LazySeries
-  - [ ] Taking LazySeries up to nth power
-    - [X] Multiplication of two `LazySeries`
-  - [ ] implement geometric series formula
   - [ ] inversion of a lazySeries
+    - [X] Taking LazySeries up to nth power
+      - [X] Multiplication of two `LazySeries`
+  - [ ] implement geometric series formula
+  
 
 - [ ] Implementation of p-adics
-  - 
+  - [ ] 
 
-- [ ]  
+- [ ] Helper/Utility methods
+  - [X] `zeroSeries`
+  - [X] `oneSeries`
+  - [ ] `isUnit` -
+  - [X] `toBinary` - 
+  - [ ] ` `
 
+## Improvements for later
+- [X] make method that spits out coefficient at specific index
+  - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
+- [ ] 
+
+
+## Other
 - [ ] Other 
   - [ ] Documentation
   - [ ] Testing
   - [ ] Github
     - [X] Set up Github Repo
+    - [X] Set up read me
   - [X] Jupyter Notebook
 
 - [ ] Theory
-  - [ ] Atiyah Macdonald chapter 6
-    - exercises
+  - [X] Atiyah Macdonald chapter 6
+    - [X] exercises 
   - [X] Atiyah Macdonald chapter 7
     - exercises
   - [ ] Atiyah Macdonald chapter 8
@@ -46,13 +60,11 @@
   
 - [ ] For REU Symposium **August 20th** 
   - [ ] Type up results in LaTeX
+    - [ ] Background 
+    - [ ] 
   - [ ] Prepare 10 minute presentation 
-## Improvements for later
-- [X] make method that spits out coefficient at specific index
-  - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
-- [ ] 
-
-
+    - [ ] Prepare demonstrations in Jupyter
+    - [ ] Prepare speech
 
 ## Some questions
 - When is a lazySeries equal to 0?
@@ -67,7 +79,9 @@
     ```
     It said 
     ``not implemented yet: fraction fields of polynomial rings over rings other than ZZ, QQ, or a finite field``
-2. 
+2. Implement Ring structure for formal power series
+
+
 ## If you want to be extra
 - [ ] Make github pages and organize notes
 - [ ] Make it possible to enter functions for LazySeries creation that doesn't have the exact same amount of inputs as the ring generators. So basically, if my ring is `QQ[x,y,z]` and someone enters a function for a LazySeries which is `(i,j)-> 7`, how do you expand it so that it corresponds with `(i,j,k)->???` form.

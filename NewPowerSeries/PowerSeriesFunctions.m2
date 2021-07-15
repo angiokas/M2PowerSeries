@@ -10,7 +10,8 @@ series = method(Options => {Degree => 5})
 
 export{"setPrecision", "coefficientFunction", "getCoefficient", "termVariables",
        "variables", "displayedPolynomial","seriesRing","formalTaylorSeries",
-       "toBinary", "zeroSeries", "oneSeries"}
+       "toBinary", "zeroSeries", "oneSeries",
+       "tempCalculations", "seriesCalculation", "binDigit", "newCalculation"}
 
 LazySeries = new Type of HashTable
 lazySeries = method(Options => {Degree => 2})
@@ -121,23 +122,38 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
 -- Converting to binary
 toBinary = method()
 toBinary(ZZ) := n ->(
-    b := "";
+    b := {};
     num := floor(log(2, n)); -- Had to use this because n in the for loop settings won't change
     for i from 0 to num do(
-        b = concatenate{toString(n % 2), b};
+        b = append(b,(n % 2));
         n = (n//2);
     );
-    b
+     reverse b
 );
 
 -- Raising LazySeries by nth power
 LazySeries ^ ZZ := LazySeries => (S,n) -> (
     R := S#seriesRing;
-    if n == 0 then zeroSeries(R);
+    if n == 0 then oneSeries(R);
+    if n == 1 then S;
+    if n == 2 then S*S;
+
     bin := toBinary(n);
-    result := 
-    temporaryCalculations := {};
-    --for i from 0 to 
+    print bin;
+
+    finalResult := oneSeries(R);
+    tempCalculations := {S};
+    binDigit := 0;
+    seriesCalculation := 0;
+
+
+    for i from 0 to #bin-1 when i>=0 do(
+        binDigit = bin#(#bin-1-i);
+        seriesCalculation = tempCalculations#i;
+        --if (binDigit == 1) then finalResult = finalResult * seriesCalculation;
+        tempCalculations = append(tempCalculations, seriesCalculation * seriesCalculation);
+    );
+    finalResult
 );
 
 -- Adding scalars
