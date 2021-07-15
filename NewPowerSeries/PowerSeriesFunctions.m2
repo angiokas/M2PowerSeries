@@ -277,7 +277,13 @@ maclaurinSeries(LazySeries,ZZ):= LazySeries => (S, deg) ->(
     );
     finalResult
 );
-
+inverse(LazySeries) := LazySeries => (S) -> (
+    -- first check if it is a unit in the ring
+    --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
+    g := (-1)*((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    (1/S#constantTerm) * maclaurinSeries (g, 5)
+    
+);
 inverse(LazySeries,ZZ) := LazySeries => (S, deg) -> (
     -- first check if it is a unit in the ring
     --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
@@ -285,7 +291,10 @@ inverse(LazySeries,ZZ) := LazySeries => (S, deg) -> (
     (1/S#constantTerm) * maclaurinSeries (g, deg)
     
 );
-
+-- Division of two LazySeries
+LazySeries / LazySeries := LazySeries => (A,B)->(
+    A* inverse(B)
+)
 
 
 
