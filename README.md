@@ -77,7 +77,7 @@ $ loadPackage "pkgname", Reload => true
 
 # Goals
 
-- [ ] Implement formal power series as an object
+- [ ] Implement formal power series as an object
 
  - [X] `LazySeries` using a ring and function
 
@@ -85,13 +85,13 @@ $ loadPackage "pkgname", Reload => true
 
  - [X] saves the coefficient function
 
- - [ ] `LazySeries` using a ring and a polynomial as a function
+ - [ ] `LazySeries` using a ring and a polynomial as a function
 
  - [X] Polynomial/`RingElement` conversion to `LazySeries`
 
   
 
-- [ ] Basic Operations involving series
+- [ ] Basic Operations involving series
 
  - [X] Addition and substraction of two `LazySeries`
 
@@ -99,9 +99,9 @@ $ loadPackage "pkgname", Reload => true
 
  - [X] Adding/substracting a scalar (of class `Number`) to/from a `LazySeries`
 
- - [ ] Multiplying and dividing a `LazySeries` by a Polynomial/`RingElement`
+ - [ ] Multiplying and dividing a `LazySeries` by a Polynomial/`RingElement`
 
- - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
+ - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
 
   
 
@@ -117,20 +117,20 @@ $ loadPackage "pkgname", Reload => true
 
   
 
-- [ ] Implementation of p-adics
+- [ ] Implementation of p-adics
 
- - [ ] base p conversion
+ - [ ] base p conversion
 
 
   
 
-- [ ] Helper/Utility methods
+- [ ] Helper/Utility methods
 
  - [X] `zeroSeries`
 
  - [X] `oneSeries`
 
- - [ ] `isUnit` -
+ - [ ] `isUnit` -
 
  - [X] `toBinary` - 
 
@@ -142,6 +142,6 @@ $ loadPackage "pkgname", Reload => true
 
 - [X] make method that spits out coefficient at specific index
 
- - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
+ - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
 
-- [ ] 
+- [ ] 
