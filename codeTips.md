@@ -153,3 +153,176 @@ fastExp = (f,N) ->
 link: http://www.math.utah.edu/~schwede/M2/PosChar.m2
 
 - isANumber()
+
+
+
+------------------------------------------------------------------------------
+## Old code that I might reference later
+
+```
+-- method that creates a series using a ring element (basically treats the ring elements as a series with rest of the coefficients as 0)
+-- n is the amount of terms you want to compute for the series
+-- f is the ring element used as the base 
+-- degree - Displayed degree
+-- maxDegree - maximum degree mathematically
+-- computedDegree - Highest power that has been computed
+
+series(ZZ, RingElement) := Series => opts -> (n,f) -> (
+     new Series from {displayedDegree => n, --we want to change this to disaplyedDegree
+      maxDegree => max((first degree f), n), -- here degree is a method for polynomials
+      computedDegree => max((first degree f), n), 
+      polynomial => f,
+	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree)), -- Does not do anything really
+      setPrecision => (newDisplayedDegree)-> series(newDisplayedDegree, f)} -- added new method
+     );
+-- note: opts -> is needed because series method has options
+series(RingElement) := Series => opts -> f -> ( 
+     new Series from {displayedDegree => opts.Degree,
+                      maxDegree => max((first degree f), opts.Degree), 
+                      computedDegree => max((first degree f), opts.Degree), 
+                      polynomial => f}
+     );
+
+-- Lazy Series: making a series using an explicit formula
+series(RingElement, Function) := Series => opts -> (X,f) -> (
+     -- Start with the zero polynomial.
+     s:=0;
+     -- add opts.Degree terms to s.
+     for i from 0 to opts.Degree do s = s + (f i)*X^i;
+     
+     -- now make a new series.
+     new Series from {displayedDegree => opts.Degree,
+        maxDegree => infinity,
+        computedDegree => opts.Degree,
+        polynomial => s, 
+        -- setDegree takes an old polynomial, the old computed degree, and a new degree, and needs
+	      -- to know how to tack on the new terms to the old polynomial.
+	      setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (newPolynomial := oldPolynomial;
+		              for i from oldComputedDegree + 1 to newDegree do newPolynomial = newPolynomial + (f i)*X^i;
+			      (newPolynomial,max(oldComputedDegree,newDegree))
+		    ))});
+
+
+
+
+--===================================================================================
+--FUNCTIONS ASSOCIATED WITH SERIES
+-- polynomial is the 
+-- computedDegree is
+-- maxDegree is
+-- degree is
+-- setDegree 
+
+setDegree = method()
+setDegree(ZZ, Series) := Series =>  (n,S) -> (
+    if n > S.maxDegree then
+        error concatenate("Cannot exceed max degree ", toString S.maxDegree, " for this power series.");
+    (f,c) := S#setDegree (S#polynomial,S#computedDegree,n);
+    new Series from {
+        polynomial => f,
+        computedDegree => c,
+        maxDegree => S#maxDegree,
+        displayedDegree => (min(n,S#maxDegree)),
+        setDegree=> S#setDegree
+    }
+);
+
+
+--===================================================================================
+
+-- Selects the terms of a polynomial up to degree specified
+truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);
+
+--===================================================================================
+-- Converts a Power series object into a polynomial by taking the part of the series up to default power 5
+-- n is the power you want to truncate it at
+toPolynomial = method()
+toPolynomial(Series) := RingElement => s -> toPolynomial(s#displayedDegree,s);
+toPolynomial(ZZ,Series) := RingElement => (n,s) -> truncate(n,(setDegree(n,s))#polynomial);
+--===================================================================================
+-- Outputs the degree of a Series
+degree(Series) := Series => F -> F#displayedDegree;
+
+--===================================================================================
+-- Returns the domninant term of the series
+dominantTerm = method()
+dominantTerm(Series) := RingElement => S -> (
+     -- This is bad, it depends on the monomial order:last terms toPolynomial S;
+     -- This seems slow but at least correct:
+     f := toPolynomial S;
+     minDegree := min apply(terms f, i -> first degree i);
+     part(minDegree,minDegree,f)
+     )
+
+--===================================================================================    
+-- Checks if the series is a unit (i.e has an inverse) by checking if the domninant term is a unit
+isUnit(Series) := Boolean => A -> isUnit(dominantTerm(A));
+
+-- 
+makeSeriesCompatible = method()
+makeSeriesCompatible(Series,Series) := Sequence => (A,B) -> (
+     newComputedDegree := min(degree(A),degree(B));
+     (
+	  new Series from {displayedDegree => newComputedDegree, 
+	       	    	   computedDegree => newComputedDegree,
+			   maxDegree => A.maxDegree,
+			   polynomial => truncate(newComputedDegree,A.polynomial),
+			   setDegree => A#setDegree},
+	  new Series from {displayedDegree => newComputedDegree, 
+	       	    	   computedDegree => newComputedDegree,
+			   maxDegree => B.maxDegree,
+			   polynomial => truncate(newComputedDegree,B.polynomial),
+			   setDegree => B#setDegree}
+     	  )
+     
+     
+     );
+-- SERIES ARITHMETIC
+--ADDITION
+Series + Series := Series => (A,B) -> (
+     (A',B') := makeSeriesCompatible(A,B);
+     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial + B'.polynomial, 
+	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
+		    if newDegree > oldComputedDegree then (
+		    	 newA := setDegree(newDegree,A);
+		    	 newB := setDegree(newDegree,B);
+		    	 (truncate(newDegree,newA.polynomial + newB.polynomial), newDegree)
+			 )
+		    else (oldPolynomial, oldComputedDegree)
+		    )
+	       )}
+);
+-- SUBTRACTION
+Series - Series := Series => (A,B) -> (
+     (A',B') := makeSeriesCompatible(A,B);
+     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial - B'.polynomial, 
+	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
+		    if newDegree > oldComputedDegree then (
+		    	 newA := setDegree(newDegree,A);
+		    	 newB := setDegree(newDegree,B);
+		    	 (truncate(newDegree,newA.polynomial - newB.polynomial), newDegree)
+			 )
+		    else (oldPolynomial, oldComputedDegree)
+		    )
+	       )}
+);
+
+-- MULTIPLICATION
+Series * Series := Series => (A,B) -> (
+     (A',B') := makeSeriesCompatible(A,B);
+     newComputedDegree := A'.computedDegree;
+     -- newComputedDegree should be changed when we do Laurent Series
+     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => newComputedDegree, polynomial => truncate(newComputedDegree ,toPolynomial(A') * toPolynomial(B')), 
+	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
+		    if newDegree > oldComputedDegree then (
+		    	 newA := setDegree(newDegree,A);
+		    	 newB := setDegree(newDegree,B);
+		    	 (truncate(newDegree, newA.polynomial * newB.polynomial), newDegree)
+			 )
+		    else (oldPolynomial, oldComputedDegree)
+		    )
+	       )}
+);
+```
+
+

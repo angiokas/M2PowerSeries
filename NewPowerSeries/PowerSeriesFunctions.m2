@@ -8,10 +8,10 @@ Series = new Type of HashTable
 -- CONSTRUCTING SERIES
 series = method(Options => {Degree => 5})
 
-export{"setPrecision", "coefficientFunction", "getCoefficient", "termVariables",
+export{"setPrecision", "coefficientFunction", "getCoefficient", "termVariables", "constantTerm",
        "variables", "displayedPolynomial","seriesRing","formalTaylorSeries",
        "toBinary", "zeroSeries", "oneSeries",
-       "tempCalculations", "seriesCalculation", "binDigit", "newCalculation"}
+       "tempCalculations", "seriesCalculation", "binDigit", "newCalculation","maclaurinSeries"}
 
 LazySeries = new Type of HashTable
 lazySeries = method(Options => {Degree => 2})
@@ -39,6 +39,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
      new LazySeries from {
         displayedDegree => opts.Degree,
         computedDegree => opts.Degree,
+        constantTerm => function (numgens R:0),
         maxDegree => infinity,
         displayedPolynomial => s,
         coefficientFunction => function,
@@ -73,13 +74,6 @@ getCoefficient(LazySeries, List) := LazySeries =>  (S,coefficientVector) -> (
     print S#coefficientFunction toSequence coefficientVector;
 );
 
-isUnit(LazySeries) := Boolean => S -> (
-    R := S#seriesRing;
-    ringZeroes := (numgens R:0);
-    print S#getCoefficient ringZeroes;
-    isUnit(S#getCoefficient ringZeroes)
-);
-
 
 --Addition and substraction of two LazySeries
 LazySeries + LazySeries := LazySeries => (A,B) -> (
@@ -101,7 +95,8 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     newFunction:= variables-> f variables - g variables;
     lazySeries(R, newFunction)
 );
--- Addition of two LazySeries
+
+-- Multiplication of two LazySeries
 LazySeries * LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := A#coefficientFunction;
@@ -134,29 +129,29 @@ toBinary(ZZ) := n ->(
 -- Raising LazySeries by nth power
 LazySeries ^ ZZ := LazySeries => (S,n) -> (
     R := S#seriesRing;
-    if n == 0 then oneSeries(R);
-    if n == 1 then S;
-    if n == 2 then S*S;
+    if n == 0 then return oneSeries(R);
+    if n == 1 then  return S;
+    if n == 2 then return S*S;
 
+    finalResult := oneSeries(R); -- prints this one
     bin := toBinary(n);
-    print bin;
-
-    finalResult := oneSeries(R);
     tempCalculations := {S};
     binDigit := 0;
     seriesCalculation := 0;
 
-
     for i from 0 to #bin-1 when i>=0 do(
         binDigit = bin#(#bin-1-i);
         seriesCalculation = tempCalculations#i;
-        --if (binDigit == 1) then finalResult = finalResult * seriesCalculation;
+
+        if (binDigit == 1) then finalResult = finalResult * seriesCalculation;
+
         tempCalculations = append(tempCalculations, seriesCalculation * seriesCalculation);
     );
+    print "FINAL RESULT:";
     finalResult
 );
 
--- Adding scalars
+-- Adding and substracting scalars to LazySeries
 Number + LazySeries := LazySeries => (n,S) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := S#coefficientFunction;
@@ -267,208 +262,41 @@ LazySeries // Number := LazySeries => (S,n) -> (
     newFunction:= variables-> (f variables) // n;
     lazySeries(R, newFunction)
 );
--- Division of scalar by LazySeries
 
+-- INVERSION
 
+isUnit(LazySeries) := Boolean => S -> (
+    isUnit(S#constantTerm)
+);
+-- inserting the `S` from `1/(S-x)`
+maclaurinSeries = method()
+maclaurinSeries(LazySeries,ZZ):= LazySeries => (S, deg) ->(
+    finalResult := 0;
+    for i from 0 to deg do (
+        finalResult = finalResult + S^i;
+    );
+    finalResult
+);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- method that creates a series using a ring element (basically treats the ring elements as a series with rest of the coefficients as 0)
--- n is the amount of terms you want to compute for the series
--- f is the ring element used as the base 
--- degree - Displayed degree
--- maxDegree - maximum degree mathematically
--- computedDegree - Highest power that has been computed
-
-series(ZZ, RingElement) := Series => opts -> (n,f) -> (
-     new Series from {displayedDegree => n, --we want to change this to disaplyedDegree
-      maxDegree => max((first degree f), n), -- here degree is a method for polynomials
-      computedDegree => max((first degree f), n), 
-      polynomial => f,
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree)), -- Does not do anything really
-      setPrecision => (newDisplayedDegree)-> series(newDisplayedDegree, f)} -- added new method
-     );
--- note: opts -> is needed because series method has options
-series(RingElement) := Series => opts -> f -> ( 
-     new Series from {displayedDegree => opts.Degree,
-                      maxDegree => max((first degree f), opts.Degree), 
-                      computedDegree => max((first degree f), opts.Degree), 
-                      polynomial => f}
-     );
-
--- Lazy Series: making a series using an explicit formula
-series(RingElement, Function) := Series => opts -> (X,f) -> (
-     -- Start with the zero polynomial.
-     s:=0;
-     -- add opts.Degree terms to s.
-     for i from 0 to opts.Degree do s = s + (f i)*X^i;
-     
-     -- now make a new series.
-     new Series from {displayedDegree => opts.Degree,
-        maxDegree => infinity,
-        computedDegree => opts.Degree,
-        polynomial => s, 
-        -- setDegree takes an old polynomial, the old computed degree, and a new degree, and needs
-	      -- to know how to tack on the new terms to the old polynomial.
-	      setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (newPolynomial := oldPolynomial;
-		              for i from oldComputedDegree + 1 to newDegree do newPolynomial = newPolynomial + (f i)*X^i;
-			      (newPolynomial,max(oldComputedDegree,newDegree))
-		    ))});
-
-
-
-
---===================================================================================
---FUNCTIONS ASSOCIATED WITH SERIES
--- polynomial is the 
--- computedDegree is
--- maxDegree is
--- degree is
--- setDegree 
-
-setDegree = method()
-setDegree(ZZ, Series) := Series =>  (n,S) -> (
-    if n > S.maxDegree then
-        error concatenate("Cannot exceed max degree ", toString S.maxDegree, " for this power series.");
-    (f,c) := S#setDegree (S#polynomial,S#computedDegree,n);
-    new Series from {
-        polynomial => f,
-        computedDegree => c,
-        maxDegree => S#maxDegree,
-        displayedDegree => (min(n,S#maxDegree)),
-        setDegree=> S#setDegree
-    }
+inverse(LazySeries,ZZ) := LazySeries => (S, deg) -> (
+    -- first check if it is a unit in the ring
+    --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
+    g := (-1)*((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    (1/S#constantTerm) * maclaurinSeries (g, deg)
+    
 );
 
 
---===================================================================================
 
--- Selects the terms of a polynomial up to degree specified
-truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);
 
---===================================================================================
--- Converts a Power series object into a polynomial by taking the part of the series up to default power 5
--- n is the power you want to truncate it at
-toPolynomial = method()
-toPolynomial(Series) := RingElement => s -> toPolynomial(s#displayedDegree,s);
-toPolynomial(ZZ,Series) := RingElement => (n,s) -> truncate(n,(setDegree(n,s))#polynomial);
---===================================================================================
--- Outputs the degree of a Series
-degree(Series) := Series => F -> F#displayedDegree;
 
---===================================================================================
--- Returns the domninant term of the series
-dominantTerm = method()
-dominantTerm(Series) := RingElement => S -> (
-     -- This is bad, it depends on the monomial order:last terms toPolynomial S;
-     -- This seems slow but at least correct:
-     f := toPolynomial S;
-     minDegree := min apply(terms f, i -> first degree i);
-     part(minDegree,minDegree,f)
-     )
 
---===================================================================================    
--- Checks if the series is a unit (i.e has an inverse) by checking if the domninant term is a unit
-isUnit(Series) := Boolean => A -> isUnit(dominantTerm(A));
 
--- 
-makeSeriesCompatible = method()
-makeSeriesCompatible(Series,Series) := Sequence => (A,B) -> (
-     newComputedDegree := min(degree(A),degree(B));
-     (
-	  new Series from {displayedDegree => newComputedDegree, 
-	       	    	   computedDegree => newComputedDegree,
-			   maxDegree => A.maxDegree,
-			   polynomial => truncate(newComputedDegree,A.polynomial),
-			   setDegree => A#setDegree},
-	  new Series from {displayedDegree => newComputedDegree, 
-	       	    	   computedDegree => newComputedDegree,
-			   maxDegree => B.maxDegree,
-			   polynomial => truncate(newComputedDegree,B.polynomial),
-			   setDegree => B#setDegree}
-     	  )
-     
-     
-     );
--- SERIES ARITHMETIC
---ADDITION
-Series + Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial + B'.polynomial, 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree,newA.polynomial + newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
--- SUBTRACTION
-Series - Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => A'.computedDegree, polynomial => A'.polynomial - B'.polynomial, 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree,newA.polynomial - newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
 
--- MULTIPLICATION
-Series * Series := Series => (A,B) -> (
-     (A',B') := makeSeriesCompatible(A,B);
-     newComputedDegree := A'.computedDegree;
-     -- newComputedDegree should be changed when we do Laurent Series
-     new Series from {displayedDegree => min(A#displayedDegree,B#displayedDegree), maxDegree => min(A'.maxDegree,B'.maxDegree), computedDegree => newComputedDegree, polynomial => truncate(newComputedDegree ,toPolynomial(A') * toPolynomial(B')), 
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (
-		    if newDegree > oldComputedDegree then (
-		    	 newA := setDegree(newDegree,A);
-		    	 newB := setDegree(newDegree,B);
-		    	 (truncate(newDegree, newA.polynomial * newB.polynomial), newDegree)
-			 )
-		    else (oldPolynomial, oldComputedDegree)
-		    )
-	       )}
-);
+
+
+
+
 
 
 
