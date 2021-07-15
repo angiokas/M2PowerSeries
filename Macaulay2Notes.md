@@ -119,6 +119,29 @@ f = i->(if i>0 then 0
         else if i==0 then 3
         else 6);
 ```
+## On functions
+Functions will not take lists as input. You can only use sequences when you have multi-variable functions.
+
+Example:
+Both `f` and `g` here are valid functions
+```
+f = (i,j) -> i
+g = {i,j} -> i
+```
+But you can only plug in values like this:
+```
+f (2,3)
+g (457,24)
+```
+
+The curly braces, i.e lists, will not work and will give you an error
+```
+f {2,3}
+f {457,24}
+```
+
+This is why it is a safe practice to put `toSequence` in front of variables that are going to be plugged into these types of functions, because this will convert any other type of list into a sequence and sequences will be unchanged. 
+
 
 ## Some useful functions to look into for later
 

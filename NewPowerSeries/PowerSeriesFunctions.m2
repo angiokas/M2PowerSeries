@@ -8,9 +8,9 @@ Series = new Type of HashTable
 -- CONSTRUCTING SERIES
 series = method(Options => {Degree => 5})
 
-export{"setPrecision","coefficientFunction", "getCoefficient", "termVariables",
-       "variables","displayedPolynomial","seriesRing","formalTaylorSeries",
-       "toBinary"}
+export{"setPrecision", "coefficientFunction", "getCoefficient", "termVariables",
+       "variables", "displayedPolynomial","seriesRing","formalTaylorSeries",
+       "toBinary", "zeroSeries", "oneSeries"}
 
 LazySeries = new Type of HashTable
 lazySeries = method(Options => {Degree => 2})
@@ -21,7 +21,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
   
     ringVariables := gens R;
     
-    try function (numgens R:0) then 1 -- checks to see if function was inputted correctly
+    try function (numgens R:0) then 1 -- checks to see if function was inputted correctly by plugging in (0 0 ... 0)
     else error "Number of inputs of given function does not match number of ring generators";
 
     combinations := {};
@@ -41,12 +41,29 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
         maxDegree => infinity,
         displayedPolynomial => s,
         coefficientFunction => function,
-        getCoefficient => (coefficientVector)-> function (toSequence coefficientVector),
+        getCoefficient => coefficientVector-> function (toSequence coefficientVector),
         termVariables => ringVariables,
         seriesRing => R
     }
 );
 
+-- Zero series
+zeroSeries = method()
+zeroSeries(Ring) := LazySeries => R -> (
+    variables := gens R;
+    lazySeries(R, variables -> 0)
+    );
+
+-- One series
+oneSeries = method()
+oneSeries(Ring) := LazySeries => R -> (
+    ringZeroes := (numgens R:0);
+    variables := gens R;
+    newFunction := variables -> (if variables == ringZeroes then 1
+                                else 0
+                                );
+    lazySeries(R, newFunction)
+    );
 -- Getting coefficient value
 
 getCoefficient = method()
@@ -55,28 +72,15 @@ getCoefficient(LazySeries, List) := LazySeries =>  (S,coefficientVector) -> (
     print S#coefficientFunction toSequence coefficientVector;
 );
 
--- Converting to binary
-toBinary = method()
-toBinary(ZZ) := n ->(
-    b := "";
-    num := floor(log(2, n)); -- Had to use this because n in the for loop settings won't change
-    for i from 0 to num do(
-        b = concatenate{toString(n % 2), b};
-        n = (n//2);
-    );
-    b
-);
--- Raising LazySeries by nth power
-LazySeries ^ ZZ := LazySeries => (S,n) -> (
-    bin := toBinary(n);
-    temporaryCalculations := {};
+isUnit(LazySeries) := Boolean => S -> (
+    R := S#seriesRing;
+    ringZeroes := (numgens R:0);
+    print S#getCoefficient ringZeroes;
+    isUnit(S#getCoefficient ringZeroes)
 );
 
 
-
-
-
---LazySeries Addition
+--Addition and substraction of two LazySeries
 LazySeries + LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := A#coefficientFunction;
@@ -96,17 +100,17 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     newFunction:= variables-> f variables - g variables;
     lazySeries(R, newFunction)
 );
--- MULTIPLICATION
+-- Addition of two LazySeries
 LazySeries * LazySeries := LazySeries => (A,B) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
-    ringZero := numgens R:0;
+    ringZeroes := numgens R:0;
     
     newFunction := coefficientVector -> (
         s := 0;
-        L := toList ringZero .. toList coefficientVector;
+        L := toList ringZeroes .. toList coefficientVector;
         for i from 0 to #L-1 do
             s = s + ((f toSequence(L#i)) * g toSequence(toList coefficientVector -  (L#i)));    
         s
@@ -114,19 +118,40 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     lazySeries(R, newFunction)
 );
 
+-- Converting to binary
+toBinary = method()
+toBinary(ZZ) := n ->(
+    b := "";
+    num := floor(log(2, n)); -- Had to use this because n in the for loop settings won't change
+    for i from 0 to num do(
+        b = concatenate{toString(n % 2), b};
+        n = (n//2);
+    );
+    b
+);
+
+-- Raising LazySeries by nth power
+LazySeries ^ ZZ := LazySeries => (S,n) -> (
+    R := S#seriesRing;
+    if n == 0 then zeroSeries(R);
+    bin := toBinary(n);
+    result := 
+    temporaryCalculations := {};
+    --for i from 0 to 
+);
 
 -- Adding scalars
 Number + LazySeries := LazySeries => (n,S) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
 
     variables := vars(1..(numgens R));
 
     if(n == 0) then S;
 
-    newFunction:= variables-> (if variables == ringZero then n + (f variables)
+    newFunction:= variables-> (if variables == ringZeroes then n + (f variables)
                                else (f variables));
     lazySeries(R, newFunction)
 );
@@ -135,13 +160,13 @@ LazySeries + Number := LazySeries => (S,n) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
     variables := vars(1..(numgens R));
 
     if(n == 0) then lazySeries(R, variables -> 0);
 
-    newFunction:= variables-> (if variables == ringZero then (f variables) + n
+    newFunction:= variables-> (if variables == ringZeroes then (f variables) + n
                                else (f variables));
     lazySeries(R, newFunction)
 );
@@ -150,13 +175,13 @@ Number - LazySeries := LazySeries => (n,S) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
 
     variables := vars(1..(numgens R));
 
     if(n == 0) then S;
 
-    newFunction:= variables-> (if variables == ringZero then n - (f variables)
+    newFunction:= variables-> (if variables == ringZeroes then n - (f variables)
                                else (f variables)) ;
     lazySeries(R, newFunction)
 );
@@ -165,13 +190,13 @@ LazySeries - Number := LazySeries => (S,n) -> (
    -- if A#seriesRing != B#seriesRing then error "Rings of series do not match"; -- cannot compare Rings in Macaulay2
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
     variables := vars(1..(numgens R));
 
     if(n == 0) then lazySeries(R, variables -> 0);
 
-    newFunction:= variables-> (if variables == ringZero then (f variables) - n
+    newFunction:= variables-> (if variables == ringZeroes then (f variables) - n
                                else (f variables))  ;
     lazySeries(R, newFunction)
 );
@@ -191,7 +216,7 @@ Number * LazySeries := LazySeries => (n,S) -> (
 LazySeries * Number := LazySeries => (S,n) -> (
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0;
+    ringZeroes := numgens R:0;
     
     variables := vars(1..(numgens R)); -- Could replace with termVariables from the constructor??
 
@@ -206,7 +231,7 @@ LazySeries / Number := LazySeries => (S,n) -> (
 
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
     variables := vars(1..(numgens R));
 
@@ -219,7 +244,7 @@ LazySeries // Number := LazySeries => (S,n) -> (
 
     f := S#coefficientFunction;
     R := S#seriesRing;
-    ringZero := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
     variables := vars(1..(numgens R));
 
@@ -227,6 +252,34 @@ LazySeries // Number := LazySeries => (S,n) -> (
     lazySeries(R, newFunction)
 );
 -- Division of scalar by LazySeries
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
