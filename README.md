@@ -74,7 +74,7 @@ If you want to reload the package in the same session without restarting macaula
 `
 $ loadPackage "pkgname", Reload => true
 `
-# Goals
+## Goals
 
 - [ ] Implement formal power series as an object
 
@@ -137,10 +137,9 @@ $ loadPackage "pkgname", Reload => true
 
   
 
-## Improvements for later
+## Improvements for later
 
 - [X] make method that spits out coefficient at specific index
 
  - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
 
-- [ ] 
