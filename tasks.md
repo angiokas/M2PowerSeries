@@ -33,13 +33,21 @@
   - [ ] `isUnit` -
   - [X] `toBinary` - 
   - [X] `maclaurinSeries`
+  - [X] `changeDegree` - make sure computed and displayed degree are properly sorted. if wanting higher degree, make sure to change both, if less then change only displayed.
+  - [ ] Returns the polynomial of a lazySeries up to a specific degree
+  - [ ] overload `sub` so that it takes a lazySeries and a ring and tries to convert the series into an a lazySeries over that ring by changing the function of the lazySeries.
+  - [ ] Also make another overload of `sub` so that you can input values and a lazySeries that (NEVER MIND IT DOESNT MAKE SENSEBECAUSE IF I EVALUATE MY POWERSERIES IT WONT CONVERGE)
+  - [ ] `addCoefficientFunction` function so that we work with functions instead of full series during computations
 
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index
   - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
-- [ ] 
+- [ ] make toBase into general function of base p conversion
+- [ ] make sure ^p powers are actually faster than S*S...S p times because right now it isn't
+- [ ] Displaying lazySeries using pretty by defining a new pretty function
 
-
+## to-do for later
+- [ ] check out http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.14/share/doc/Macaulay2/Divisor/html/index.html for ideas on displaying and constructors and documentation.
 ## Other
 - [ ] Other 
   - [ ] Documentation
@@ -86,4 +94,4 @@
 ## If you want to be extra
 - [ ] Make github pages and organize notes
 - [ ] Make it possible to enter functions for LazySeries creation that doesn't have the exact same amount of inputs as the ring generators. So basically, if my ring is `QQ[x,y,z]` and someone enters a function for a LazySeries which is `(i,j)-> 7`, how do you expand it so that it corresponds with `(i,j,k)->???` form.
-- [ ] 
+- [ ] MULTITHREADING 

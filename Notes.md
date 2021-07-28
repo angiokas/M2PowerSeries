@@ -59,6 +59,15 @@ If you fixed the browser to work on wsl, it should redirect you to your chosen b
 
 If you are using wsl, the browser version might not work. Therefore, try using the vs code extension for jupyter: 
 https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
+## UPDATE on jupyter not working in browser
+Use jupyter notebook through anaconda since it solves the python issue:
+https://docs.anaconda.com/anaconda/install/linux/
+https://jupyter.org/install
+After you install anacdonda on wsl server:
+
+```
+conda install -c conda-forge notebook
+```
 
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
@@ -74,3 +83,14 @@ $ loadPackage "pkgname", Reload => true
 `
 ## Adding custom C++ modules
 Should avoid doing that.
+
+## 
+Will check for updates for everything
+```
+sudo apt update
+```
+
+This command will download new versions of everything
+```
+sudo apt upgrade
+```

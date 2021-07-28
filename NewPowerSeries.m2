@@ -36,18 +36,7 @@ newPackage(
 
 
 load "./NewPowerSeries/PowerSeriesFunctions.m2"
-export{
---PowerSeriesFunctions (PowerSeriesFunctions.m2)
-    "toPolynomial",
-    "setDegree",
-    "series",
-    "polynomial", 
-    "maxDegree",
-    "computedDegree",
-    "displayedDegree",
-    "lazySeries"
 
-}
 
 
 --DOCUMENTATION

@@ -287,4 +287,34 @@ makeSeriesCompatible(Series,Series) := Sequence => (A,B) -> (
      );
 ```
 
+## comparing Rings 
+You can only compare rings by using `===` symbol, otherwise it won't work. 
+Example: 
+```
+R = ZZ[x]
+T = QQ[x,y]
+R === T
+```
 
+## Promoting elements to rings by using `sub`
+
+
+
+
+
+
+
+## Implementing caching in objects
+
+
+
+
+## 
+Using `sub` is actually slow if you use it a lot of times. Another way to promote ringElements to other rings that might be faster is to use ring maps like so:
+``` 
+R = ZZ[x,y]
+S = QQ[x,y]
+use R
+phi = map(S,R)
+phi(x_R)
+```
