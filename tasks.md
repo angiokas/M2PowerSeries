@@ -44,10 +44,12 @@
   - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
 - [ ] make toBase into general function of base p conversion
 - [ ] make sure ^p powers are actually faster than S*S...S p times because right now it isn't
-- [ ] Displaying lazySeries using pretty by defining a new pretty function
+- [X] Displaying lazySeries using pretty by defining a new pretty function
+  - [ ] Need to fix thr ```i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree})) ``` line because displayedDegree in graded rings will be a list and not an integer and `{s#displayedDegree}` will not give us what we want. 
 
 ## to-do for later
 - [ ] check out http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.14/share/doc/Macaulay2/Divisor/html/index.html for ideas on displaying and constructors and documentation.
+- [ ] 
 ## Other
 - [ ] Other 
   - [ ] Documentation

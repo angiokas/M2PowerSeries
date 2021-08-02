@@ -6,7 +6,7 @@ Series = new Type of HashTable
 
 --===================================================================================
 -- CONSTRUCTING SERIES
-series = method(Options => {Degree => 5})
+series = method(Options => {Degree => 2})
 export{
 --PowerSeriesFunctions (PowerSeriesFunctions.m2)
     "maxDegree",
@@ -29,11 +29,11 @@ export{"toLazySeries",
 
 
 LazySeries = new Type of HashTable
-lazySeries = method(Options => {Degree => 2, displayedDegree => 5, computedDegree => 5})
+lazySeries = method(Options => {Degree => 2, displayedDegree => 3, computedDegree => 3})
 --LAZY SERIES
 
 -- f is the function which has to have the same amount of inputs as there are variables
-lazySeries(Function, Ring) := LazySeries => opts -> (function, R) -> (
+lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
   
     ringVariables := gens R;
     
@@ -64,7 +64,6 @@ lazySeries(Function, Ring) := LazySeries => opts -> (function, R) -> (
         cache => new CacheTable from {} -- for calculating powers!!!!!! IMPLEMENTTT
     }
 );
-
 
 ------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------------
 
@@ -101,9 +100,9 @@ changeDegree(LazySeries, ZZ) := LazySeries => (S,newDeg) -> (
 
     if newDeg == oldDeg then S
     else if newDeg > oldDeg then (
-        lazySeries(R,f, displayedDegree => newDeg, computedDegree => newDeg)
+        lazySeries(R, f, displayedDegree => newDeg, computedDegree => newDeg)
         )
-    else lazySeries(R,f, displayedDegree => newDeg, computedDegree => oldDeg)
+    else lazySeries(R, f, displayedDegree => newDeg, computedDegree => oldDeg)
 
 );
 
@@ -156,7 +155,7 @@ getFunction(LazySeries) := Function => S -> (
 -- Overloading of sub; Promotes LazySeries defined over a ring to the specified new ring
 sub(LazySeries, Ring) := LazySeries => (S,R) -> (
     f := getFunction(S);
-    lazySeries(f, R, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
+    lazySeries(R, f, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
 );
 
 -- Overloading of isUnit method; checks if the leading coefficient is a unit in the ring
@@ -196,7 +195,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     newFunction:= variables-> f variables + g variables;
     newDegree := max(A#displayedDegree, B#displayedDegree);
 
-    changeDegree(lazySeries(R, newFunction), newDegree)
+    changeDegree(lazySeries(newFunction, R), newDegree)
 );
 
 LazySeries - LazySeries := LazySeries => (A,B) -> (
@@ -213,7 +212,7 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
 
 
 -- Adding and substracting scalars to LazySeries
-Number + LazySeries := LazySeries => (n,S) -> (
+Number + LazySeries := LazySeries => (n, S) -> (
     --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring
 
     f := S#coefficientFunction;
@@ -252,7 +251,8 @@ LazySeries - Number := LazySeries => (S,n) -> n-S;
 
 -- Multilplying LazySeries by a scalar
 Number * LazySeries := LazySeries => (n,S) -> (
-    --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring
+    --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring\
+    if n == 1 then S;
 
     f := S#coefficientFunction;
     R := S#seriesRing;
@@ -260,7 +260,7 @@ Number * LazySeries := LazySeries => (n,S) -> (
     --try sub(n, R) -- CHECKS IF NUMBER MAKES SENSE IN THE SERIES RING, TRY
     --else error("sjkfhaksdfhks");
 
-    if(n == 0_R) then lazySeries(R, variables -> 0);
+    if(n == 0) then zeroSeries(R); 
 
     variables := vars(1..(numgens R));
 
@@ -320,7 +320,7 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
             s = s + ((f toSequence(L#i)) * g toSequence(toList coefficientVector -  (L#i)));    
         s
     );
-    lazySeries(R, newFunction, displayedDegree => A#displayedDegree + B#displayedDegree, computedDegree => A#displayedDegree + B#displayedDegree)
+    lazySeries(R, newFunction, computedDegree => A#displayedDegree + B#displayedDegree) -- REMOVED DISPLAYED DEGREE FOR A BIT
 );
 
 -- Converting to binary
@@ -336,31 +336,38 @@ toBinary(ZZ) := n ->(
 );
 
 -- Raising LazySeries by nth power
-LazySeries ^ ZZ := LazySeries => (S,n) -> ( -- TAKING TOO LONG TO COMPUTE
+LazySeries ^ ZZ := LazySeries => (S,n) -> (
     R := S#seriesRing;
     if n == 0 then return oneSeries(R);
     if n == 1 then  return S;
-    if n == 2 then return S*S;
 
-    finalResult := oneSeries(R); -- prints this one
     bin := toBinary(n);
-    tempCalculations := {S}; -- 
-    binDigit := 0;
-    seriesCalculation := 0;
-
-    for i from 0 to #bin-1 when i>=0 do(
-        binDigit = bin#(#bin-1-i);
-        seriesCalculation = tempCalculations#i;
-
-        if (binDigit == 1) then finalResult = finalResult * seriesCalculation;
-
-        tempCalculations = append(tempCalculations, seriesCalculation * seriesCalculation);
+    finalResult := 1;
+    tempCalculation:= S;
+    j := 1;
+    while (true) do (
+        -- print j;        
+        if(bin#(#bin-j)== 1) then (
+            finalResult = tempCalculation;
+            break;
+        );        
+        tempCalculation = tempCalculation * tempCalculation;
+        -- print "1 CALCULATION z";
+        j = j+1;
     );
-    if debugLevel > 0 then print "FINAL RESULT:";
+    -- << "final j: "<< j <<endl;
+
+    for i from 0 to #bin-j-1 when i >= 0 do(
+        -- << "#bin-j-1-i: " << #bin-j-1-i<< endl;
+        tempCalculation = tempCalculation * tempCalculation; 
+        -- print "1 CALCULATION y";
+        if bin#(#bin-j-1-i) == 1 then (
+            finalResult = finalResult * tempCalculation;
+            -- print "1 CALCULATION x";
+        );       
+    );
     finalResult
 );
-
-
 -- inserting the `S` from `1/(S-x)`
 
 maclaurinSeries = method() -- bad method
@@ -384,7 +391,7 @@ tempInverse(LazySeries) := LazySeries => S ->(
     )
 
 
-)
+);
 
 inverse(LazySeries) := LazySeries => (S) -> (
     -- first check if it is a unit in the ring
@@ -400,13 +407,13 @@ inverse(LazySeries) := LazySeries => (S) -> (
 inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (
     -- first check if it is a unit in the ring
     --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
-    g := (-1)*((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    g := (-1) * ((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
     (1/S#constantTerm) * maclaurinSeries (g, deg)
     
 );
 -- Division of two LazySeries
 LazySeries / LazySeries := LazySeries => (A, B)->(
-    A* inverse(B)
+    A * inverse(B)
 )
 -- Dividing a number by LazySeries
 Number / LazySeries := LazySeries => (n, B)->(
@@ -420,12 +427,12 @@ pretty LazySeries := s -> net new Sum from apply(
         select(
             apply(
                 s#displayedDegree+2,
-                i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree}))
+                i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree})) -- NEEDS TO BE FIXED BECAUSE DEGREE IN GRADED RINGS IS A LIST NOT AN INTEGER
             ),
             p-> p!=0),
         expression
         ),
-    e -> if instance(e,Sum) then
+    e -> if instance(e, Sum) then
         new Parenthesize from {e} 
         else e
 )
@@ -435,5 +442,6 @@ net Series := s -> net pretty s + expression "O(" expression(s#displayedDegree+1
 toString Series := s -> toString pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 tex Series := s -> tex pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 html Series := s -> html pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
+
 
 --===================================================================================

@@ -318,3 +318,14 @@ use R
 phi = map(S,R)
 phi(x_R)
 ```
+
+## PRINT SUCKS
+```
+print #{2,3,4}
+```
+will not work and will give an error. 
+Use `<<` instead 
+```
+<< #{2,3,4}
+```
+
