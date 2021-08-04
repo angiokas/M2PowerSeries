@@ -30,7 +30,7 @@
 - [ ] Helper/Utility methods
   - [X] `zeroSeries`
   - [X] `oneSeries`
-  - [ ] `isUnit` -
+  - [X] `isUnit` -
   - [X] `toBinary` - 
   - [X] `maclaurinSeries`
   - [X] `changeDegree` - make sure computed and displayed degree are properly sorted. if wanting higher degree, make sure to change both, if less then change only displayed.
@@ -38,14 +38,21 @@
   - [ ] overload `sub` so that it takes a lazySeries and a ring and tries to convert the series into an a lazySeries over that ring by changing the function of the lazySeries.
   - [ ] Also make another overload of `sub` so that you can input values and a lazySeries that (NEVER MIND IT DOESNT MAKE SENSEBECAUSE IF I EVALUATE MY POWERSERIES IT WONT CONVERGE)
   - [ ] `addCoefficientFunction` function so that we work with functions instead of full series during computations
+  - [ ] comparing LazySeries objects with one another
 
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index
   - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.
 - [ ] make toBase into general function of base p conversion
-- [ ] make sure ^p powers are actually faster than S*S...S p times because right now it isn't
+- [X] make sure ^p powers are actually faster than S*S...S p times because right now it isn't
 - [X] Displaying lazySeries using pretty by defining a new pretty function
-  - [ ] Need to fix thr ```i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree})) ``` line because displayedDegree in graded rings will be a list and not an integer and `{s#displayedDegree}` will not give us what we want. 
+  - [ ] Need to fix the ```i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree})) ``` line because displayedDegree in graded rings will be a list and not an integer and `{s#displayedDegree}` will not give us what we want. 
+  - [ ] `pretty` doesn't work properly because it went out of bounds on a specific LazySeries.
+  - [ ] `toLazySeries` isn't outputting the correct degree
+  - [X] Update `lazySeries` method to work with any ring, i.e no matter the function, the values all get converted to the corresponding value in the given ring. (Solved using `sub`)
+
+
+
 
 ## to-do for later
 - [ ] check out http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.14/share/doc/Macaulay2/Divisor/html/index.html for ideas on displaying and constructors and documentation.

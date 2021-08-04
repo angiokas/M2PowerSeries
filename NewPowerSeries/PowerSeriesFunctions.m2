@@ -34,10 +34,11 @@ lazySeries = method(Options => {Degree => 2, displayedDegree => 3, computedDegre
 
 -- f is the function which has to have the same amount of inputs as there are variables
 lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
-  
+    f := (x) -> sub(function (x), R);
+
     ringVariables := gens R;
     
-    try function (numgens R:0) then 1 -- checks to see if function was inputted correctly by plugging in (0 0 ... 0)
+    try f (numgens R:0) then 1 -- checks to see if f was inputted correctly by plugging in (0 0 ... 0)
     else error "Number of inputs of given function does not match number of ring generators";
 
     combinations := {};
@@ -48,17 +49,17 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
     s := 0;
      -- add opts.Degree terms to s.
     for j from 0 to #combinations-1 do 
-        s = s + sub((function toSequence(combinations#j)), R) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));-- ADDED SUB HERE
+        s = s + (f toSequence(combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));-- ADDED SUB HERE
     if debugLevel >2 then print s;
      -- Making a new lazySeries
     new LazySeries from {
         displayedDegree => opts.displayedDegree,
         computedDegree => opts.computedDegree,
-        constantTerm => function (numgens R:0),
+        constantTerm => f (numgens R:0),
         maxDegree => infinity,
         displayedPolynomial => s,
-        coefficientFunction => function,
-        -- getCoefficient => coefficientVector-> function (toSequence coefficientVector),
+        coefficientFunction => f,
+        -- getCoefficient => coefficientVector-> f (toSequence coefficientVector),
         termVariables => ringVariables,
         seriesRing => R,
         cache => new CacheTable from {} -- for calculating powers!!!!!! IMPLEMENTTT
@@ -69,7 +70,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
 
 -- Converting ring elements and polynomials into LazySeries
 toLazySeries = method()
-toLazySeries(RingElement) := LazySeries => P -> (
+toLazySeries(RingElement) := LazySeries => P -> (-- Isn't outputting correct degree for the polynomial
     listPolynomial := listForm P;
     R := ring P;
     variables := gens R;
@@ -90,7 +91,6 @@ toLazySeries(RingElement) := LazySeries => P -> (
     lazySeries(R, h)
 )
 
-
 -- Changing degree of LazySeries
 changeDegree = method()
 changeDegree(LazySeries, ZZ) := LazySeries => (S,newDeg) -> (
@@ -103,7 +103,6 @@ changeDegree(LazySeries, ZZ) := LazySeries => (S,newDeg) -> (
         lazySeries(R, f, displayedDegree => newDeg, computedDegree => newDeg)
         )
     else lazySeries(R, f, displayedDegree => newDeg, computedDegree => oldDeg)
-
 );
 
 -- 
@@ -195,7 +194,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     newFunction:= variables-> f variables + g variables;
     newDegree := max(A#displayedDegree, B#displayedDegree);
 
-    changeDegree(lazySeries(newFunction, R), newDegree)
+    changeDegree(lazySeries(R, newFunction), newDegree)
 );
 
 LazySeries - LazySeries := LazySeries => (A,B) -> (
@@ -303,11 +302,10 @@ LazySeries // Number := LazySeries => (S,n) -> (
     lazySeries(R, newFunction, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
 );
 
--- INVERSION
-
 -- Multiplication of two LazySeries
 LazySeries * LazySeries := LazySeries => (A,B) -> (
     if not (A#seriesRing === B#seriesRing) then error "Rings of series do not match"; -- checks if using same ring
+
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
@@ -320,7 +318,7 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
             s = s + ((f toSequence(L#i)) * g toSequence(toList coefficientVector -  (L#i)));    
         s
     );
-    lazySeries(R, newFunction, computedDegree => A#displayedDegree + B#displayedDegree) -- REMOVED DISPLAYED DEGREE FOR A BIT
+    lazySeries(R, newFunction, displayedDegree => A#displayedDegree + B#displayedDegree, computedDegree => A#displayedDegree + B#displayedDegree) -- REMOVED DISPLAYED DEGREE FOR A BIT
 );
 
 -- Converting to binary
@@ -368,6 +366,14 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
     );
     finalResult
 );
+
+tempInverse = method()
+tempInverse(LazySeries) := LazySeries => S ->(
+    f := S#coefficientFunction;
+    R := S#seriesRing;
+
+);
+
 -- inserting the `S` from `1/(S-x)`
 
 maclaurinSeries = method() -- bad method
@@ -379,18 +385,33 @@ maclaurinSeries(LazySeries, ZZ):= LazySeries => (S, deg) ->(
     finalResult
 );
 
-tempInverse = method()
-tempInverse(LazySeries) := LazySeries => S ->(
-    f := S#coefficientFunction;
+lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (
+    f := (x) -> sub(function (x), R);
     R := S#seriesRing;
 
-    newLazySeriesFunction := X -> (
-        
-        
-
-    )
-
-
+    s:=0;
+     -- add opts.Degree terms to s.
+    for i from 0 to S#displayedDegree do (
+        s = s + (f i)*S^i;
+        print s#displayedPolynomial;
+        );
+    
+    if debugLevel >2 then print s;
+     -- Making a new lazySeries
+    new LazySeries from {
+        displayedDegree => opts.displayedDegree,
+        computedDegree => opts.computedDegree,
+        constantTerm => s#constantTerm,
+        maxDegree => infinity,
+        displayedPolynomial => s,
+        coefficientFunction => f,
+        -- getCoefficient => coefficientVector-> f (toSequence coefficientVector),
+        termVariables => S,
+        seriesRing => R,
+        cache => new CacheTable from {
+            
+        } -- for calculating powers!!!!!! IMPLEMENTTT
+    }
 );
 
 inverse(LazySeries) := LazySeries => (S) -> (
@@ -399,7 +420,7 @@ inverse(LazySeries) := LazySeries => (S) -> (
     print "STARTING INVERSE";
     g := (-1)*((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
     print "CALCULATING MACLAURIN SERIES";
-    h := (1/S#constantTerm) * maclaurinSeries (g, 5);
+    h := (1/S#constantTerm) * lazySeries(g, i->1);
     print "CALCULATED";
     h
 );
@@ -442,6 +463,5 @@ net Series := s -> net pretty s + expression "O(" expression(s#displayedDegree+1
 toString Series := s -> toString pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 tex Series := s -> tex pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
 html Series := s -> html pretty s + expression "O(" expression(s#displayedDegree+1) expression ")"
-
 
 --===================================================================================
