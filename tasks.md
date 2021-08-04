@@ -13,14 +13,16 @@
   - [X] Addition and substraction of two `LazySeries`
   - [X] Multiplying and dividing a `LazySeries` by a scalar (of class `Number`)
   - [X] Adding/substracting a scalar (of class `Number`) to/from a `LazySeries`
-  - [ ] Multiplying and dividing a `LazySeries` by a Polynomial/`RingElement`
+  - [X] Multiplying a `LazySeries` by a Polynomial/`RingElement`
+  - [ ] Dividing a `LazySeries` by a Polynomial/`RingElement`
   - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
 
 - [X] Division of two LazySeries
   - [X] inversion of a lazySeries
     - [X] Taking LazySeries up to nth power
       - [X] Multiplication of two `LazySeries`
-  - [X] implement geometric series formula
+  - [X] Implement LazySeries made up of a LazySeries
+    - [ ] generalize
   
 
 - [ ] Implementation of p-adics

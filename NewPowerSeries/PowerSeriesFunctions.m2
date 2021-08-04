@@ -34,15 +34,17 @@ lazySeries = method(Options => {Degree => 2, displayedDegree => 3, computedDegre
 
 -- f is the function which has to have the same amount of inputs as there are variables
 lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
-    f := (x) -> sub(function (x), R);
+    
+    f := x -> sub(function x, R);
 
     ringVariables := gens R;
+    ringZeroes := numgens R:0;
     
     try f (numgens R:0) then 1 -- checks to see if f was inputted correctly by plugging in (0 0 ... 0)
     else error "Number of inputs of given function does not match number of ring generators";
 
     combinations := {};
-    for j from 0 to opts.displayedDegree do
+    for j from 0 to opts.displayedDegree do -- IT WONT WORK WITH MULTI GRADED RINGS WITH DEGREES THAT ARE LISTS, can use `from ringZeroes .. to opts.displayedPolynomial`, but it gives error somewhere else down the line
         combinations = append(combinations, compositions (#ringVariables,j)); 
     combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
 
@@ -88,7 +90,7 @@ toLazySeries(RingElement) := LazySeries => P -> (-- Isn't outputting correct deg
         );
         0
     );
-    lazySeries(R, h)
+    lazySeries(R, h, displayedDegree => (degree P)#0, computedDegree => (degree P)#0) -- temporary fix, but will have to make list degrees work in general
 )
 
 -- Changing degree of LazySeries
@@ -190,7 +192,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
-    variables := vars(1..(numgens R)); -- why am I not using gens R????????????????????????!!!!
+    variables := gens R; -- why am I not using gens R????????????????????????!!!!
     newFunction:= variables-> f variables + g variables;
     newDegree := max(A#displayedDegree, B#displayedDegree);
 
@@ -202,7 +204,7 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
-    variables := vars(1..(numgens R));
+    variables := gens R;
     newFunction:= variables-> f variables - g variables;
     newDegree := max(A#displayedDegree, B#displayedDegree);
 
@@ -219,7 +221,7 @@ Number + LazySeries := LazySeries => (n, S) -> (
     n = sub(n, R);
 
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
-    variables := vars(1..(numgens R));
+    variables := gens R;
 
     if(n == 0) then S;
 
@@ -237,7 +239,7 @@ Number - LazySeries := LazySeries => (n,S) -> (
     n = sub(n, R);
 
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
-    variables := vars(1..(numgens R));
+    variables := gens R;
 
     if(n == 0) then S;
 
@@ -261,7 +263,7 @@ Number * LazySeries := LazySeries => (n,S) -> (
 
     if(n == 0) then zeroSeries(R); 
 
-    variables := vars(1..(numgens R));
+    variables := gens R;
 
     newFunction:= variables-> (n * (f variables));
     lazySeries(R, newFunction, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
@@ -280,11 +282,27 @@ LazySeries / Number := LazySeries => (S,n) -> (
 
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
-    variables := vars(1..(numgens R));
+    variables := gens R;
 
     newFunction:= variables-> (f variables) / n;
     lazySeries(R, newFunction, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
 );
+
+LazySeries / RingElement := LazySeries => (S,x) -> (
+    if (ring x === S#seriesRing) == false then error "Rings of series and ringElement do not match"; -- checks if using same ring
+    if x == 0 then error "Cannot divide by 0"; -- have to change 0 to ring 0
+
+    f := S#coefficientFunction;
+    R := S#seriesRing;
+    x = sub(x, R);
+
+    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    variables := gens R;
+
+    newFunction:= variables-> (f variables) / x;
+    lazySeries(R, newFunction, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
+);
+
 -- Division with remainder by scalar (the `//` binary operator)
 LazySeries // Number := LazySeries => (S,n) -> (
     --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring
@@ -296,7 +314,7 @@ LazySeries // Number := LazySeries => (S,n) -> (
 
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
-    variables := vars(1..(numgens R));
+    variables := gens R;
 
     newFunction:= variables-> (f variables) // n;
     lazySeries(R, newFunction, displayedDegree => S#displayedDegree, computedDegree => S#computedDegree)
@@ -320,6 +338,22 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     );
     lazySeries(R, newFunction, displayedDegree => A#displayedDegree + B#displayedDegree, computedDegree => A#displayedDegree + B#displayedDegree) -- REMOVED DISPLAYED DEGREE FOR A BIT
 );
+
+-- Multiplication of LazySeries by RingElement
+
+RingElement * LazySeries := LazySeries => (x,S) -> (
+    --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring\
+    R := S#seriesRing;
+    -- NEED TO ADD CONDITIONALS OF WHEN P is ring 1 or 0;
+    try x = sub(x, R) then 1
+    else error("Cannot promote RingElement to LazySeries Ring"); -- coul try adding another condition for checking if we can promote series to ringElement ring
+    
+    P := toLazySeries(x);
+      
+    P*S
+);
+
+LazySeries * RingElement := LazySeries => (S,x) -> x * S;
 
 -- Converting to binary
 toBinary = method() -- GENERALIZE TO BASE P
@@ -365,8 +399,9 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
         );       
     );
     finalResult
+    -- NEED TO ADD OPTION FOR NEGATIVE POWERS AS WELL!!!!!!!!!!!!
 );
-
+------------------------------------
 tempInverse = method()
 tempInverse(LazySeries) := LazySeries => S ->(
     f := S#coefficientFunction;
@@ -374,20 +409,9 @@ tempInverse(LazySeries) := LazySeries => S ->(
 
 );
 
--- inserting the `S` from `1/(S-x)`
-
-maclaurinSeries = method() -- bad method
-maclaurinSeries(LazySeries, ZZ):= LazySeries => (S, deg) ->(
-    finalResult := 0;
-    for i from 0 to deg do (
-        finalResult = finalResult + S^i;
-    );
-    finalResult
-);
-
-lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (
-    f := (x) -> sub(function (x), R);
+lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (    
     R := S#seriesRing;
+    f := x -> sub(function x, R);
 
     s:=0;
      -- add opts.Degree terms to s.
@@ -399,17 +423,17 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (
     if debugLevel >2 then print s;
      -- Making a new lazySeries
     new LazySeries from {
-        displayedDegree => opts.displayedDegree,
-        computedDegree => opts.computedDegree,
+        displayedDegree => s.displayedDegree,
+        computedDegree => s.computedDegree,
         constantTerm => s#constantTerm,
         maxDegree => infinity,
-        displayedPolynomial => s,
-        coefficientFunction => f,
+        displayedPolynomial => s#displayedPolynomial,
+        coefficientFunction => s#coefficientFunction,
         -- getCoefficient => coefficientVector-> f (toSequence coefficientVector),
         termVariables => S,
         seriesRing => R,
         cache => new CacheTable from {
-            
+
         } -- for calculating powers!!!!!! IMPLEMENTTT
     }
 );
@@ -417,10 +441,18 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (
 inverse(LazySeries) := LazySeries => (S) -> (
     -- first check if it is a unit in the ring
     --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
+    c := S#constantTerm;
     print "STARTING INVERSE";
-    g := (-1)*((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+
+    print ((-1)*((S / c)-1));
+    g := ((-1)*((S / c)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    print "THIS IS g: ";
+    print g;
     print "CALCULATING MACLAURIN SERIES";
-    h := (1/S#constantTerm) * lazySeries(g, i->1);
+    print c;
+    print "lazy";
+    print (lazySeries(g, i->1));
+    h := (1/c) * lazySeries(g, i->1); -- temporary displayDegree
     print "CALCULATED";
     h
 );
@@ -429,7 +461,7 @@ inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (
     -- first check if it is a unit in the ring
     --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
     g := (-1) * ((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
-    (1/S#constantTerm) * maclaurinSeries (g, deg)
+    (S#constantTerm) * maclaurinSeries (g, deg)
     
 );
 -- Division of two LazySeries
