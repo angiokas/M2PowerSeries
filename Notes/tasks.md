@@ -54,6 +54,26 @@
   - [X] Update `lazySeries` method to work with any ring, i.e no matter the function, the values all get converted to the corresponding value in the given ring. (Solved using `sub`)
 
 
+## Meeting notes 
+- [ ] For the `coefficient` overloading function
+-- given two vectors
+-- {7, 1}
+-- {2, 8}
+-- compute everything up to {7,8} 
+-- GOAL ^
+-- but currently bandaid by using total Degree:
+-- maybe for now just do integers (total degree), not vectors
+
+- [ ] Rewrite the constructors
+  - [ ] Make it into a new type of semi-mutable hashtable
+  - [ ] all the mutable keys are stored in the cache, Query the cache first and should works
+    - [ ] Store powers of the power series that have been computed.
+  - [ ] works with list Degrees (longterm goal, for now total degree okay)
+  - [ ] `changeComputedDegree`method that changes the computedDegree but should not be exposed to the user. When you call this method you should actually compute up to that degree.
+- [ ] Rewrite multiplication to use the above internal computedDegree changing function `changeComputedDegree`. See comments. 
+  - [ ] Change the computed Degree only but not the displayed Degree. Goal is to up the computedDegree in general, but keep displayed version short as much as possible.
+  - [ ] Truncate the polynomials we are going to be multiplying to the appropriate degree
+  
 
 
 ## to-do for later
@@ -80,6 +100,7 @@
   
 - [ ] For REU Symposium **August 20th** 
   - [ ] Type up results in LaTeX
+    - [ ] Use **beamer** for presentations
     - [ ] Background 
     - [ ] 
   - [ ] Prepare 10 minute presentation 
