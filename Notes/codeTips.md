@@ -68,6 +68,13 @@ with output:
 2
 1
 ```
+for loops do not work on lists :(
+```
+for i from {1,2,3} do print i;
+```
+will give an error
+
+## `toBinary` method notes
 For the `toBinary` function though, the way it's written using `floor(log(2, n))` for the counter is more efficient than replacing it with `n` like here:
 ```
 toBinary(ZZ) := n ->(
@@ -165,128 +172,23 @@ link: http://www.math.utah.edu/~schwede/M2/PosChar.m2
 
 
 ------------------------------------------------------------------------------
-## Old code that I might reference later
+
+## Combinations, or rather, `compositions`
+
+Example:
+```
+combinations = {};
+for j from 0 to 5 do combinations = append(combinations, compositions (3,j)); 
+print combinations;
+combinations = flatten combinations; 
+print combinations;
 
 ```
--- method that creates a series using a ring element (basically treats the ring elements as a series with rest of the coefficients as 0)
--- n is the amount of terms you want to compute for the series
--- f is the ring element used as the base 
--- degree - Displayed degree
--- maxDegree - maximum degree mathematically
--- computedDegree - Highest power that has been computed
 
-series(ZZ, RingElement) := Series => opts -> (n,f) -> (
-     new Series from {displayedDegree => n, --we want to change this to disaplyedDegree
-      maxDegree => max((first degree f), n), -- here degree is a method for polynomials
-      computedDegree => max((first degree f), n), 
-      polynomial => f,
-	  setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (oldPolynomial,oldComputedDegree)), -- Does not do anything really
-      setPrecision => (newDisplayedDegree)-> series(newDisplayedDegree, f)} -- added new method
-     );
--- note: opts -> is needed because series method has options
-series(RingElement) := Series => opts -> f -> ( 
-     new Series from {displayedDegree => opts.Degree,
-                      maxDegree => max((first degree f), opts.Degree), 
-                      computedDegree => max((first degree f), opts.Degree), 
-                      polynomial => f}
-     );
-
--- Lazy Series: making a series using an explicit formula
-series(RingElement, Function) := Series => opts -> (X,f) -> (
-     -- Start with the zero polynomial.
-     s:=0;
-     -- add opts.Degree terms to s.
-     for i from 0 to opts.Degree do s = s + (f i)*X^i;
-     
-     -- now make a new series.
-     new Series from {displayedDegree => opts.Degree,
-        maxDegree => infinity,
-        computedDegree => opts.Degree,
-        polynomial => s, 
-        -- setDegree takes an old polynomial, the old computed degree, and a new degree, and needs
-	      -- to know how to tack on the new terms to the old polynomial.
-	      setDegree => ((oldPolynomial,oldComputedDegree,newDegree) -> (newPolynomial := oldPolynomial;
-		              for i from oldComputedDegree + 1 to newDegree do newPolynomial = newPolynomial + (f i)*X^i;
-			      (newPolynomial,max(oldComputedDegree,newDegree))
-		    ))});
-
-
-
-
---===================================================================================
---FUNCTIONS ASSOCIATED WITH SERIES
--- polynomial is the 
--- computedDegree is
--- maxDegree is
--- degree is
--- setDegree 
-
-setDegree = method()
-setDegree(ZZ, Series) := Series =>  (n,S) -> (
-    if n > S.maxDegree then
-        error concatenate("Cannot exceed max degree ", toString S.maxDegree, " for this power series.");
-    (f,c) := S#setDegree (S#polynomial,S#computedDegree,n);
-    new Series from {
-        polynomial => f,
-        computedDegree => c,
-        maxDegree => S#maxDegree,
-        displayedDegree => (min(n,S#maxDegree)),
-        setDegree=> S#setDegree
-    }
-);
-
-
---===================================================================================
-
--- Selects the terms of a polynomial up to degree specified
-truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);
-
---===================================================================================
--- Converts a Power series object into a polynomial by taking the part of the series up to default power 5
--- n is the power you want to truncate it at
-toPolynomial = method()
-toPolynomial(Series) := RingElement => s -> toPolynomial(s#displayedDegree,s);
-toPolynomial(ZZ,Series) := RingElement => (n,s) -> truncate(n,(setDegree(n,s))#polynomial);
---===================================================================================
--- Outputs the degree of a Series
-degree(Series) := Series => F -> F#displayedDegree;
-
---===================================================================================
--- Returns the domninant term of the series
-dominantTerm = method()
-dominantTerm(Series) := RingElement => S -> (
-     -- This is bad, it depends on the monomial order:last terms toPolynomial S;
-     -- This seems slow but at least correct:
-     f := toPolynomial S;
-     minDegree := min apply(terms f, i -> first degree i);
-     part(minDegree,minDegree,f)
-     )
-
---===================================================================================    
--- Checks if the series is a unit (i.e has an inverse) by checking if the domninant term is a unit
-isUnit(Series) := Boolean => A -> isUnit(dominantTerm(A));
-
--- 
-makeSeriesCompatible = method()
-makeSeriesCompatible(Series,Series) := Sequence => (A,B) -> (
-     newComputedDegree := min(degree(A),degree(B));
-     (
-	  new Series from {displayedDegree => newComputedDegree, 
-	       	    	   computedDegree => newComputedDegree,
-			   maxDegree => A.maxDegree,
-			   polynomial => truncate(newComputedDegree,A.polynomial),
-			   setDegree => A#setDegree},
-	  new Series from {displayedDegree => newComputedDegree, 
-	       	    	   computedDegree => newComputedDegree,
-			   maxDegree => B.maxDegree,
-			   polynomial => truncate(newComputedDegree,B.polynomial),
-			   setDegree => B#setDegree}
-     	  )
-     
-     
-     );
 ```
-
+sort(combinations)
+rsort(combinations)
+```
 ## comparing Rings 
 You can only compare rings by using `===` symbol, otherwise it won't work. 
 Example: 
@@ -328,4 +230,15 @@ Use `<<` instead
 ```
 << #{2,3,4}
 ```
+
+## Old Meeting notes
+f(i,j,k)
+
+f(0,0,0)+(....) inverse of f(0,0,0)(1-K) is this*by using geometric sequence): 1/(f(0,0,0)(1-K)) = 1+K+k^2+...
+
+any any((1,2,3), t -> t==2) 1/(a-f(x,y,z)) = ... 1/(1 - f(x,y,z)) 1 + f(x,y,z) + f(x,y,z)^2 + ... a + f(x,y,z) f(x,y,z) = a + g(x,y,z) = (1/a)(1 - (-1/a)g(x,y,z)) = (a)(1 - (-1/a)g(x,y,z)) = a(1 - h(x,y,z)) (1/a)(1 + h(x,y,z) + h(x,y,z)^2 + …) From Karl E Schwede to Everyone: 01:25 PM (a+b)^7 = a^7 + b^7
+
+a^7 + (7 choose 1)a^6b^1 + … + b^7 (prime choose i) is divisible by p if i is not p or 0 (a+b)^7 a^7 + b^7 f(x,y)^7 f(x,y)^8 f(x,y)^7*f(x,y) {a \choose b} char R {i,j,k} {2,0,1} {0,0,0}+{2,0,1} {2,0,1}+{0,0,0} {1,0,1} + {1,0,0} {1,0,0}+{1,0,1} {2,0,0}, + {0,0,1}
+
+to check if a user has inputted a function with the corect amount of variables that corresponds with the number of variables in the ring, we could use a test with a zero vector of the size of the amounnt of variables in the ring and if it ouputs an error, then error out to the user that they need to input the correct type of function. Use try Catch. https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_try.html
 

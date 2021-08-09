@@ -5,7 +5,11 @@
 - [ ] Implement formal power series as an object
   - [X] `LazySeries` using a ring and function
     - [X] Works for multivariate rings
+    - [ ] Works for multi-graded rings
+      - [ ] Using the sum of the 
     - [X] saves the coefficient function
+    - [ ] Uses caching for fast retreival
+    - [ ] 
   - [ ] `LazySeries` using a ring and a polynomial as a function
   - [X] Polynomial/`RingElement` conversion to `LazySeries`
 
@@ -41,6 +45,7 @@
   - [ ] Also make another overload of `sub` so that you can input values and a lazySeries that (NEVER MIND IT DOESNT MAKE SENSEBECAUSE IF I EVALUATE MY POWERSERIES IT WONT CONVERGE)
   - [ ] `addCoefficientFunction` function so that we work with functions instead of full series during computations
   - [ ] comparing LazySeries objects with one another
+  - [ ] Overloading `ring` method
 
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index

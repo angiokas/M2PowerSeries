@@ -43,7 +43,7 @@ load "./NewPowerSeries/PowerSeriesFunctions.m2"
 load "./NewPowerSeries/PowerSeriesFunctionsDoc.m2"
 --beginDocumentation()
 
-load "./NewPowerSeries/Tests/PowerSeriesFunctionsTest.m2"
+load "./NewPowerSeries/Tests/ConstructionTests.m2"
 
 
 -- TESTS

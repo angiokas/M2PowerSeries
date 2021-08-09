@@ -16,20 +16,18 @@ Headline
     A package allowing construction and manipulation of formal power series in multi-variable.
 Description
     Text     
-        A power series is normally described on paper in the form "a_0 + a_1x + a_2 x^2 + ...", and
-        the ellipsis in the above description is implemented to maximize efficiency. By analogy
-        with floating point numbers, a power series is only ever calculated to finite precision,
-        but power series in this package also contain enough information to generate arbitrarily
-        more precision when needed. Combined with some caching abilities, this means that
-        power series whose coefficients are very difficult to compute can be manipulated
-        without sacrificing the ability to calculate more terms at a later time.
+        Formal power series are an important part of understanding ring completions. This package 
+        allows the implementation of Formal Power Series which offers the usage in multi-variate
+        and multi-graded rings, as well as multiplication and inversion. Of course, it is impossible
+        to make an object that is infinite, however this package offers Power series in a form in which
+        any coefficient can be calculated. The focus is mainly on a specific type of series which we call
+        LazySeries (Credit to Magma) which is a power series where all coefficients are possible to 
+        calculate by a given function, or rather a ring map. Once a coefficient is computed,
+        it is stored in the object cache for fast retrieval.
 
-        The focus is mainly on a specific type of series which we call LazySeries(Credit to Magma) which
-        is a power series where all coefficients are possible to calculate by a given function. Once a
-        coefficient is computed, it is stored in the object cache for fast retrieval.
-
-        There are large documentation nodes included for @TO "Creating LazySeries"@ and
-        @TO"Operations on Series"@.
+        For different ways of constructing LazySeries, see @TO "Creating LazySeries"@.
+        As for how to use basic operations involving LazySeries, see @TO"Operations on Series"@.
+        
 ///
 
 doc ///
@@ -45,7 +43,7 @@ doc ///
      series will return finite-precision results, the precision can be increased at
      any time. The easiest examples of such series are:
   
-     1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "HELLO HELLO")@
+     1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "hjghj")@
   SeeAlso
     hilbertSeries
 ///    
