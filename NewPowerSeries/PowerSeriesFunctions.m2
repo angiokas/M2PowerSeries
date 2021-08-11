@@ -10,11 +10,11 @@ export{
     "coefficientFunction",
     "constantTerm",
     "seriesRing",
-
+    "LazySeries",
     "DisplayedDegree", 
     "ComputedDegree",  
     "displayedPolynomial",
-    "computedPolynomial"
+    "computedPolynomial"  
 }
 
 export{
@@ -22,9 +22,15 @@ export{
 }
 load "./HelperFunctions.m2";
 
-LazySeries = new Type of MutableHashTable
+LazySeries = new Type of MutableHashTable;
 
-lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3})
+
+net LazySeries := L -> (
+    "hello does this work"
+)
+
+lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})
+
 
 -- f is the function which has to have the same amount of inputs as there are variables
 lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
@@ -63,8 +69,14 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
 lazySeries(RingElement) := LazySeries => opts -> P -> ( 
     R := ring P;
     variables := gens R;
-    newFunction := variables -> coefficient(variables, P);
-
+    local newFunction;
+    if (opts.coefficientFunction === null) then (
+        newFunction = variables -> coefficient(variables, P)
+    )
+    else(
+        newFunction = opts.coefficientFunction;
+    );
+    
     lazySeries(R, newFunction, DisplayedDegree =>sum (degree P), ComputedDegree => sum (degree P)) 
 );
 
@@ -103,12 +115,40 @@ changeDegree(LazySeries, ZZ) := LazySeries => (S, newDeg) -> (
     oldDeg := S.cache.DisplayedDegree;
     f := S#coefficientFunction;
     R := S#seriesRing;
+    local tempPoly;
 
     if newDeg == oldDeg then S
     else if newDeg > oldDeg then (
-        lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
-        )
-    else lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => oldDeg) -- needs to truncate the displauedPolynomial too
+        S#cache#ComputedDegree = newDeg;
+        S#cache#DisplayedDegree = newDeg;
+        tempPoly = (calculatePolynomial(newDeg, R, f))#0;
+        S#cache#computedPolynomial = tempPoly;
+        S#cache#displayedPolynomial = tempPoly;
+        --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
+    )
+    else (
+        S#cache#DisplayedDegree = newDeg;
+        S#cache#displayedPolynomial = truncate(newDeg, S#cache#displayedPolynomial);
+    );
+    S
+);
+
+changeComputedDegree = method()
+changeComputedDegree(LazySeries, ZZ) := LazySeries => (S, newDeg) -> (
+
+    oldDeg := S.cache.DisplayedDegree;
+    f := S#coefficientFunction;
+    R := S#seriesRing;
+    local tempPoly;
+
+    if newDeg == oldDeg then S
+    else if newDeg > oldDeg then (
+        S#cache#ComputedDegree = newDeg;
+        tempPoly = (calculatePolynomial(newDeg, R, f))#0;
+        S#cache#computedPolynomial = tempPoly;
+        --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
+    );
+    S
 );
 
 -- overloading coefficient method
@@ -119,29 +159,20 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
 
     f := 0;
     h := 0;
+    local val;
     
-    if (sum indexVector <= L#cache#computedDegree) then (
-        val := coefficient(indexVector, L#cache#computedPolynomial);
-        --we still still need to cache the output
+    if (sum indexVector <= L#cache#ComputedDegree) then (
+        val = coefficient(indexVector, L#cache#computedPolynomial);                
+    )
+    else if ( (L#cache)#?indexVector ) then (
+        val = (L#cache)#indexVector;
     )
     else (
-        --run the coefficient function instead of seeing what's computed
-    )
-    -*for j from 0 to (#indexVector)-1 do(
-        f := t ->(
-                val := coefficient(indexVector#j, t.cache.computedPolynomial);
-                << "Added value " << val << " with key " << indexVector#j << "to cache" << endl;
-                val
-                );
-        h = (cacheValue indexVector#j) f;
-
-        coefficientValues = append(coefficientValues,  h L);
-    );*-
-    coefficientValues
-
+        val = (L#coefficientFunction)(indexVector);
+        L#cache#indexVector = val;
+    );
+    val
     --checks cache of LazySeries first and grabs the coefficients if available
-    -- else change the computed degree up to the level we need and compute the polynomial up to the same level
-    -- change ComputedDegree 
 );
 coefficient(VisibleList, RingElement) := (L, P) -> coefficient(toMonomial(L, ring P), P); -- USE THIS FOR RINGELEMENT TO LAZYSERIES CONSTRUCTOR
 coefficient(ZZ, RingElement) := (n, P) -> coefficient(toMonomial({n}, ring P), P); -- for one 
@@ -304,8 +335,19 @@ Number * LazySeries := LazySeries => (n,S) -> (
     if n == 0 then zeroSeries(R);
 
     variables := gens R;
+    newComputedPoly := n*(S#computedPolynomial);
 
     newFunction:= variables-> (n * (f variables));
+    --fix this so it doesn't compute things
+    -*new LazySeries from {
+        seriesRing => R,
+        coefficientFunction => newFunction, 
+        DisplayedDegree => S#DisplayedDegree;
+        ComputedDegree => S#ComputedDegree;
+        computedPolynomial => newComputedPoly;
+        displayedPolynomial => truncate(S#DisplayedDegree, newComputedPoly);
+    }*-
+
     lazySeries(R, newFunction, DisplayedDegree => S.cache.DisplayedDegree, ComputedDegree => S.cache.ComputedDegree)
 );
 
@@ -372,27 +414,35 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     ringZeroes := numgens R:0;
 
     newDegree := A.cache.DisplayedDegree + B.cache.DisplayedDegree;
-
+    print ("newDegree: " | toString(newDegree));
+    
     newFunction := coefficientVector -> (
         print coefficientVector;
         tempDegree := coefficientVector; -- bandaid!!!!!
         if(class coefficientVector === List) then tempDegree = sum coefficientVector;
         print tempDegree;
 
-        a := changeDegree(A, tempDegree);
-        b := changeDegree(B, tempDegree);
+        a := changeComputedDegree(A, tempDegree);
+        
+        b := changeComputedDegree(B, tempDegree);
 
-        P1 := a.cache.displayedPolynomial;
-        P2 := b.cache.displayedPolynomial;
+        P1 := a.cache.computedPolynomial;
+        P2 := b.cache.computedPolynomial;
 
-        P := P1*P2;
+        P := truncate(newDegree, P1*P2);
+        --P = P1*P2;
 
         << "FINALRESULT: "<< coefficient(coefficientVector, P)<<endl;
         coefficient(coefficientVector, P)
         
     );    
+    changeComputedDegree(A, newDegree);
+    changeComputedDegree(B, newDegree);
+    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.computedPolynomial))*(truncate(newDegree, B.cache.computedPolynomial)));
 
-    lazySeries(R, newFunction, DisplayedDegree =>  newDegree, ComputedDegree => newDegree)
+    finalSeries := lazySeries(newPoly, coefficientFunction => newFunction, DisplayedDegree =>  newDegree, ComputedDegree => newDegree);
+    changeDegree(finalSeries, max(A.cache.DisplayedDegree, B.cache.DisplayedDegree))
+    --lazySeries(R, newFunction, DisplayedDegree =>  newDegree, ComputedDegree => newDegree)
 );
 
 -- Multiplication of LazySeries by RingElement
@@ -489,6 +539,7 @@ LazySeries / LazySeries := LazySeries => (A, B)->(
 Number / LazySeries := LazySeries => (n, B)->(
     n * inverse(B)
 )
+
 
 --===================================================================================    
 

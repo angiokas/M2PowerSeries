@@ -6,6 +6,9 @@ export{
     "calculatePolynomial"
 }
 
+--this is taken from the PowerSeries.m2 package
+truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);
+
 toMonomial = (L, S) ->(
      variableList := flatten entries vars S;
      m := 1;
