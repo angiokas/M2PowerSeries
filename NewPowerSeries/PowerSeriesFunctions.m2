@@ -5,28 +5,22 @@
 --PowerSeriesFunctions (PowerSeriesFunctions.m2)
 
 
-export{
-    "lazySeries",
-    "coefficientFunction",
-    "constantTerm",
-    "seriesRing",
-    "LazySeries",
-    "DisplayedDegree", 
-    "ComputedDegree",  
-    "displayedPolynomial",
-    "computedPolynomial"  
-}
 
-export{
-    "changeDegree"
-}
 load "./HelperFunctions.m2";
 
-LazySeries = new Type of MutableHashTable;
+
 
 
 net LazySeries := L -> (
-    "hello does this work"
+    myStr := "";
+    termList := reverse terms (L#cache#displayedPolynomial);
+    j := 0;
+    while (j < #termList) do (        
+        myStr = myStr | toString (termList#j);
+        j = j+1;
+        if (j < #termList) then myStr = myStr | " + ";
+    );
+    myStr + " ... "
 )
 
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})

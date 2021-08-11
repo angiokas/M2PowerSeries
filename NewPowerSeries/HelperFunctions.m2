@@ -1,10 +1,4 @@
---toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S.  It returns a monomial m with exponent vector L. author:Jessica Sidman
-export{
-    "toMonomial",
-    "maximumsList",
-    "toBinary",
-    "calculatePolynomial"
-}
+--toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S.  It 
 
 --this is taken from the PowerSeries.m2 package
 truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);

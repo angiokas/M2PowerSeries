@@ -30,10 +30,28 @@ newPackage(
         Headline => "A package for implementing power series and its calculations",
         DebuggingMode => true,
         Reload => true,
-        AuxiliaryFiles=>true,
-        PackageExports=>{"Depth"} --exports all the functions from a package automatically
+        AuxiliaryFiles=>true        
         )
 
+export{
+    "lazySeries",
+    "coefficientFunction",
+    "constantTerm",
+    "seriesRing",
+    "LazySeries",
+    "DisplayedDegree", 
+    "ComputedDegree",  
+    "displayedPolynomial",
+    "computedPolynomial",
+    "changeDegree",
+    "toMonomial",
+    "maximumsList",
+    "toBinary",
+    "calculatePolynomial",
+    "dog"
+}
+LazySeries = new Type of MutableHashTable;
+dog = new Type of HashTable;
 
 load "./NewPowerSeries/PowerSeriesFunctions.m2"
 
