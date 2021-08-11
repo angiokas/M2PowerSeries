@@ -63,27 +63,37 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
     --else 
     (
      -- n>1 n-variable version
-        dummyConstantVector := apply(numgens R, t -> 0);
-        try (function dummyConstantVector) else (
-            try (function toSequence dummyConstantVector) then (
+        dummyConstantVector := apply(numgens R, t -> 0);        
+        print "hellow world";
+        try sub(function dummyConstantVector, R) else (
+            try sub(function toSequence dummyConstantVector, R) then (
+                print "first thing worked";
                 newFunction = tempList -> function toSequence tempList
             )
             else(                
+                print "second thing worked";
+                print (function (dummyConstantVector#0));
                 newFunction = tempList -> function (tempList#0); 
             );
         );
-        try newFunction dummyConstantVector else error "The lazySeries function should take a exponent vector and output a ring element";
+        try newFunction dummyConstantVector then ( print (newFunction dummyConstantVector) )
+        else (
+            error "The lazySeries function should take a exponent vector and output a ring element";
+        );
         try(
             if instance(newFunction(dummyConstantVector), R) then f = newFunction else f = v -> sub(newFunction v, R);
         ) else (
             error "The lazySeries function needs to output something that can be interpretted as a ring element.";
         );
         
-
-         for j from start to deg do -- IT WONT WORK WITH MULTI GRADED RINGS WITH DEGREES THAT ARE LISTS, can use `from ringZeroes .. to opts.displayedPolynomial`, but it gives error somewhere else down the line
+        
+         for j from start to deg do (-- IT WONT WORK WITH MULTI GRADED RINGS WITH DEGREES THAT ARE LISTS, can use `from ringZeroes .. to opts.displayedPolynomial`, but it gives error somewhere else down the line
+            print compositions (#ringVariables, j);
             combinations = append(combinations, compositions (#ringVariables, j)); 
-        combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
+         );
 
+        combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
+        
      -- add ops.Degree terms to s.
     for j from 0 to #combinations-1 do (
         s = s + (f (combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));

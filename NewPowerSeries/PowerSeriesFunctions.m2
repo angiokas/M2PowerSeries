@@ -120,7 +120,14 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
     f := 0;
     h := 0;
     
-    for j from 0 to (#indexVector)-1 do(
+    if (sum indexVector <= L#cache#computedDegree) then (
+        val := coefficient(indexVector, L#cache#computedPolynomial);
+        --we still still need to cache the output
+    )
+    else (
+        --run the coefficient function instead of seeing what's computed
+    )
+    -*for j from 0 to (#indexVector)-1 do(
         f := t ->(
                 val := coefficient(indexVector#j, t.cache.computedPolynomial);
                 << "Added value " << val << " with key " << indexVector#j << "to cache" << endl;
@@ -129,7 +136,7 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
         h = (cacheValue indexVector#j) f;
 
         coefficientValues = append(coefficientValues,  h L);
-    );
+    );*-
     coefficientValues
 
     --checks cache of LazySeries first and grabs the coefficients if available
