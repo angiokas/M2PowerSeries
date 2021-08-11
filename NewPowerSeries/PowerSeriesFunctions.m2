@@ -12,15 +12,16 @@ load "./HelperFunctions.m2";
 
 
 net LazySeries := L -> (
-    myStr := "";
+    myStr := toString("");
     termList := reverse terms (L#cache#displayedPolynomial);
     j := 0;
     while (j < #termList) do (        
-        myStr = myStr | toString (termList#j);
+        print (termList#j);
+        myStr = myStr | toString (termList#j);        
         j = j+1;
         if (j < #termList) then myStr = myStr | " + ";
-    );
-    myStr + " ... "
+    );    
+    net(myStr | toString(" + ... "))
 )
 
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})
@@ -407,7 +408,7 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
     ringZeroes := numgens R:0;
 
-    newDegree := A.cache.DisplayedDegree + B.cache.DisplayedDegree;
+    newDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     print ("newDegree: " | toString(newDegree));
     
     newFunction := coefficientVector -> (
