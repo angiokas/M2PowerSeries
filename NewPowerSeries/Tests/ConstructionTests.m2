@@ -3,8 +3,12 @@
 -- Testing main constructor lazySeries(Ring, Function) method --
 TEST ///
 R = ZZ[x]
+
 f = i-> 7
 L = lazySeries(R, f)
+
+g = i->i
+L = lazySeries(R, g)
 ///
 
 TEST ///
