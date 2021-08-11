@@ -43,8 +43,10 @@ doc ///
      series will return finite-precision results, the precision can be increased at
      any time. The easiest examples of such series are:
   
-     1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "hjghj")@
+     1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "using a given ring and function")@
+     2. Creating LazySeries by the @TO2((RingElement), "using a given ringElement")@
   SeeAlso
+    "Operations on Series"
     hilbertSeries
 ///    
 
@@ -64,7 +66,9 @@ doc ///
         s: LazySeries
     Description
         Text
-            [ENTER DESCRIPTION]
+            This is the easiest way to make a formal power series that has coefficients inside a specifief ring.
+            Make sure the function you are inputting has the same amount of inputs as the amount of variables in
+            the specified ring, else it will give an error.
 
         Example
             R = ZZ/101[x,y];
@@ -74,6 +78,7 @@ doc ///
             [Additional information I want to add]
     SeeAlso
         "Creating LazySeries"
+        "Operations on Series"
 
 ///
 
@@ -103,5 +108,23 @@ doc ///
         "Creating LazySeries"
 
 ///
+
+doc ///
+  Key
+    "Operations on Series"
+  Headline
+    An overview of the various ways to create LazySeries.
+  Description
+   Text
+     Most series have enough information to extend their polynomial approximation to 
+     arbitrary degree when needed. This means that even though sums and products of
+     series will return finite-precision results, the precision can be increased at
+     any time. The easiest examples of such series are:
+  
+     1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "using a given ring and function")@
+     2. Creating LazySeries by the @TO2((lazySeries, RingElement), "using a given RingElement")@
+  SeeAlso
+    hilbertSeries
+///    
 
 

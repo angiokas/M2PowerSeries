@@ -40,13 +40,13 @@ load "./NewPowerSeries/PowerSeriesFunctions.m2"
 
 
 --DOCUMENTATION
+beginDocumentation()
 load "./NewPowerSeries/PowerSeriesFunctionsDoc.m2"
---beginDocumentation()
-
-load "./NewPowerSeries/Tests/ConstructionTests.m2"
 
 
 -- TESTS
-
+load "./NewPowerSeries/Tests/ConstructionTests.m2"
+load "./NewPowerSeries/Tests/HelperFunctionTests.m2"
+load "./NewPowerSeries/Tests/BasicOperationsTests.m2"
 
 end

@@ -74,6 +74,7 @@ lazySeries(R,h)
 
 -- Testing lazySeries(RingElement) method
 
+-- check 9
 TEST /// 
 R = ZZ[x]
 P = 7*x^2+57*x^8-91*x^5
@@ -81,6 +82,7 @@ P = 7*x^2+57*x^8-91*x^5
 L = lazySeries(P)
 ///
 
+--check 10
 TEST ///
 R = ZZ/5[x,y,z]
 S = lazySeries(x^2+x*y+z^2+ 54+z)

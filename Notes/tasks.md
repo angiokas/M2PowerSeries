@@ -6,10 +6,10 @@
   - [X] `LazySeries` using a ring and function
     - [X] Works for multivariate rings
     - [ ] Works for multi-graded rings
-      - [ ] Using the sum of the 
+      - [X] Using the sum of the list of degrees
     - [X] saves the coefficient function
-    - [ ] Uses caching for fast retreival
-    - [ ] 
+    - [X] Uses caching for fast retreival
+    - [X] Works for single-variable (FIXED)
   - [ ] `LazySeries` using a ring and a polynomial as a function
   - [X] Polynomial/`RingElement` conversion to `LazySeries`
 
@@ -40,12 +40,16 @@
   - [X] `toBinary` - 
   - [X] `maclaurinSeries`
   - [X] `changeDegree` - make sure computed and displayed degree are properly sorted. if wanting higher degree, make sure to change both, if less then change only displayed.
+    - [ ] Need to fix
   - [ ] Returns the polynomial of a lazySeries up to a specific degree
   - [ ] overload `sub` so that it takes a lazySeries and a ring and tries to convert the series into an a lazySeries over that ring by changing the function of the lazySeries.
   - [ ] Also make another overload of `sub` so that you can input values and a lazySeries that (NEVER MIND IT DOESNT MAKE SENSEBECAUSE IF I EVALUATE MY POWERSERIES IT WONT CONVERGE)
   - [ ] `addCoefficientFunction` function so that we work with functions instead of full series during computations
   - [ ] comparing LazySeries objects with one another
-  - [ ] Overloading `ring` method
+  
+  -[ ] Overloaded methods
+    - [X] `ring` - Returns 
+    - [ ] `coefficient`
 
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index
