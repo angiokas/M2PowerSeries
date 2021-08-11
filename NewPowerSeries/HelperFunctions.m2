@@ -49,25 +49,44 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
     
     ringVariables := gens R;
 
-    local s;
+    s := sub(0, R);
     local f;
-    if (numgens R == 1) then ( -- 1-variable version
+    local newFunction;
+    newFunction = function;
+
+    -*if (numgens R == 1) then ( -- 1-variable version
         f = x -> sub(function x, R);
         --ringZeroes = 0;
 
         for i from 0 to deg do s = s + (f i)*(ringVariables#0)^i;
-        )
-    else (
+        )*-
+    --else 
+    (
      -- n>1 n-variable version
-        f = ringVariables -> sub(function ringVariables, R);
+        dummyConstantVector := apply(numgens R, t -> 0);
+        try (function dummyConstantVector) else (
+            try (function toSequence dummyConstantVector) then (
+                newFunction = tempList -> function toSequence tempList
+            )
+            else(                
+                newFunction = tempList -> function (tempList#0); 
+            );
+        );
+        try newFunction dummyConstantVector else error "The lazySeries function should take a exponent vector and output a ring element";
+        try(
+            if instance(newFunction(dummyConstantVector), R) then f = newFunction else f = v -> sub(newFunction v, R);
+        ) else (
+            error "The lazySeries function needs to output something that can be interpretted as a ring element.";
+        );
+        
 
          for j from start to deg do -- IT WONT WORK WITH MULTI GRADED RINGS WITH DEGREES THAT ARE LISTS, can use `from ringZeroes .. to opts.displayedPolynomial`, but it gives error somewhere else down the line
             combinations = append(combinations, compositions (#ringVariables, j)); 
         combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
 
-     -- add opts.Degree terms to s.
+     -- add ops.Degree terms to s.
     for j from 0 to #combinations-1 do (
-        s = s + (f toSequence(combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));
+        s = s + (f (combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));
         );
     );
     (s,f)
