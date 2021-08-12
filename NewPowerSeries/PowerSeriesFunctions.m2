@@ -12,16 +12,49 @@ load "./HelperFunctions.m2";
 
 
 net LazySeries := L -> (
-    myStr := toString("");
+    myStr := net("");
+    local tempStr;
+    local tempTerm;
     termList := reverse terms (L#cache#displayedPolynomial);
     j := 0;
-    while (j < #termList) do (        
-        print (termList#j);
-        myStr = myStr | toString (termList#j);        
-        j = j+1;
-        if (j < #termList) then myStr = myStr | " + ";
+    while (j < #termList) do (                
+        tempStr = toString(termList#j);
+        if (tempStr#0 === "-") then (
+            tempTerm = (-1)*(termList#j);
+            if (j > 0) then myStr = myStr | net(" - ");
+            if (j == 0) then myStr = net("-");
+        )
+        else (
+            if (j > 0) then myStr = myStr | net(" + ");
+            tempTerm = termList#j;
+        );
+        myStr = myStr | net (tempTerm);                
+        j = j+1;        
     );    
-    net(myStr | toString(" + ... "))
+    net(myStr | net(" + ... "))
+)
+
+toString LazySeries := L -> (
+    myStr := toString("");
+    local tempStr;
+    local tempTerm;
+    termList := reverse terms (L#cache#displayedPolynomial);
+    j := 0;
+    while (j < #termList) do (                
+        tempStr = toString(termList#j);
+        if (tempStr#0 === "-") then (
+            tempTerm = (-1)*(termList#j);
+            if (j > 0) then myStr = myStr | toString(" - ");
+            if (j == 0) then myStr = toString("-");
+        )
+        else (
+            if (j > 0) then myStr = myStr | toString(" + ");
+            tempTerm = termList#j;
+        );
+        myStr = myStr | toString (tempTerm);                
+        j = j+1;        
+    );    
+    toString(myStr | toString(" + ... "))
 )
 
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})
