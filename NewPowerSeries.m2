@@ -34,24 +34,32 @@ newPackage(
         )
 
 export{
+    "LazySeries",
     "lazySeries",
     "coefficientFunction",
     "constantTerm",
     "seriesRing",
-    "LazySeries",
+    
     "DisplayedDegree", 
     "ComputedDegree",  
     "displayedPolynomial",
-    "computedPolynomial",
-    "changeDegree",
+    "computedPolynomial"  
+}
+
+export{
+  "changeDegree",
+  "zeroSeries",
+  "oneSeries"
+}
+
+-- HelperFunctions
+export{
     "toMonomial",
     "maximumsList",
     "toBinary",
-    "calculatePolynomial",
-    "dog"
+    "calculatePolynomial"
+
 }
-LazySeries = new Type of MutableHashTable;
-dog = new Type of HashTable;
 
 load "./NewPowerSeries/PowerSeriesFunctions.m2"
 

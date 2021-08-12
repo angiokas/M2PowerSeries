@@ -54,7 +54,7 @@ toString LazySeries := L -> (
     toString(myStr | toString(" + ... "))
 )
 
-lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})
+lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3})
 
 -- Making a LazySeries without the added computation of polynomial construction
 lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayedPoly, computedPoly) -> (
@@ -107,23 +107,16 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
 
 -- Converting ring elements and polynomials into LazySeries
 lazySeries(RingElement) := LazySeries => opts -> P -> ( 
-    R := ring P;
-    variables := gens R;
-    local newFunction;
-    if (opts.coefficientFunction === null) then (
-        newFunction = variables -> coefficient(variables, P)
-    )
-    else(
-        newFunction = opts.coefficientFunction;
-    );
+    R := ring P; 
+    f := variables -> coefficient(variables, P);
+
     deg:= sum (degree P); -- default degree
     if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
 
     displayedPoly := part(0, deg, P);
       
-    lazySeries(R, newFunction, displayedPoly, P, DisplayedDegree => deg, ComputedDegree => deg) 
+    lazySeries(R, f, displayedPoly, P, DisplayedDegree => deg, ComputedDegree => deg) 
 );
-
 
 lazySeries(LazySeries, Function) := LazySeries => opts -> (S, function) -> (    
     R := S#seriesRing;
@@ -176,7 +169,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (S, newDeg) -> (
     );
     S
 );
-
+-- changes ComputedDegree and computedPolynomial only
 changeComputedDegree = method()
 changeComputedDegree(LazySeries, ZZ) := LazySeries => (S, newDeg) -> (
 
@@ -241,7 +234,7 @@ getPolynomial(LazySeries, List) := RingElement => (S, deg) -> (
     select(sub(P, R), i -> degree i >= deg)
 );
 
--- 
+-- Questionable....
 makeSeriesCompatible = method()
 makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
     if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match";
@@ -283,19 +276,26 @@ isUnit(LazySeries) := Boolean => S -> (
 -- Zero series
 zeroSeries = method() -- maybe we can just change it to a variable instead??
 zeroSeries(Ring) := LazySeries => R -> (
-    variables := gens R;
-    lazySeries(R, variables -> 0)
+    f := variables -> 0;
+    P := sub(0, R);
+
+    lazySeries(R, f, P, P)
     );
 
 -- One series
 oneSeries = method()
 oneSeries(Ring) := LazySeries => R -> (
     ringZeroes := (numgens R:0);
-    variables := gens R;
-    newFunction := variables -> (if variables == ringZeroes then 1
-                                else 0
-                                );
-    lazySeries(R, newFunction)
+    if (numgens R == 1) then ringZeroes = 0;
+    
+    f := variables -> (
+        if (variables == ringZeroes) or (variables == {ringZeroes}) then 1
+        else 0
+        );
+
+    P := sub(1, R);
+
+    lazySeries(R, f, P, P)
     );
 ------------------------ BASIC OPERATIONS----------------------------------------------------------
 
