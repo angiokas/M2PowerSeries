@@ -4,12 +4,9 @@
 --===================================================================================
 --PowerSeriesFunctions (PowerSeriesFunctions.m2)
 
-
-
 load "./HelperFunctions.m2";
 
-
-
+LazySeries = new Type of MutableHashTable;
 
 net LazySeries := L -> (
     myStr := net("");
@@ -59,7 +56,21 @@ toString LazySeries := L -> (
 
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3, coefficientFunction => null})
 
+-- Making a LazySeries without the added computation of polynomial construction
+lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayedPoly, computedPoly) -> (
 
+    new LazySeries from {
+        coefficientFunction => f,
+        seriesRing => R,
+
+        cache => new CacheTable from { -- contains everything mutable
+            DisplayedDegree => opts.DisplayedDegree,
+            displayedPolynomial => displayedPoly,
+            ComputedDegree => opts.ComputedDegree,
+            computedPolynomial => computedPoly
+        }
+    }
+)
 -- f is the function which has to have the same amount of inputs as there are variables
 lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
     --try f ringZeroes then 1 -- checks to see if f was inputted correctly by plugging in (0 0 ... 0)
@@ -70,12 +81,13 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
    
     local f;
     local s;
-    deg := opts.DisplayedDegree;
+    deg := opts.DisplayedDegree; -- need to change it to computed degree actually because that should be priority for calculation
     if (class opts.DisplayedDegree === List) then deg = sum opts.DisplayedDegree;
 
     K:= calculatePolynomial(deg, R, function);
     s = K#0;
     f = K#1;
+
      -- Making a new lazySeries
     L := new LazySeries from {
         --constantTerm => f sum degree (1_R),
@@ -104,8 +116,12 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
     else(
         newFunction = opts.coefficientFunction;
     );
-    
-    lazySeries(R, newFunction, DisplayedDegree =>sum (degree P), ComputedDegree => sum (degree P)) 
+    deg:= sum (degree P); -- default degree
+    if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
+
+    displayedPoly := part(0, deg, P);
+      
+    lazySeries(R, newFunction, displayedPoly, P, DisplayedDegree => deg, ComputedDegree => deg) 
 );
 
 
@@ -358,25 +374,24 @@ Number * LazySeries := LazySeries => (n,S) -> (
     else error("Cannot promote number to Series ring");
 
     if n == 1 then S;
-
-    
     if n == 0 then zeroSeries(R);
 
     variables := gens R;
     newComputedPoly := n*(S#computedPolynomial);
 
     newFunction:= variables-> (n * (f variables));
+
     --fix this so it doesn't compute things
-    -*new LazySeries from {
+    new LazySeries from {
         seriesRing => R,
         coefficientFunction => newFunction, 
         DisplayedDegree => S#DisplayedDegree;
         ComputedDegree => S#ComputedDegree;
         computedPolynomial => newComputedPoly;
         displayedPolynomial => truncate(S#DisplayedDegree, newComputedPoly);
-    }*-
+    }
 
-    lazySeries(R, newFunction, DisplayedDegree => S.cache.DisplayedDegree, ComputedDegree => S.cache.ComputedDegree)
+    --lazySeries(R, newFunction, DisplayedDegree => S.cache.DisplayedDegree, ComputedDegree => S.cache.ComputedDegree)
 );
 
 LazySeries * Number := LazySeries => (S,n) -> n * S;
