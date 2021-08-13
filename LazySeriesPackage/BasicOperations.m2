@@ -346,14 +346,13 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
 );
 ------------------------------------
 
-inverse(LazySeries) := LazySeries => (S) -> (
+inverse(LazySeries) := LazySeries => (L) -> (
     -- first check if it is a unit in the ring
-    if isUnit(S) == false then error "Cannot invert series because it is not a unit";
-    c := S#constantTerm;
-    print "STARTING INVERSE";
+    if isUnit(L) == false then error "Cannot invert series because it is not a unit";
+    c := part(0, L.cache.displayedPolynomial);
 
-    print ((-1)*((S / c)-1));
-    g := ((-1)*((S / c)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    print ((-1)*((L / c)-1));
+    g := ((-1)*((L / c)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
     print "THIS IS g: ";
     print g;
     print "CALCULATING MACLAURIN SERIES";
@@ -362,7 +361,7 @@ inverse(LazySeries) := LazySeries => (S) -> (
     print (lazySeries(g, i->1));
     h := (1/c) * lazySeries(g, i->1); -- temporary displayDegree
     print "CALCULATED";
-    h
+    changeDegree(L.cache.DisplayedDegree, h)
 );
 -*
 inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (

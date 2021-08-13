@@ -73,9 +73,6 @@ lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayed
 )
 -- f is the function which has to have the same amount of inputs as there are variables
 lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
-    --try f ringZeroes then 1 -- checks to see if f was inputted correctly by plugging in (0 0 ... 0)
-    --else error "Number of inputs of given function does not match number of ring generators";
-    -- ^ I think this check is a bit useless since the problem could be something else besides the number of inputs
     --ringZeroes := numgens R:0;
     --ringZeroes := 0;
    
@@ -243,7 +240,38 @@ getPolynomial(LazySeries, List) := RingElement => (S, deg) -> (
     select(sub(P, R), i -> degree i >= deg)
 );
 
+-- Get coefficient function of a LazySeries (THINKING OF REMOVING BECAUSE WE DON'T WANT USERS TO SEE)
+getFunction = method()
+getFunction(LazySeries) := Function => S -> (
+    S#coefficientFunction
+);
+
+
+-- Overloading of sub; Promotes LazySeries defined over a ring to the specified new ring
+sub(LazySeries, Ring) := LazySeries => (L, R) -> (
+    f := getFunction(L);
+    newDisplayedPoly := sub(L.cache.displayedPolynomial, R);
+    newComputedPoly := sub(L.cache.computedPolynomial, R);
+
+    lazySeries(
+        R,
+        f,
+        newDisplayedPoly,
+        newComputedPoly,
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.ComputedDegree
+        )
+);
+
+-- Overloading of isUnit method; checks if the leading coefficient is a unit in the ring
+isUnit(LazySeries) := Boolean => L -> (
+    constantTerm := part(0, L.cache.displayedPolynomial);
+    isUnit(constantTerm)
+    
+);
+
 -- Questionable....
+-*
 makeSeriesCompatible = method()
 makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
     if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match";
@@ -253,29 +281,4 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
     else if A#DisplayedDegree > B#DisplayedDegree then (changeDegree(A, B#DisplayedDegree), B)
     else (A, changeDegree(B, A#DisplayedDegree))
     );
-
-
--- Get coefficient function of a LazySeries (THINKING OF REMOVING BECAUSE WE DON'T WANT USERS TO SEE)
-getFunction = method()
-getFunction(LazySeries) := Function => S -> (
-    R := S#seriesRing;
-    sub(S#coefficientFunction, R) --might want to change how i save functions inside the constructor instead of using sub here i.e use sub in the constructor
-);
-
-
--- Overloading of sub; Promotes LazySeries defined over a ring to the specified new ring
-sub(LazySeries, Ring) := LazySeries => (S,R) -> (
-    f := getFunction(S);
-    P := 
-    lazySeries(
-        R,
-        f,
-        DisplayedDegree => S#DisplayedDegree, ComputedDegree => S#ComputedDegree)
-);
-
--- Overloading of isUnit method; checks if the leading coefficient is a unit in the ring
-isUnit(LazySeries) := Boolean => S -> (
-    R := S#seriesRing;
-    -- coefficientRing L; -- not sure if I even need this, since it promote it to the ring regardless
-    isUnit(sub(S#constantTerm,R))
-);
+*-
