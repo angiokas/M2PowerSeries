@@ -189,6 +189,9 @@ print combinations;
 sort(combinations)
 rsort(combinations)
 ```
+
+[`compositions`](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_compositions.html)
+
 ## comparing Rings 
 You can only compare rings by using `===` symbol, otherwise it won't work. 
 Example: 
@@ -242,3 +245,24 @@ a^7 + (7 choose 1)a^6b^1 + … + b^7 (prime choose i) is divisible by p if i is 
 
 to check if a user has inputted a function with the corect amount of variables that corresponds with the number of variables in the ring, we could use a test with a zero vector of the size of the amounnt of variables in the ring and if it ouputs an error, then error out to the user that they need to input the correct type of function. Use try Catch. https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_try.html
 
+## For testing
+- [`assert`](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.17/share/doc/Macaulay2/Macaulay2Doc/html/_assert.html)
+- [hypertext list format](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.15/share/doc/Macaulay2/Macaulay2Doc/html/_hypertext_splist_spformat.html)
+
+## Some polynomial methods I used
+- Truncating polynomial: 
+[`parts`](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.15/share/doc/Macaulay2/Macaulay2Doc/html/_part.html)
+
+- Getting coefficient of monomial in a polynomial:
+[`coefficient `](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_coefficient.html)
+
+- Getting a list of degree of polynomial:
+[`degree`](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.15/share/doc/Macaulay2/Macaulay2Doc/html/_degree_lp__Ring__Element_rp.html)
+
+- List exponents of a polynomial
+[`exponents`](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.16/share/doc/Macaulay2/Macaulay2Doc/html/_exponents.html)
+- 
+## Documentation
+
+[SimpleDoc](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.16/share/doc/Macaulay2/SimpleDoc/html/index.html)
+[]
