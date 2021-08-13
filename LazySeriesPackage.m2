@@ -4,7 +4,7 @@
 --*************************************************
 --*************************************************
 newPackage(
-        "NewPowerSeries",
+        "LazySeriesPackage",
         Version => "2.0", 
         Date => "5/14/2021",
         Authors => {
@@ -34,45 +34,49 @@ newPackage(
         )
 
 export{
+  -- HelperFunctions
+    "toMonomial",
+    "maximumsList",
+    "toBinary",
+    "calculatePolynomial",
+
+    -- LazySeries
     "LazySeries",
     "lazySeries",
     "coefficientFunction",
     "constantTerm",
     "seriesRing",
-    
     "DisplayedDegree", 
     "ComputedDegree",  
     "displayedPolynomial",
-    "computedPolynomial"  
-}
+    "computedPolynomial",
 
-export{
-  "changeDegree",
-  "zeroSeries",
-  "oneSeries"
-}
+    -- Methods
+    "changeDegree",
 
--- HelperFunctions
-export{
-    "toMonomial",
-    "maximumsList",
-    "toBinary",
-    "calculatePolynomial"
+ 
+    -- Basic Operations
+    
+    "zeroSeries",
+    "oneSeries"
 
 }
 
-load "./NewPowerSeries/PowerSeriesFunctions.m2"
 
+load "./LazySeriesPackage/LazySeriesMethods.m2"
+load "./LazySeriesPackage/BasicOperations.m2"
 
 
 --DOCUMENTATION
 beginDocumentation()
-load "./NewPowerSeries/PowerSeriesFunctionsDoc.m2"
+load "./LazySeriesPackage/LazySeriesMethodsDoc.m2"
+load "./LazySeriesPackage/BasicOperationsDoc.m2"
+
 
 
 -- TESTS
-load "./NewPowerSeries/Tests/ConstructionTests.m2"
-load "./NewPowerSeries/Tests/HelperFunctionTests.m2"
-load "./NewPowerSeries/Tests/BasicOperationsTests.m2"
+load "./LazySeriesPackage/Tests/ConstructionTests.m2"
+load "./LazySeriesPackage/Tests/HelperFunctionTests.m2"
+load "./LazySeriesPackage/Tests/BasicOperationsTests.m2"
 
 end

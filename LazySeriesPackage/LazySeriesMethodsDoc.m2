@@ -8,7 +8,7 @@ needsPackage "SimpleDoc";
 
 doc ///
 Key
-    NewPowerSeries
+    LazySeriesPackage
     LazySeries
     
 
