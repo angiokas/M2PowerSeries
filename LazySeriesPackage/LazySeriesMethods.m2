@@ -82,8 +82,8 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
     if (class opts.DisplayedDegree === List) then deg = sum opts.DisplayedDegree;
 
     K:= calculatePolynomial(deg, R, function);
-    s = K#0;
-    f = K#1;
+    s = K#0; -- polynomial
+    f = K#1; -- function
 
      -- Making a new lazySeries
     L := new LazySeries from {
@@ -126,7 +126,7 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     f := x -> sub(function x, R);
 
     s := 0;
-    deg := L#DisplayedDegree;
+    deg := L.cache.DisplayedDegree;
      -- add terms to s up to deg degree.
     for i from 0 to deg do (
         s = s + (f i)*L^i;
@@ -137,10 +137,10 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     lazySeries(
         R,
         newFunction,
-        s#displayedPolynomial,
-        s#computedPolynomial,
+        s.cache.displayedPolynomial,
+        s.cache.computedPolynomial,
         DisplayedDegree => deg,
-        ComputedDegree=> s#ComputedDegree
+        ComputedDegree=> s.cache.ComputedDegree
         )
 );
 
@@ -158,18 +158,20 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
     R := L#seriesRing;
     local tempPoly;
 
-    if newDeg == oldDeg then L
+    if newDeg == oldDeg then (
+        L
+    )
     else if newDeg > oldDeg then (
-        L#cache#ComputedDegree = newDeg;
-        L#cache#DisplayedDegree = newDeg;
+        L.cache.ComputedDegree = newDeg;
+        L.cache.DisplayedDegree = newDeg;
         tempPoly = (calculatePolynomial(newDeg, R, f))#0;
-        L#cache#computedPolynomial = tempPoly;
-        L#cache#displayedPolynomial = tempPoly;
+        L.cache.computedPolynomial = tempPoly;
+        L.cache.displayedPolynomial = tempPoly;
         --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
     )
     else (
-        L#cache#DisplayedDegree = newDeg;
-        L#cache#displayedPolynomial = truncate(newDeg, L#cache#displayedPolynomial);
+        L.cache.DisplayedDegree = newDeg;
+        L.cache.displayedPolynomial = part(0, newDeg, L.cache.displayedPolynomial);
     );
 
     L
@@ -179,19 +181,32 @@ changeComputedDegree = method()
 changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
 
     oldDeg := L.cache.DisplayedDegree;
+    oldPoly := L.cache.displayedPolynomial;
+
     f := L#coefficientFunction;
     R := L#seriesRing;
     local tempPoly;
 
     if newDeg == oldDeg then L
     else if newDeg > oldDeg then (
+        print "THIS IS EXACTLY THE PROBLEM BTW";
         L#cache#ComputedDegree = newDeg;
         tempPoly = (calculatePolynomial(newDeg, R, f))#0;
         L#cache#computedPolynomial = tempPoly;
+
+        lazySeries(
+            R,
+            f,
+            oldPoly,
+            tempPoly,
+            DisplayedDegree => oldDeg,
+            ComputedDegree => newDeg)
         --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
-    );
-    
-    L
+    )
+    else (
+        print "Trying to lessen computed degree. why would you do that?";
+        L
+        );
 );
 
 -- overloading coefficient method
@@ -230,15 +245,16 @@ coefficient(RingElement, LazySeries) := (M, L) ->(
 ring(LazySeries) := L -> L#seriesRing;
 
 -- Returns displayed polynomial
-getPolynomial = method()
-getPolynomial(LazySeries):= L -> L.cache.displayedPolynomial;
+polynomial = method()
+polynomial(LazySeries):= L -> L.cache.displayedPolynomial;
 
 -- Get polynomial of a LazySeries of specified degree 
-getPolynomial(LazySeries, List) := RingElement => (S, deg) -> (
+-*getPolynomial(LazySeries, List) := RingElement => (S, deg) -> (
     R := S#seriesRing;
     P := S.cache.displayedPolynomial;
     select(sub(P, R), i -> degree i >= deg)
 );
+*-
 
 -- Get coefficient function of a LazySeries (THINKING OF REMOVING BECAUSE WE DON'T WANT USERS TO SEE)
 getFunction = method()

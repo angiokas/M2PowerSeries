@@ -21,7 +21,7 @@ oneSeries(Ring) := LazySeries => R -> (
     if (numgens R == 1) then ringZeroes = 0;
     
     f := v -> (
-        if (v == ringZeroes) or (v == {ringZeroes}) then 1
+        if (v == ringZeroes) then 1
         else 0
         );
 
@@ -42,8 +42,8 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     newFunction:= v -> f v + g v;
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
 
-    a := parts(0, newDegree, A.cache.displayedPolynomial);
-    b := parts(0, newDegree, B.cache.displayedPolynomial);
+    a := part(0, newDegree, A.cache.displayedPolynomial);
+    b := part(0, newDegree, B.cache.displayedPolynomial);
     newPoly :=  a + b;
 
     lazySeries(
@@ -65,8 +65,8 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     newFunction:= v-> f v - g v;
     newDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
 
-    a := parts(0, newDegree, A.cache.displayedPolynomial);
-    b := parts(0, newDegree, B.cache.displayedPolynomial);
+    a := part(0, newDegree, A.cache.displayedPolynomial);
+    b := part(0, newDegree, B.cache.displayedPolynomial);
     newPoly :=  a - b;
 
     -- Do we want similar calculatiion for ComputedDegree? Do we want long ComputedDegree calculations?
@@ -97,15 +97,15 @@ Number + LazySeries := LazySeries => (n, L) -> (
                                else (f v)
                                );
 
-    newPoly := n + L.displayedPolynomial;
+    newPoly := n + L.cache.displayedPolynomial;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
         newPoly,
-        DisplayedDegree => L.DisplayedDegree,
-        ComputedDegree => L.DisplayedDegree
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.DisplayedDegree
         )
 );
 
@@ -128,7 +128,7 @@ Number - LazySeries := LazySeries => (n, L) -> (
         else (- (f v))
         );
     
-    newPoly := n - L.displayedPolynomial;
+    newPoly := n - L.cache.displayedPolynomial;
 
     lazySeries(
         R,
@@ -157,15 +157,15 @@ Number * LazySeries := LazySeries => (n, L) -> (
     --newComputedPoly := n * (S#computedPolynomial);
 
     newFunction:= v -> (n * (f v));
-    newPoly := n * (L#displayedPolynomial);
+    newPoly := n * (L.cache.displayedPolynomial);
 
     lazySeries(
         R,
         newFunction,
         newPoly,
         newPoly,
-        DisplayedDegree => L.DisplayedDegree,
-        ComputedDegree => L.DisplayedDegree
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.DisplayedDegree
         )
 
 );
@@ -186,16 +186,20 @@ LazySeries / Number := LazySeries => (L, n) -> (
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
 
     newFunction:= v -> (f v) / n;
-    newPoly := L.displayedPolynomial / n;
+    newPoly := (calculatePolynomial((L.cache.DisplayedDegree), R, newFunction))#0;
+
+    --newPoly := L.cache.displayedPolynomial / n;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
         newPoly,
-        DisplayedDegree => L.DisplayedDegree,
-        ComputedDegree => L.DisplayedDegree
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.DisplayedDegree
         )
+
+
     
 );
 -* NEED TO FIX
@@ -236,15 +240,15 @@ LazySeries // Number := LazySeries => (L, n) -> (
     
 
     newFunction:= v-> (f v) // n;
-    newPoly := L.displayedPolynomial // n;
+    newPoly := L.cache.displayedPolynomial // n;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
         newPoly,
-        DisplayedDegree => L.DisplayedDegree,
-        ComputedDegree => L.DisplayedDegree
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.DisplayedDegree
         )
 );
 -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -259,14 +263,12 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     ringZeroes := numgens R:0;
 
     newDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
-    
-    newFunction := coefficientVector -> (
-        
-        tempDegree := coefficientVector; -- bandaid!!!!!
+    --newDegree := min(A.cache.DisplayedDegree + B.cache.DisplayedDegree, 10);
 
+    newFunction := coefficientVector -> (
+        tempDegree := coefficientVector; -- bandaid!!!!!
         if(class coefficientVector === List) then tempDegree = sum coefficientVector;
         
-
         a := changeComputedDegree(A, tempDegree);
         b := changeComputedDegree(B, tempDegree);
 
@@ -276,7 +278,6 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         P := truncate(newDegree, P1*P2);
 
         coefficient(coefficientVector, P)
-        
     );
 
     changeComputedDegree(A, newDegree);
@@ -290,7 +291,8 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         newPoly,
         DisplayedDegree =>  newDegree,
         ComputedDegree => newDegree);
-    changeDegree(finalSeries, max(A.cache.DisplayedDegree, B.cache.DisplayedDegree))
+
+    changeDegree(finalSeries, newDegree)
     
 );
 
@@ -310,7 +312,6 @@ RingElement * LazySeries := LazySeries => (P, L) -> (
 
 LazySeries * RingElement := LazySeries => (S,x) -> x * S;
 
-
 -- Raising LazySeries by nth power
 LazySeries ^ ZZ := LazySeries => (S,n) -> (
     R := S#seriesRing;
@@ -318,15 +319,16 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
     if n == 1 then  return S;
 
     if n < 0 then (
-        return inverse(S ^ (-n));
+        return inverse(S^(-n));
     );
 
     bin := toBinary(n);
     finalResult := 1;
     tempCalculation:= S;
     j := 1;
+
     while (true) do (     
-        if(bin#(#bin-j)== 1) then (
+        if(bin#(#bin-j) == 1) then (
             finalResult = tempCalculation;
             break;
         );        
@@ -339,7 +341,7 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
 
         if bin#(#bin-j-1-i) == 1 then (
             finalResult = finalResult * tempCalculation;
-        );       
+        );
     );
     finalResult
 
@@ -348,21 +350,17 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
 
 inverse(LazySeries) := LazySeries => (L) -> (
     -- first check if it is a unit in the ring
+
     if isUnit(L) == false then error "Cannot invert series because it is not a unit";
     c := part(0, L.cache.displayedPolynomial);
+    c = sub(c, coefficientRing (L#seriesRing));
 
-    print ((-1)*((L / c)-1));
     g := ((-1)*((L / c)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
-    print "THIS IS g: ";
-    print g;
-    print "CALCULATING MACLAURIN SERIES";
-    print c;
-    print "lazy";
-    print (lazySeries(g, i->1));
-    h := (1/c) * lazySeries(g, i->1); -- temporary displayDegree
-    print "CALCULATED";
-    changeDegree(L.cache.DisplayedDegree, h)
+    h := (1/c) * (lazySeries(g, i->1)); 
+
+    changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
+
 -*
 inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (
     -- first check if it is a unit in the ring

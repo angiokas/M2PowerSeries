@@ -1,7 +1,9 @@
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S.  It 
 
 --this is taken from the PowerSeries.m2 package
-truncate(ZZ,RingElement) := RingElement => (n,f) -> part(,n,f);
+truncate(ZZ, RingElement) := (n, P) ->(
+     part(0, n, P)
+    );
 
 toMonomial = (L, S) ->(
      variableList := flatten entries vars S;
@@ -58,34 +60,35 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
         for i from 0 to deg do s = s + (f i)*(ringVariables#0)^i;
         )*-
     --else 
-    (
+    
      -- n>1 n-variable version
         dummyConstantVector := apply(numgens R, t -> 0);        
-        print "hellow world";
+        
         try sub(function dummyConstantVector, R) else (
             try sub(function toSequence dummyConstantVector, R) then (
-                print "first thing worked";
+                --print "first thing worked";
                 newFunction = tempList -> function toSequence tempList
             )
             else(                
-                print "second thing worked";
-                print (function (dummyConstantVector#0));
+                --print "second thing worked";
+                --print (function (dummyConstantVector#0));
                 newFunction = tempList -> function (tempList#0); 
             );
         );
-        try newFunction dummyConstantVector then ( print (newFunction dummyConstantVector) )
+        try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
         else (
             error "The lazySeries function should take a exponent vector and output a ring element";
         );
         try(
-            if instance(newFunction(dummyConstantVector), R) then f = newFunction else f = v -> sub(newFunction v, R);
+            if instance(newFunction(dummyConstantVector), R) then f = newFunction
+            else f = v -> sub(newFunction v, R);
         ) else (
             error "The lazySeries function needs to output something that can be interpretted as a ring element.";
         );
         
         
          for j from start to deg do (-- IT WONT WORK WITH MULTI GRADED RINGS WITH DEGREES THAT ARE LISTS, can use `from ringZeroes .. to opts.displayedPolynomial`, but it gives error somewhere else down the line
-            print compositions (#ringVariables, j);
+            --print compositions (#ringVariables, j);
             combinations = append(combinations, compositions (#ringVariables, j)); 
          );
 
@@ -95,7 +98,6 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
     for j from 0 to #combinations-1 do (
         s = s + (f (combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));
         );
-    );
-    (s,f)
-)
-
+    
+    (s, f)
+);
