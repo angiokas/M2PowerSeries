@@ -5,7 +5,7 @@ truncate(ZZ, RingElement) := (n, P) ->(
      part(0, n, P)
     );
 
-toMonomial = (L, S) ->(
+toMonomial = (L, S) -> (
      variableList := flatten entries vars S;
      m := 1;
      for i from 0 to (#L-1) do(

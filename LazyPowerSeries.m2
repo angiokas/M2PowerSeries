@@ -4,7 +4,7 @@
 --*************************************************
 --*************************************************
 newPackage(
-        "LazySeriesPackage",
+        "LazyPowerSeries",
         Version => "2.0", 
         Date => "5/14/2021",
         Authors => {
@@ -63,20 +63,20 @@ export{
 }
 
 
-load "./LazySeriesPackage/LazySeriesMethods.m2"
-load "./LazySeriesPackage/BasicOperations.m2"
+load "./LazyPowerSeries/LazySeriesMethods.m2"
+load "./LazyPowerSeries/BasicOperations.m2"
 
 
 --DOCUMENTATION
 beginDocumentation()
-load "./LazySeriesPackage/LazySeriesMethodsDoc.m2"
-load "./LazySeriesPackage/BasicOperationsDoc.m2"
+load "./LazyPowerSeries/LazySeriesMethodsDoc.m2"
+load "./LazyPowerSeries/BasicOperationsDoc.m2"
 
 
 
 -- TESTS
-load "./LazySeriesPackage/Tests/ConstructionTests.m2"
-load "./LazySeriesPackage/Tests/HelperFunctionTests.m2"
-load "./LazySeriesPackage/Tests/BasicOperationsTests.m2"
+load "./LazyPowerSeries/Tests/ConstructionTests.m2"
+load "./LazyPowerSeries/Tests/HelperFunctionTests.m2"
+load "./LazyPowerSeries/Tests/BasicOperationsTests.m2"
 
 end

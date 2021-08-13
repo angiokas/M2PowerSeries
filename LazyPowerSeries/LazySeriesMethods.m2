@@ -104,7 +104,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
 -- Converting ring elements and polynomials into LazySeries
 lazySeries(RingElement) := LazySeries => opts -> P -> ( 
     R := ring P; 
-    f := variables -> coefficient(variables, P);
+    f := v -> coefficient(v, P);
 
     deg:= sum (degree P); -- default degree
     if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
@@ -126,21 +126,23 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     f := x -> sub(function x, R);
 
     s := 0;
-    deg := L.cache.DisplayedDegree;
+    oldDeg := L.cache.DisplayedDegree;
+    
      -- add terms to s up to deg degree.
-    for i from 0 to deg do (
+    for i from 0 to oldDeg do (
         s = s + (f i)*L^i;
         );    
      -- Making a new lazySeries
+    newDeg := s.cache.ComputedDegree;
     newFunction := s#coefficientFunction;
 
     lazySeries(
         R,
         newFunction,
-        s.cache.displayedPolynomial,
-        s.cache.computedPolynomial,
-        DisplayedDegree => deg,
-        ComputedDegree=> s.cache.ComputedDegree
+        truncate(oldDeg, s.cache.displayedPolynomial),
+        truncate(oldDeg, s.cache.computedPolynomial),
+        DisplayedDegree => oldDeg,
+        ComputedDegree=> newDeg
         )
 );
 
@@ -189,7 +191,7 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
 
     if newDeg == oldDeg then L
     else if newDeg > oldDeg then (
-        print "THIS IS EXACTLY THE PROBLEM BTW";
+        
         L#cache#ComputedDegree = newDeg;
         tempPoly = (calculatePolynomial(newDeg, R, f))#0;
         L#cache#computedPolynomial = tempPoly;
@@ -201,7 +203,6 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
             tempPoly,
             DisplayedDegree => oldDeg,
             ComputedDegree => newDeg)
-        --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
     )
     else (
         print "Trying to lessen computed degree. why would you do that?";

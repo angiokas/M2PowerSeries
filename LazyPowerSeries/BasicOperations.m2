@@ -202,7 +202,7 @@ LazySeries / Number := LazySeries => (L, n) -> (
 
     
 );
--* NEED TO FIX
+-*
 LazySeries / RingElement := LazySeries => (S, P) -> (
     
     if n == 0 then error "Cannot divide by 0"; -- have to change 0 to ring 0
@@ -215,7 +215,8 @@ LazySeries / RingElement := LazySeries => (S, P) -> (
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
 
     newFunction:= v -> (f v) / P; -- have to think about this
-    newPoly := L.displayedPolynomial / P;
+    --newPoly := L.displayedPolynomial / P;
+    
     
     lazySeries(
         R,
@@ -225,8 +226,8 @@ LazySeries / RingElement := LazySeries => (S, P) -> (
         DisplayedDegree => L.DisplayedDegree,
         ComputedDegree => L.DisplayedDegree
         )
-);*-
-
+);
+*-
 -- Division with remainder by scalar (the `//` binary operator)
 LazySeries // Number := LazySeries => (L, n) -> (
 
@@ -238,7 +239,6 @@ LazySeries // Number := LazySeries => (L, n) -> (
 
     ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
     
-
     newFunction:= v-> (f v) // n;
     newPoly := L.cache.displayedPolynomial // n;
 
@@ -354,9 +354,10 @@ inverse(LazySeries) := LazySeries => (L) -> (
     if isUnit(L) == false then error "Cannot invert series because it is not a unit";
     c := part(0, L.cache.displayedPolynomial);
     c = sub(c, coefficientRing (L#seriesRing));
+    d := 1/c;
 
-    g := ((-1)*((L / c)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
-    h := (1/c) * (lazySeries(g, i->1)); 
+    g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    h := d * (lazySeries(g, i->1)); 
 
     changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
