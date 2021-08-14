@@ -8,6 +8,7 @@ load "./HelperFunctions.m2";
 
 LazySeries = new Type of HashTable;
 
+
 net LazySeries := L -> (
     myStr := net("");
     local tempStr;
@@ -189,7 +190,9 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
     R := L#seriesRing;
     local tempPoly;
 
-    if newDeg == oldDeg then L
+    if (debugLevel > 0) then print "tried to change computed degree to a lower value, nothing done";
+
+    if newDeg <= oldDeg then L
     else if newDeg > oldDeg then (
         
         L#cache#ComputedDegree = newDeg;
@@ -204,10 +207,6 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
             DisplayedDegree => oldDeg,
             ComputedDegree => newDeg)
     )
-    else (
-        print "Trying to lessen computed degree. why would you do that?";
-        L
-        );
 );
 
 -- overloading coefficient method

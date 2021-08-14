@@ -280,38 +280,38 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
     ringZeroes := numgens R:0;
 
-    newDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
-    --newDegree := min(A.cache.DisplayedDegree + B.cache.DisplayedDegree, 10);
+    --Karl:  I changed this to min, feel free to remove comment if you don't object
+    newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
     newFunction := coefficientVector -> (
         tempDegree := coefficientVector; -- bandaid!!!!!
-        if(class coefficientVector === List) then tempDegree = sum coefficientVector;
-        
+        if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
+                
         a := changeComputedDegree(A, tempDegree);
         b := changeComputedDegree(B, tempDegree);
 
         P1 := a.cache.computedPolynomial;
         P2 := b.cache.computedPolynomial;
 
-        P := truncate(newDegree, P1*P2);
+        P := truncate(tempDegree, P1*P2);
 
         coefficient(coefficientVector, P)
     );
 
-    changeComputedDegree(A, newDegree);
-    changeComputedDegree(B, newDegree);
-    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.computedPolynomial))*(truncate(newDegree, B.cache.computedPolynomial)));
+    --changeComputedDegree(A, newDegree);
+    --changeComputedDegree(B, newDegree);
+    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
+    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
 
     finalSeries := lazySeries(
         R,
         newFunction,
         newPoly,
-        newPoly,
+        newCompPoly,
         DisplayedDegree =>  newDegree,
-        ComputedDegree => newDegree);
-
-    changeDegree(finalSeries, newDegree)
-    
+        ComputedDegree => newCompDegree)
+    --changeDegree(finalSeries, newDegree)    
 );
 
 -- Multiplication of LazySeries by RingElement
