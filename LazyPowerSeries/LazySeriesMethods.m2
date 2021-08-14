@@ -107,44 +107,67 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
     R := ring P; 
     f := v -> coefficient(v, P);
 
-    deg:= sum (degree P); -- default degree
-    if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
+    --deg:= infinity; -- default degree, it should be infinite unless the user says
+    --if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
 
-    displayedPoly := part(0, deg, P);
+    displayedPoly := truncate(opts.DisplayedDegree, P);
       
     lazySeries(
         R,
         f,
         displayedPoly,
         P,
-        DisplayedDegree => deg,
-        ComputedDegree => deg
+        DisplayedDegree => opts.DisplayedDegree,
+        ComputedDegree => infinity
         ) 
 );
 
 lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (    
+    local tempLPower;
     R := L#seriesRing;
     f := x -> sub(function x, R);
 
     s := 0;
-    oldDeg := L.cache.DisplayedDegree;
+    oldDeg := L.cache.ComputedDegree; --it makes sense to compute this to the same degree
+    origComputed := L.cache.computedPolynomial;
     
-     -- add terms to s up to deg degree.
-    for i from 0 to oldDeg do (
-        s = s + (f i)*L^i;
-        );    
+    --first we compute the new computed polynomial
+    newComputed := sum( apply(oldDeg+1, i -> truncate(oldDeg, (f i)*origComputed^i)) ); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
+    newDisplayed := truncate(L#cache.DisplayedDegree, newComputed);
+
+    newFunction := v -> (
+        sumV := sum v;
+        --if (debugLevel > 0) then print (L.cache.computedPolynomial);
+        changeComputedDegree(L, sumV); --compute it at a higher degree if needed
+        --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of manually taking the polynomial to the i.
+        --if (debugLevel > 0) then print (L.cache.computedPolynomial);
+        tempOrigComputed := L.cache.computedPolynomial;
+
+        tempComputed := sub(sum( apply(sumV+1, i -> truncate(sumV, (f i)*tempOrigComputed^i)) ), L#seriesRing);
+        --if (debugLevel > 0) then print tempComputed;
+        coefficient(v, tempComputed)
+    );
+     -- add terms to s up to deg degree.        
+    -*for i from 0 to oldDeg do (
+        tempLPower = L^i;        
+        s = s + (f i)*L^i;        
+    );*-    
      -- Making a new lazySeries
+     --s
+
+     -*
     newDeg := s.cache.ComputedDegree;
     newFunction := s#coefficientFunction;
-
+    *-
     lazySeries(
         R,
         newFunction,
-        truncate(oldDeg, s.cache.displayedPolynomial),
-        truncate(oldDeg, s.cache.computedPolynomial),
-        DisplayedDegree => oldDeg,
-        ComputedDegree=> newDeg
+        newDisplayed,
+        newComputed,
+        DisplayedDegree => L#cache.DisplayedDegree,
+        ComputedDegree=> L#cache.ComputedDegree
         )
+    
 );
 
 

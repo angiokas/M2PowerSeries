@@ -6,17 +6,16 @@
 --===================================================================================
 
 -- Zero series
-zeroSeries = method() -- maybe we can just change it to a variable instead??
-zeroSeries(Ring) := LazySeries => R -> (
+zeroSeries = method(Options=>{DisplayedDegree => 3}) -- maybe we can just change it to a variable instead??
+zeroSeries(Ring) := LazySeries => opts -> R -> (
     f := variables -> 0;
-    P := sub(0, R);
-
-    lazySeries(R, f, P, P)
-    );
+    P := sub(0, R);    
+    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>infinity)
+);
 
 -- One series
-oneSeries = method()
-oneSeries(Ring) := LazySeries => R -> (
+oneSeries = method(Options=>{DisplayedDegree => 3})
+oneSeries(Ring) := LazySeries => opts -> R -> (
     ringZeroes := (numgens R:0);
     if (numgens R == 1) then ringZeroes = 0;
     
@@ -27,8 +26,8 @@ oneSeries(Ring) := LazySeries => R -> (
 
     P := sub(1, R);
 
-    lazySeries(R, f, P, P)
-    );
+    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>infinity)
+);
 ------------------------ BASIC OPERATIONS----------------------------------------------------------
 
 --Addition and substraction of two LazySeries
@@ -323,7 +322,7 @@ RingElement * LazySeries := LazySeries => (P, L) -> (
     try P = sub(P, R) then P = sub(P, R)
     else error("Cannot promote RingElement to LazySeries Ring"); -- coul try adding another condition for checking if we can promote series to ringElement ring
     
-    lazyP := lazySeries(P);
+    lazyP := lazySeries(P, DisplayedDegree => L#cache#DisplayedDegree);
       
     lazyP * L
 );
@@ -333,7 +332,7 @@ LazySeries * RingElement := LazySeries => (S,x) -> x * S;
 -- Raising LazySeries by nth power
 LazySeries ^ ZZ := LazySeries => (S,n) -> (
     R := S#seriesRing;
-    if n == 0 then return oneSeries(R);
+    if n == 0 then return lazySeries(sub(1, R), DisplayedDegree=>S#cache#DisplayedDegree);--oneSeries(R);
     if n == 1 then  return S;
 
     if n < 0 then (
@@ -368,16 +367,16 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
 
 inverse(LazySeries) := LazySeries => (L) -> (
     -- first check if it is a unit in the ring
-
+    coeffRing := coefficientRing (L#seriesRing);
     if isUnit(L) == false then error "Cannot invert series because it is not a unit";
     c := part(0, L.cache.displayedPolynomial);
-    c = sub(c, coefficientRing (L#seriesRing));
-    d := 1/c;
+    c = sub(c, coeffRing);
+    d := sub(1/c, coeffRing);    
 
-    g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...    
     h := d * (lazySeries(g, i->1)); 
-
-    changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
+    h
+    --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
 
 -*

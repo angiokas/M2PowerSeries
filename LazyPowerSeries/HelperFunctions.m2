@@ -5,6 +5,12 @@ truncate(ZZ, RingElement) := (n, P) ->(
      part(0, n, P)
     );
 
+truncate(InfiniteNumber, RingElement) := (n, P) ->(
+     if n == infinity then return P;
+     if n == -infinity then return sub(0, ring P);
+     P
+    );
+
 toMonomial = (L, S) -> (
      variableList := flatten entries vars S;
      m := 1;
