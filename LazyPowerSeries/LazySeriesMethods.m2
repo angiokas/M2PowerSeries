@@ -174,7 +174,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
         else ( --otherwise we have to compute everything
             L.cache.ComputedDegree = newDeg;
             L.cache.DisplayedDegree = newDeg;
-            tempPoly = (calculatePolynomial(newDeg, R, f))#0;
+            tempPoly = (calculatePolynomial(newDeg, R, f))#0;--we have no choice but to call this
             L.cache.computedPolynomial = tempPoly;
             L.cache.displayedPolynomial = tempPoly;
             --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
