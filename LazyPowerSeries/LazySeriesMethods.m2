@@ -6,7 +6,7 @@
 
 load "./HelperFunctions.m2";
 
-LazySeries = new Type of MutableHashTable;
+LazySeries = new Type of HashTable;
 
 net LazySeries := L -> (
     myStr := net("");
