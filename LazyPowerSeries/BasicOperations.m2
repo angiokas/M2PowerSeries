@@ -40,44 +40,53 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
 
     newFunction:= v -> f v + g v;
-    newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := part(0, newDegree, A.cache.displayedPolynomial);
-    b := part(0, newDegree, B.cache.displayedPolynomial);
-    newPoly :=  a + b;
+    a := truncate(newDispDegree, A.cache.displayedPolynomial);
+    b := truncate(newDispDegree, B.cache.displayedPolynomial);
+    newDispPoly :=  a + b;
+    a2 := truncate(newCompDegree, A.cache.computedPolynomial);
+    b2 := truncate(newCompDegree, B.cache.computedPolynomial);
+    newCompPoly := a2 + b2;
+    
 
     lazySeries(
         A.seriesRing,
         newFunction,
-        newPoly,
-        newPoly,
-        DisplayedDegree => newDegree,
-        ComputedDegree => newDegree
+        newDispPoly,
+        newCompPoly,
+        DisplayedDegree => newDispDegree,
+        ComputedDegree => newCompDegree
         )
 );
 
 LazySeries - LazySeries := LazySeries => (A,B) -> (
     if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match"; -- checks if using same ring
-    f := A.cache.coefficientFunction;
-    g := B.cache.coefficientFunction;
+
+    f := A.coefficientFunction;
+    g := B.coefficientFunction;
     R := A#seriesRing;
 
-    newFunction:= v-> f v - g v;
-    newDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newFunction:= v -> f v - g v;
+    newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := part(0, newDegree, A.cache.displayedPolynomial);
-    b := part(0, newDegree, B.cache.displayedPolynomial);
-    newPoly :=  a - b;
-
-    -- Do we want similar calculatiion for ComputedDegree? Do we want long ComputedDegree calculations?
+    a := truncate(newDispDegree, A.cache.displayedPolynomial);
+    b := truncate(newDispDegree, B.cache.displayedPolynomial);
+    newDispPoly :=  a - b;
+    a2 := truncate(newCompDegree, A.cache.computedPolynomial);
+    b2 := truncate(newCompDegree, B.cache.computedPolynomial);
+    newCompPoly := a2 - b2;
+    
 
     lazySeries(
         A.seriesRing,
         newFunction,
-        newPoly,
-        newPoly,
-        DisplayedDegree => newDegree,
-        ComputedDegree => newDegree
+        newDispPoly,
+        newCompPoly,
+        DisplayedDegree => newDispDegree,
+        ComputedDegree => newCompDegree
         )
 );
 
@@ -89,23 +98,23 @@ Number + LazySeries := LazySeries => (n, L) -> (
     try sub(n, R) then n = sub(n, R)
     else error("Cannot promote number to Series ring");
 
-    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
-    
+    --ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring    
     if(n == 0) then L;
 
-    newFunction := v -> (if v == ringZeroes then n + (f v)
+    newFunction := v -> (if all(v, t->t==0) then n + (f v)
                                else (f v)
                                );
 
     newPoly := n + L.cache.displayedPolynomial;
+    newPolyComputed := n + L.cache.computedPolynomial;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
-        newPoly,
+        newPolyComputed,
         DisplayedDegree => L.cache.DisplayedDegree,
-        ComputedDegree => L.cache.DisplayedDegree
+        ComputedDegree => L.cache.ComputedDegree
         )
 );
 
@@ -119,24 +128,25 @@ Number - LazySeries := LazySeries => (n, L) -> (
     else error("Cannot promote number to Series ring");
 
     
-    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
+    --ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring
 
     if(n == 0) then L;
 
     newFunction:= v -> (
-        if v == ringZeroes then n - (f v)
+        if all(v, t->t==0) then n - (f v)
         else (- (f v))
         );
     
     newPoly := n - L.cache.displayedPolynomial;
+    newComputedPoly := n - L.cache.computedPolynomial;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
-        newPoly,
-        DisplayedDegree => L.DisplayedDegree,
-        ComputedDegree => L.DisplayedDegree
+        newComputedPoly,
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.ComputedDegree
         )
 );
 
@@ -158,14 +168,15 @@ Number * LazySeries := LazySeries => (n, L) -> (
 
     newFunction:= v -> (n * (f v));
     newPoly := n * (L.cache.displayedPolynomial);
+    newComputedPoly := n * (L.cache.computedPolynomial);
 
     lazySeries(
         R,
         newFunction,
         newPoly,
-        newPoly,
+        newComputedPoly,
         DisplayedDegree => L.cache.DisplayedDegree,
-        ComputedDegree => L.cache.DisplayedDegree
+        ComputedDegree => L.cache.ComputedDegree
         )
 
 );
@@ -183,9 +194,14 @@ LazySeries / Number := LazySeries => (L, n) -> (
     try sub(n, R) then n = sub(n, R) 
     else error("Cannot promote number to Series ring");
 
-    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
+    if (n == 0) then error "cannot divide by zero";
 
-    newFunction:= v -> (f v) / n;
+    if not isUnit(n) then error "argument to divide by is not a unit in this ring";
+    oneOverN := sub(1/n, R);
+
+    oneOverN * L
+-*    
+    newFunction:= v -> (f v) * oneOverN;
     newPoly := (calculatePolynomial((L.cache.DisplayedDegree), R, newFunction))#0;
 
     --newPoly := L.cache.displayedPolynomial / n;
@@ -198,10 +214,9 @@ LazySeries / Number := LazySeries => (L, n) -> (
         DisplayedDegree => L.cache.DisplayedDegree,
         ComputedDegree => L.cache.DisplayedDegree
         )
-
-
-    
+    *-
 );
+
 -*
 LazySeries / RingElement := LazySeries => (S, P) -> (
     
@@ -235,20 +250,23 @@ LazySeries // Number := LazySeries => (L, n) -> (
     R := ring L;
 
     try sub(n, R) then n = sub(n, R) 
-    else error("Cannot promote number to Series ring");
+    else error("Cannot promote number to Series ring");    
 
-    ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators 
-    
+    if (n == 0) then error "cannot divide by zero";
+
+    if not isUnit(n) then error "argument to divide by is not a unit in this ring";
+        
     newFunction:= v-> (f v) // n;
     newPoly := L.cache.displayedPolynomial // n;
+    newComputedPoly := L.cache.computedPolynomial // n;
 
     lazySeries(
         R,
         newFunction,
         newPoly,
-        newPoly,
+        newComputedPoly,
         DisplayedDegree => L.cache.DisplayedDegree,
-        ComputedDegree => L.cache.DisplayedDegree
+        ComputedDegree => L.cache.ComputedDegree
         )
 );
 -------------------------------------------------------------------------------------------------------------------------------------------------------
