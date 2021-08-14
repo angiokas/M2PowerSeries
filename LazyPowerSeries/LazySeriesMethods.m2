@@ -156,21 +156,29 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
 changeDegree = method()
 changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
 
-    oldDeg := L.cache.DisplayedDegree;
+    oldDispDeg := L.cache.DisplayedDegree;
+    oldCompDeg := L.cache.ComputedDegree;
     f := L#coefficientFunction;
     R := L#seriesRing;
     local tempPoly;
 
-    if newDeg == oldDeg then (
+    if newDeg == oldDispDeg then (
         L
-    )
-    else if newDeg > oldDeg then (
-        L.cache.ComputedDegree = newDeg;
-        L.cache.DisplayedDegree = newDeg;
-        tempPoly = (calculatePolynomial(newDeg, R, f))#0;
-        L.cache.computedPolynomial = tempPoly;
-        L.cache.displayedPolynomial = tempPoly;
-        --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
+    )    
+    else if newDeg > oldDispDeg then (
+        if oldCompDeg >= newDeg then (--if we've already computed that high, just use it
+            L.cache.DisplayedDegree = newDeg;
+            tempPoly = truncate(newDeg, L.cache.computedPolynomial);
+            L.cache.displayedPolynomial = tempPoly;
+        )
+        else ( --otherwise we have to compute everything
+            L.cache.ComputedDegree = newDeg;
+            L.cache.DisplayedDegree = newDeg;
+            tempPoly = (calculatePolynomial(newDeg, R, f))#0;
+            L.cache.computedPolynomial = tempPoly;
+            L.cache.displayedPolynomial = tempPoly;
+            --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
+        );
     )
     else (
         L.cache.DisplayedDegree = newDeg;
