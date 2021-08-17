@@ -147,6 +147,13 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
         --if (debugLevel > 0) then print tempComputed;
         coefficient(v, tempComputed)
     );
+
+    newChangeDegFunction := d -> (
+        changeComputedDegree(L, d);
+        tempOrigComputed := L.cache.computedPolynomial;
+        tempComputed := sub(sum( apply(d+1, i -> truncate(d, (f i)*tempOrigComputed^i)) ), L#seriesRing);
+        tempComputed
+    );
      -- add terms to s up to deg degree.        
     -*for i from 0 to oldDeg do (
         tempLPower = L^i;        
@@ -159,15 +166,17 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     newDeg := s.cache.ComputedDegree;
     newFunction := s#coefficientFunction;
     *-
-    lazySeries(
+    newL := lazySeries(
         R,
         newFunction,
         newDisplayed,
         newComputed,
         DisplayedDegree => L#cache.DisplayedDegree,
         ComputedDegree=> L#cache.ComputedDegree
-        )
-    
+        );
+    newL#cache#"FastChangeComputedDegree" = newChangeDegFunction;
+
+    newL    
 );
 
 
@@ -197,7 +206,14 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
         else ( --otherwise we have to compute everything
             L.cache.ComputedDegree = newDeg;
             L.cache.DisplayedDegree = newDeg;
-            tempPoly = (calculatePolynomial(newDeg, R, f))#0;--we have no choice but to call this
+            if L#cache#?"FastChangeComputedDegree" then (
+                if (debugLevel > 0) then print "changeDegree: using cached fast degree change function";
+                tempPoly = (L#cache#"FastChangeComputedDegree")(newDeg);                
+            )
+            else( 
+                if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
+                tempPoly = (calculatePolynomial(newDeg, R, f))#0;--we have no choice but to call this
+            );
             L.cache.computedPolynomial = tempPoly;
             L.cache.displayedPolynomial = tempPoly;
             --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
@@ -213,6 +229,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
 -- changes ComputedDegree and computedPolynomial only
 changeComputedDegree = method()
 changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
+    if (debugLevel > 0) then print "changeComputedDegree: starting";
 
     oldDeg := L.cache.DisplayedDegree;
     oldPoly := L.cache.displayedPolynomial;
@@ -227,7 +244,14 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
     else if newDeg > oldDeg then (
         
         L#cache#ComputedDegree = newDeg;
-        tempPoly = (calculatePolynomial(newDeg, R, f))#0;
+        if L#cache#?"FastChangeComputedDegree" then (
+            if (debugLevel > 0) then print "channgeComputedDegree: using cached fast degree change function";
+            tempPoly = (L#cache#"FastChangeComputedDegree")(newDeg);
+        )
+        else(
+            if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
+            tempPoly = (calculatePolynomial(newDeg, R, f))#0;  
+        );
         L#cache#computedPolynomial = tempPoly;
 
         lazySeries(

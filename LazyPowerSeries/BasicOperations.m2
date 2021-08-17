@@ -290,8 +290,8 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         a := changeComputedDegree(A, tempDegree);
         b := changeComputedDegree(B, tempDegree);
 
-        P1 := a.cache.computedPolynomial;
-        P2 := b.cache.computedPolynomial;
+        P1 := truncate(tempDegree, a.cache.computedPolynomial);
+        P2 := truncate(tempDegree, b.cache.computedPolynomial);
 
         P := truncate(tempDegree, P1*P2);
 
@@ -309,7 +309,20 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         newPoly,
         newCompPoly,
         DisplayedDegree =>  newDegree,
-        ComputedDegree => newCompDegree)
+        ComputedDegree => newCompDegree);
+
+    newFastChangeDegree := i -> (
+        a := changeComputedDegree(A, i);
+        b := changeComputedDegree(B, i);
+        P1 := truncate(i, a.cache.computedPolynomial);
+        P2 := truncate(i, b.cache.computedPolynomial);
+        myPoly := truncate(i, P1*P2);
+        myPoly
+    );
+
+    finalSeries#cache#"FastChangeComputedDegree" = newFastChangeDegree;
+
+    finalSeries
     --changeDegree(finalSeries, newDegree)    
 );
 
@@ -374,7 +387,9 @@ inverse(LazySeries) := LazySeries => (L) -> (
     d := sub(1/c, coeffRing);    
 
     g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...    
-    h := d * (lazySeries(g, i->1)); 
+    tempSeries := lazySeries(g, i->1);
+    h := d * (tempSeries); 
+    h#cache#"FastChangeComputedDegree" = i -> d*(tempSeries#cache#"FastChangeComputedDegree")(i);
     h
     --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
