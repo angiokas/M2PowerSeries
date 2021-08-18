@@ -283,28 +283,34 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
-    a := changeComputedDegree(A, tempDegree);
-    b := changeComputedDegree(B, tempDegree);
+    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
+    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
 
-    P1 := truncate(tempDegree, a.cache.computedPolynomial);
-    P2 := truncate(tempDegree, b.cache.computedPolynomial);
+    myCache := new CacheTable from {computedPolynomial => newCompPoly, ComputedDegree => newCompDegree, dispalyedPolynomial => newPoly, DisplayedDegree => newPoly};  
 
-    P := truncate(tempDegree, P1 * P2);
+    --myCache should be used as the new cache object, and use an internal-only constructor, or manually create the object
 
     newFunction := coefficientVector -> (
         tempDegree := coefficientVector; -- bandaid!!!!!
-        if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
-                
         
+        if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
+
+        if (myCache#ComputedDegree >= tempDegree) then return (coffiecient(coefficientVector, myCache#ComputedPolynomial));
+                
+        changeComputedDegree(A, tempDegree);
+        changeComputedDegree(B, tempDegree);
+
+        P1 := truncate(tempDegree, A.cache.computedPolynomial);
+        P2 := truncate(tempDegree, B.cache.computedPolynomial);
+
+        P := truncate(tempDegree, P1*P2);
 
         coefficient(coefficientVector, P)
     );
 
     --changeComputedDegree(A, newDegree);
     --changeComputedDegree(B, newDegree);
-    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
-    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
-
+    
     finalSeries := lazySeries(
         R,
         newFunction,
@@ -314,10 +320,10 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         ComputedDegree => newCompDegree);
 
     newFastChangeDegree := i -> (
-        a := changeComputedDegree(A, i);
-        b := changeComputedDegree(B, i);
-        P1 := truncate(i, a.cache.computedPolynomial);
-        P2 := truncate(i, b.cache.computedPolynomial);
+        changeComputedDegree(A, i);
+        changeComputedDegree(B, i);
+        P1 := truncate(i, A.cache.computedPolynomial);
+        P2 := truncate(i, B.cache.computedPolynomial);
         myPoly := truncate(i, P1*P2);
         myPoly
     );
