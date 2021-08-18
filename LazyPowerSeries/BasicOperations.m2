@@ -283,17 +283,19 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
+    a := changeComputedDegree(A, tempDegree);
+    b := changeComputedDegree(B, tempDegree);
+
+    P1 := truncate(tempDegree, a.cache.computedPolynomial);
+    P2 := truncate(tempDegree, b.cache.computedPolynomial);
+
+    P := truncate(tempDegree, P1 * P2);
+
     newFunction := coefficientVector -> (
         tempDegree := coefficientVector; -- bandaid!!!!!
         if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
                 
-        a := changeComputedDegree(A, tempDegree);
-        b := changeComputedDegree(B, tempDegree);
-
-        P1 := truncate(tempDegree, a.cache.computedPolynomial);
-        P2 := truncate(tempDegree, b.cache.computedPolynomial);
-
-        P := truncate(tempDegree, P1*P2);
+        
 
         coefficient(coefficientVector, P)
     );
@@ -320,7 +322,7 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         myPoly
     );
 
-    finalSeries#cache#"FastChangeComputedDegree" = newFastChangeDegree;
+    finalSeries.cache."FastChangeComputedDegree" = newFastChangeDegree;
 
     finalSeries
     --changeDegree(finalSeries, newDegree)    
@@ -394,15 +396,6 @@ inverse(LazySeries) := LazySeries => (L) -> (
     --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
 
--*
-inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (
-    -- first check if it is a unit in the ring
-    --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
-    g := (-1) * ((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
-    (S#constantTerm) * maclaurinSeries (g, deg)
-    
-);
-*-
 -- Division of two LazySeries
 LazySeries / LazySeries := LazySeries => (A, B)->(
     A * inverse(B)
