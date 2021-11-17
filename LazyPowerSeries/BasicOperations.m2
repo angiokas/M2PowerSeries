@@ -283,25 +283,15 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
-    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
-    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
-
-    myCache := new CacheTable from {computedPolynomial => newCompPoly, ComputedDegree => newCompDegree, dispalyedPolynomial => newPoly, DisplayedDegree => newPoly};  
-
-    --myCache should be used as the new cache object, and use an internal-only constructor, or manually create the object
-
     newFunction := coefficientVector -> (
         tempDegree := coefficientVector; -- bandaid!!!!!
-        
         if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
-
-        if (myCache#ComputedDegree >= tempDegree) then return (coffiecient(coefficientVector, myCache#ComputedPolynomial));
                 
-        changeComputedDegree(A, tempDegree);
-        changeComputedDegree(B, tempDegree);
+        a := changeComputedDegree(A, tempDegree);
+        b := changeComputedDegree(B, tempDegree);
 
-        P1 := truncate(tempDegree, A.cache.computedPolynomial);
-        P2 := truncate(tempDegree, B.cache.computedPolynomial);
+        P1 := a.cache.computedPolynomial;
+        P2 := b.cache.computedPolynomial;
 
         P := truncate(tempDegree, P1*P2);
 
@@ -310,27 +300,16 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
 
     --changeComputedDegree(A, newDegree);
     --changeComputedDegree(B, newDegree);
-    
+    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
+    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
+
     finalSeries := lazySeries(
         R,
         newFunction,
         newPoly,
         newCompPoly,
         DisplayedDegree =>  newDegree,
-        ComputedDegree => newCompDegree);
-
-    newFastChangeDegree := i -> (
-        changeComputedDegree(A, i);
-        changeComputedDegree(B, i);
-        P1 := truncate(i, A.cache.computedPolynomial);
-        P2 := truncate(i, B.cache.computedPolynomial);
-        myPoly := truncate(i, P1*P2);
-        myPoly
-    );
-
-    finalSeries.cache."FastChangeComputedDegree" = newFastChangeDegree;
-
-    finalSeries
+        ComputedDegree => newCompDegree)
     --changeDegree(finalSeries, newDegree)    
 );
 
@@ -395,13 +374,20 @@ inverse(LazySeries) := LazySeries => (L) -> (
     d := sub(1/c, coeffRing);    
 
     g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...    
-    tempSeries := lazySeries(g, i->1);
-    h := d * (tempSeries); 
-    h#cache#"FastChangeComputedDegree" = i -> d*(tempSeries#cache#"FastChangeComputedDegree")(i);
+    h := d * (lazySeries(g, i->1)); 
     h
     --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
 
+-*
+inverse(LazySeries, ZZ) := LazySeries => (S, deg) -> (
+    -- first check if it is a unit in the ring
+    --if isUnit(S) == false then error "Cannot invert series because it is not a unit";
+    g := (-1) * ((S / S#constantTerm)-1); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...
+    (S#constantTerm) * maclaurinSeries (g, deg)
+    
+);
+*-
 -- Division of two LazySeries
 LazySeries / LazySeries := LazySeries => (A, B)->(
     A * inverse(B)
