@@ -1,4 +1,4 @@
-# M2PowerSeries
+# Lazy Power Series
 Power series rings implementation in Macaulay2
 
 # Notes
