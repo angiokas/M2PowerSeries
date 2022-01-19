@@ -3,6 +3,23 @@ Power series rings implementation in Macaulay2
 
 # Notes
 
+## Installing WSL 
+Macaulay2 only runs on Linux so far and for windows users one way to bypass this is to use the software called WSL (Windows Subsystem for Linux) that runs linux on a virtual machine. This is included in windows so it's not a third party software you have to install. 
+
+First to install wsl, make sure you open a power shell with administrative privilages and run the command
+```
+wsl --install
+```
+If it ran successfully, it should say 
+```
+The requested operation is successful. Changes will not be effective until the system is rebooted.
+```
+As it says, do not forget to reboot!
+
+Then you have to make sure WSL is enabled on your windows by going to Windows Features.
+
+To choose the linux system, you can go to the windows store and install the appropriate one. As an example, I always go for ubuntu and currently I have Ubuntu 20.04 LTS installed. Note that you need to have WSL installed and enabled before you are able to use this. 
+
 ## In case of Visual Studio Code error
 Most likely, you have to reset wsl so you can type this in your terminal:
 ```
