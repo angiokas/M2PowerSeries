@@ -2,13 +2,12 @@
 Power series rings implementation in Macaulay2
 
 # Notes
-
 ## Installing WSL 
 Macaulay2 only runs on Linux so far and for windows users one way to bypass this is to use the software called WSL (Windows Subsystem for Linux) that runs linux on a virtual machine. This is included in windows so it's not a third party software you have to install. 
 
 First to install wsl, make sure you open a power shell with administrative privilages and run the command
 ```
-wsl --install
+$ wsl --install
 ```
 If it ran successfully, it should say 
 ```
@@ -19,6 +18,45 @@ As it says, do not forget to reboot!
 Then you have to make sure WSL is enabled on your windows by going to Windows Features.
 
 To choose the linux system, you can go to the windows store and install the appropriate one. As an example, I always go for ubuntu and currently I have Ubuntu 20.04 LTS installed. Note that you need to have WSL installed and enabled before you are able to use this. 
+
+## Configuring Visual Studio Code
+If you are using Visual Studio Code you shuld install the extension called Remote - WSL. you can find information on it here: [Remote - WSL - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)
+
+It is a useful tool to be able to access Macaulay2 files on the linux machine while editting in Windows.
+
+Run this periodically
+```
+$ sudo apt update
+$ sudo apt upgrade
+```
+
+Install git in Linux by typing this in the 
+```
+$ sudo apt-get install git
+```
+
+## Installing Macaulay2
+Before installing Macaulay2, you need to add the Macaulay2 ppa if you are on an Ubuntu version less than 21.04. 
+
+```
+sudo add-apt-repository ppa:macaulay2/macaulay2
+```
+
+Now you can install Macaulay2:
+```
+$ sudo apt install macaulay2
+```
+
+To check if it installed correctly, type in:
+```
+$ M2
+```
+You need to do the initial setup after running M2 on the virtual machine for the first time:
+```
+$ setup()
+```
+You find information on this here: [setup (macaulay2.com)](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.17/share/doc/Macaulay2/Macaulay2Doc/html/_setup.html)
+
 
 ## In case of Visual Studio Code error
 Most likely, you have to reset wsl so you can type this in your terminal:
