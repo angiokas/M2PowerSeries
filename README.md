@@ -71,6 +71,14 @@ $ chmod +x M2script
 This will create a file named M2script that has the bash script where `-nw` runs emacs in tty (non-windows) mode.  The `-f M2` runs Macaulay2 on startup. 
 Afterwards go to settings and type in macaulay2. It should say "Macaulay2: Executable Path" and copy paste the location of your bash script. (Technically if you had put it in your home directory then the path should look something like "/home/username/M2script". If you don't know what it is, type in the command `pwd` which tells you your current directory. 
 
+If you want the window for emacs to not split and have a menu bar in tty mode, then add commands to your file like this:
+```
+$ echo "(add-hook 'emacs-startup-hook
+          (lambda () (delete-other-windows)) t)
+ (unless (display-graphic-p)
+   (menu-bar-mode -1))" >> M2script
+ ```
+ 
 ## In case of Visual Studio Code error
 Most likely, you have to reset wsl so you can type this in your terminal:
 ```
@@ -144,51 +152,51 @@ https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 
-`
+```
 $ loadPackage "pkgname"
-`
+```
 
 If you want to reload the package in the same session without restarting macaulay2
 
-`
+```
 $ loadPackage "pkgname", Reload => true
-`
+```
 
 ## On Documentation
 If you want to generate the html files of the documentation, then use the command `installPackage` and then restart Macaulay2:
 ```
-installPackage NewPowerSeries
+$ installPackage NewPowerSeries
 ```
 
 Then if you want to view the documentation in a browser, use the command `viewHelp`:
 ```
-viewHelp NewPowerSeries
+$ viewHelp NewPowerSeries
 ```
 or if you prefer viewing the documentation in the terminal, use the command `help`:
 ```
-help NewPowerSeries
+$ help NewPowerSeries
 ```
 
 If you want to be safe when trying to update documentation, you can uninstall a package first, then load it and then install it:
 ```
-uninstallPackage NewPowerSeries
-loadPackage NewPowerSeries
-install NewPowerSeries
+$ uninstallPackage NewPowerSeries
+$ loadPackage NewPowerSeries
+$ install NewPowerSeries
 ```
 
 ## On Testing
 If you want to check tests, you should type the `check` command in macaulay like so:
 ```
-check NewPowerSeries
+$ check NewPowerSeries
 ```
 
 ## Checking for updates periodically
 Will check for updates for everything
 ```
-sudo apt update
+$ sudo apt update
 ```
 
 This command will download new versions of everything
 ```
-sudo apt upgrade
+$ sudo apt upgrade
 ```
