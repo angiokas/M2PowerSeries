@@ -66,6 +66,7 @@ You can run the no windows version of Macaulay2 in emacs, in a vscode terminal b
 First you go to your home directory (You can do this by using the command cd) and type in:
 ```
 $ echo 'emacs -nw -f M2' >> M2script
+$ chmod +x M2script
 ```
 This will create a file named M2script that has the bash script where `-nw` runs emacs in tty (non-windows) mode.  The `-f M2` runs Macaulay2 on startup. 
 Afterwards go to settings and type in macaulay2. It should say "Macaulay2: Executable Path" and copy paste the location of your bash script. (Technically if you had put it in your home directory then the path should look something like "/home/username/M2script"
