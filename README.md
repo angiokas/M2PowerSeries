@@ -63,13 +63,13 @@ In case you are using Visual Studio Code, I recommend installing this extension 
 You can view the original instructions on the Macaulay 2 google group: https://groups.google.com/g/macaulay2/c/FXhHePFYhuA/m/MTz7qK5tAwAJ
 
 You can run the no windows version of Macaulay2 in emacs, in a vscode terminal by following the next steps: 
-First you go to your home directory (You can do this by using the command cd) and type in:
+First you need to navigate to your home directory (You can do this by using the command cd) and type in:
 ```
 $ echo 'emacs -nw -f M2' >> M2script
 $ chmod +x M2script
 ```
 This will create a file named M2script that has the bash script where `-nw` runs emacs in tty (non-windows) mode.  The `-f M2` runs Macaulay2 on startup. 
-Afterwards go to settings and type in macaulay2. It should say "Macaulay2: Executable Path" and copy paste the location of your bash script. (Technically if you had put it in your home directory then the path should look something like "/home/username/M2script"
+Afterwards go to settings and type in macaulay2. It should say "Macaulay2: Executable Path" and copy paste the location of your bash script. (Technically if you had put it in your home directory then the path should look something like "/home/username/M2script". If you don't know what it is, type in the command `pwd` which tells you your current directory. 
 
 ## In case of Visual Studio Code error
 Most likely, you have to reset wsl so you can type this in your terminal:
