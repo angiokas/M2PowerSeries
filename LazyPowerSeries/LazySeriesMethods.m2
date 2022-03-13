@@ -127,8 +127,8 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     origComputed := L.cache.computedPolynomial;
     
     --first we compute the new computed polynomial
-    newComputed := sum( apply(oldDeg+1, i -> truncate(oldDeg, (f i)*origComputed^i)) ); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
-    newDisplayed := truncate(L#cache.DisplayedDegree, newComputed);
+    newComputed := sum( apply(oldDeg+1, i -> truncat(oldDeg, (f i)*origComputed^i)) ); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
+    newDisplayed := truncat(L#cache.DisplayedDegree, newComputed);
 
     newFunction := v -> (
         sumV := sum v;
@@ -138,7 +138,7 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
         --if (debugLevel > 0) then print (L.cache.computedPolynomial);
         tempOrigComputed := L.cache.computedPolynomial;
 
-        tempComputed := sub(sum( apply(sumV+1, i -> truncate(sumV, (f i)*tempOrigComputed^i)) ), L#seriesRing);
+        tempComputed := sub(sum( apply(sumV+1, i -> truncat(sumV, (f i)*tempOrigComputed^i)) ), L#seriesRing);
         --if (debugLevel > 0) then print tempComputed;
         coefficient(v, tempComputed)
     );
@@ -146,7 +146,7 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     newChangeDegFunction := d -> (
         changeComputedDegree(L, d);
         tempOrigComputed := L.cache.computedPolynomial;
-        tempComputed := sub(sum( apply(d+1, i -> truncate(d, (f i)*tempOrigComputed^i)) ), L#seriesRing);
+        tempComputed := sub(sum( apply(d+1, i -> truncat(d, (f i)*tempOrigComputed^i)) ), L#seriesRing);
         tempComputed
     );
      -- add terms to s up to deg degree.        
@@ -195,7 +195,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
     else if newDeg > oldDispDeg then (
         if oldCompDeg >= newDeg then (--if we've already computed that high, just use it
             L.cache.DisplayedDegree = newDeg;
-            tempPoly = truncate(newDeg, L.cache.computedPolynomial);
+            tempPoly = truncat(newDeg, L.cache.computedPolynomial);
             L.cache.displayedPolynomial = tempPoly;
         )
         else ( --otherwise we have to compute everything
