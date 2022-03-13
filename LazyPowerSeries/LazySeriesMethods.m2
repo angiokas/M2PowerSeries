@@ -55,10 +55,32 @@ toString LazySeries := L -> (
     toString(myStr | toString(" + ... "))
 )
 
+---------------------------------------------------------------------------------------
+
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3})
 
+lazySeries(Ring, Function) := opts -> (R, f) -> ( 
+    if(opts.DisplayedDegree > opts.ComputedDegree) then error "Displayed degree cannot be more than computed degree.";
+
+    computedPoly := calculatePolynomial(opts.ComputedDegree, R, f);
+    displayedPoly := truncat(opts.DisplayedDegree, computedPoly);
+
+    new LazySeries from {
+        coefficientFunction => f,
+        seriesRing => R,
+
+        cache => new CacheTable from { -- contains everything mutable
+            DisplayedDegree => opts.DisplayedDegree,
+            displayedPolynomial => displayedPoly,
+            ComputedDegree => opts.ComputedDegree,
+            computedPolynomial => computedPoly
+        }
+    }
+)
+
 -- Making a LazySeries without the added computation of polynomial construction
-lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayedPoly, computedPoly) -> (
+lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayedPoly, computedPoly) -> ( 
+    -- Why is there a ...,RingElement, Ringelement) in there?
 
     new LazySeries from {
         coefficientFunction => f,
@@ -73,34 +95,7 @@ lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayed
     }
 )
 -- f is the function which has to have the same amount of inputs as there are variables
-lazySeries(Ring, Function) := LazySeries => opts -> (R, function) -> (
-    --ringZeroes := numgens R:0;
-    --ringZeroes := 0;
-   
-    local f;
-    local s;
-    deg := opts.DisplayedDegree; -- need to change it to computed degree actually because that should be priority for calculation
-    if (class opts.DisplayedDegree === List) then deg = sum opts.DisplayedDegree;
 
-    K:= calculatePolynomial(deg, R, function);
-    s = K#0; -- polynomial
-    f = K#1; -- function
-
-     -- Making a new lazySeries
-    L := new LazySeries from {
-        --constantTerm => f sum degree (1_R),
-        coefficientFunction => f,
-        seriesRing => R,
-
-        cache => new CacheTable from { -- contains everything mutable
-            DisplayedDegree => opts.DisplayedDegree,
-            displayedPolynomial => s,
-            ComputedDegree => opts.ComputedDegree,
-            computedPolynomial => s
-        } 
-    };
-    L 
-);
 
 -- Converting ring elements and polynomials into LazySeries
 lazySeries(RingElement) := LazySeries => opts -> P -> ( 
@@ -212,7 +207,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
             )
             else( 
                 if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
-                tempPoly = (calculatePolynomial(newDeg, R, f))#0;--we have no choice but to call this
+                tempPoly = (calculatePolynomial(newDeg, R, f));--we have no choice but to call this
             );
             L.cache.computedPolynomial = tempPoly;
             L.cache.displayedPolynomial = tempPoly;
@@ -250,7 +245,7 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
         )
         else(
             if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
-            tempPoly = (calculatePolynomial(newDeg, R, f))#0;  
+            tempPoly = (calculatePolynomial(newDeg, R, f));  
         );
         L#cache#computedPolynomial = tempPoly;
 
@@ -353,3 +348,7 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
     else (A, changeDegree(B, A#DisplayedDegree))
     );
 *-
+
+--*******************************************************
+--Implementation of P-ADICS
+--*******************************************************

@@ -1,16 +1,17 @@
---toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S.  It 
+-- Truncates given polynomial
+truncat = method()
 
---this is taken from the PowerSeries.m2 package
-truncate(ZZ, RingElement) := (n, P) ->(
-     part(0, n, P)
-    );
-
-truncate(InfiniteNumber, RingElement) := (n, P) ->(
+truncat(InfiniteNumber, RingElement) := (n , P) ->(
      if n == infinity then return P;
      if n == -infinity then return sub(0, ring P);
      P
     );
 
+truncat(ZZ, RingElement) := (n, p) ->(
+    part(0,n,p)
+    );
+
+--toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S.
 toMonomial = (L, S) -> (
      variableList := flatten entries vars S;
      m := 1;
@@ -105,5 +106,18 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
         s = s + (f (combinations#j)) * product(apply(#ringVariables, i -> (ringVariables#i)^((combinations#j)#i)));
         );
     
-    (s, f)
+    s
+);
+
+--Carrying = method()
+
+calculatePartialSeries = method()
+--deg is the degree of the partial series, R is the ring in which we are working in, f is the function that spits out coefficients
+-- goal is for it to output parital series outputting function 
+calculatePartialSeries(ZZ, Ring, Function) := (deg, R, f) ->(  
+    --polynomial := calculatePolynomial(deg, R,f);
+
+    g := i -> sum(apply(i, t-> ((f t)^t)))
+
+
 );

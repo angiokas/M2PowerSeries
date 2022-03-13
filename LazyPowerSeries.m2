@@ -39,6 +39,8 @@ export{
     "maximumsList",
     "toBinary",
     "calculatePolynomial",
+    "trunc",
+    "calculatePartialSeries",
 
     -- LazySeries
     "LazySeries",
