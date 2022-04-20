@@ -60,7 +60,10 @@ export{
     -- Basic Operations
     
     "zeroSeries",
-    "oneSeries"
+    "oneSeries",
+
+    -- P-adics
+    "toAdics"
 
 }
 

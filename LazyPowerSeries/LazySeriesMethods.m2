@@ -352,3 +352,4 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
 --*******************************************************
 --Implementation of P-ADICS
 --*******************************************************
+

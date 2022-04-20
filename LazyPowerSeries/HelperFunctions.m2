@@ -109,15 +109,76 @@ calculatePolynomial(ZZ, Ring, Function) := (deg, R, function) ->(
     s
 );
 
---Carrying = method()
 
 calculatePartialSeries = method()
---deg is the degree of the partial series, R is the ring in which we are working in, f is the function that spits out coefficients
+
 -- goal is for it to output parital series outputting function 
-calculatePartialSeries(ZZ, Ring, Function) := (deg, R, f) ->(  
+calculatePartialSeries(ZZ, Ring, Function) := (deg, R, f) ->(  --deg is the degree of the partial series, R is the ring in which we are working in, f is the function that spits out coefficients
     --polynomial := calculatePolynomial(deg, R,f);
 
     g := i -> sum(apply(i, t-> ((f t)^t)))
 
-
 );
+
+-- Extracts information about the appropariate coefficients of a polynomial in p-adics form
+toAdics = method()
+toAdics(ZZ, RingElement) := (p, poly) -> (
+    R := ring poly;
+    workingf := poly;
+    coefficientslist := {};
+    displayedDegree := 5;
+    m := (ideal p)+(ideal gens R); -- Ex. p = 7 and R = ZZ[x,y,z] then (7)+(x,y,z) = (7,x,y,z)
+    local workingIdeal;
+    local workingList;
+    local workingIdeal2;
+    local currentMonomial;
+    local n;
+    local workingf;
+    local workingf2;
+    local workingCoefficient;
+    local tempMonomial; 
+
+    outputList := {}; 
+
+    for i from 0 to displayedDegree do(
+        print ("i = "| toString(i));
+
+        workingIdeal = m^(i+1);
+        print ("workingIdeal: " | toString(workingIdeal));
+        -- list of generators of the ideal m^i for ex. m^2 = (49,7x,x^2) then working_list is {49,7x,x^2}
+        workingList = first entries gens (m^i); 
+        print("workingList: " | toString(workingList));
+
+        n = #workingList;
+
+        for j from 0 to n-1 do(
+            print ("j = "| toString(j));
+            print("workingf: " | toString(workingf));
+
+            currentMonomial = workingList#0;
+            print ("currentMonomial: "| toString(currentMonomial));
+
+            workingList = drop(workingList,{0,0});
+            print ("workingList: " | toString(workingList));
+            -- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
+            workingIdeal2 = trim(ideal(workingList) + workingIdeal);
+            print ("workingIdeal2: " |toString(workingIdeal2));
+
+            workingf2 = workingf % workingIdeal2;
+            
+            print ("workingf2: " | toString(workingf2));
+            tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0;
+            print ("tempMonomial: " | toString(tempMonomial));
+
+
+            workingCoefficient = ceiling(coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial));
+            print ("WorkingCoefficient: " | toString(workingCoefficient));
+
+            outputList = append(outputList, currentMonomial => workingCoefficient);
+
+            workingf = workingf - workingf2;
+            );
+        );
+        print outputList;
+        
+)
