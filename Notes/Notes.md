@@ -73,6 +73,17 @@ If you fixed the browser to work on wsl, it should redirect you to your chosen b
 You can also try using the VS code extension for jupyter: 
 https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
 
+### For downloading Jupter notebooks as latex of pdf
+In the beginning you might get an error if you don't have livetex installed. Jupyter should direct you to a website where you can get the code for installing the livetex for jupyter formatting which you should type in bash inside of your linux virtual machine:
+```
+sudo apt-get install texlive-xetex texlive-fonts-recommended texlive-plain-generic
+```
+Here is the website:
+https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
+
+## Problems with overloading
+
+
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 

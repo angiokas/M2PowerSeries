@@ -138,7 +138,7 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
     R := ring poly;
     workingf := poly;
     coefficientslist := {};
-    displayedDegree := 5;
+    deg := floor(log_p leadCoefficient poly) + (sum degree poly);
     m := (ideal p)+(ideal gens R); -- Ex. p = 7 and R = ZZ[x,y,z] then (7)+(x,y,z) = (7,x,y,z)
     local workingIdeal;
     local workingList;
@@ -152,16 +152,17 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
 
     outputList := {}; 
 
-    for i from 0 to displayedDegree do(
+
+    for i from 0 to deg do(
+        workingIdeal = m^(i+1);
+        workingList = first entries gens (m^i); -- list of generators of the ideal m^i for ex. m^2 = (49,7x,x^2) then working_list is {49,7x,x^2}
+        n = #workingList;
+
         if debugLevel > 1 then (
             print ("i = "| toString(i));
             print ("workingIdeal: " | toString(workingIdeal));
             print("workingList: " | toString(workingList));
         );
-
-        workingIdeal = m^(i+1);
-        workingList = first entries gens (m^i); -- list of generators of the ideal m^i for ex. m^2 = (49,7x,x^2) then working_list is {49,7x,x^2}
-        n = #workingList;
 
         for j from 0 to n-1 do(
             currentMonomial = workingList#0;
@@ -188,42 +189,6 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
 
         outputList
         
-);
-
--- Outputs a slightly altered function to accomodate proper input or spits out an error in case of wrong intended argument number
-inputFunctionCheck = method() 
-inputFunctionCheck(Ring, List, Function) := Function => (R, variables, f) -> (
-
-    dummyConstantVector := apply(#variables, t -> 0);
-
-    newFunction := f;
-    local newFunction2;
-
-    try sub(f dummyConstantVector, R)
-        else (
-                try sub(f toSequence dummyConstantVector, R) then (
-
-                    newFunction = tempList -> (f toSequence tempList)
-                )
-                else(                
-
-                    newFunction = tempList -> f (tempList#0); 
-                );
-        );
-            
-        try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
-        else (
-                error "The lazySeries function should take a exponent vector and output a ringElement.";
-            );
-        
-        try(
-                if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
-                else newFunction2 = v -> sub(newFunction v, R);
-            )
-        else(
-                error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
-            );
-
 );
 
 
@@ -282,5 +247,54 @@ for j from start to deg do (
         s = s + (newFunction2 (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
         );   
     s
+
+);
+
+constructAdicsPoly(List) := Padics => L -> (
+    termList :=(apply(L, i-> i#0));
+    coefficientList :=(apply(L, i-> i#1));
+
+    s := 0;
+
+    for j from 0 to #termList-1 do (
+        s = s + (coefficientList#j * termList#j);
+    );
+    s
+);
+
+--------------------
+-- Outputs a slightly altered function to accomodate proper input or spits out an error in case of wrong intended argument number
+inputFunctionCheck = method() 
+inputFunctionCheck(Ring, List, Function) := Function => (R, variables, f) -> (
+
+    dummyConstantVector := apply(#variables, t -> 0);
+
+    newFunction := f;
+    local newFunction2;
+
+    try sub(f dummyConstantVector, R)
+        else (
+                try sub(f toSequence dummyConstantVector, R) then (
+
+                    newFunction = tempList -> (f toSequence tempList)
+                )
+                else(                
+
+                    newFunction = tempList -> f (tempList#0); 
+                );
+        );
+            
+        try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
+        else (
+                error "The lazySeries function should take a exponent vector and output a ringElement.";
+            );
+        
+        try(
+                if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
+                else newFunction2 = v -> sub(newFunction v, R);
+            )
+        else(
+                error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
+            );
 
 );
