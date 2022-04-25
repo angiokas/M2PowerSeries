@@ -355,7 +355,7 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
 --*******************************************************
 
 
-Padics = new Type of LazySeries;
+Padics = new Type of LazySeries; -- Could potentially change it to HashTable since so far have not used inheritence
 
 net Padics := L -> (
     myStr := net("");
@@ -366,7 +366,6 @@ net Padics := L -> (
     valueList := L.cache.valueList;
     termList :=(apply(valueList, i-> i#0));
     coefficientList :=(apply(valueList, i-> i#1));
-    print coefficientList;
 
     j :=0;
     while (j< #termList) do (
@@ -395,53 +394,39 @@ net Padics := L -> (
 
     );
 
-
--*net Padics := L -> (
+toString Padics := L -> (
     myStr := net("");
     local tempStr;
     local tempTerm;
+    local tempCoefficient;
 
-    termList := reverse terms (L#cache#displayedPolynomial);
-    print termList;
-    j := 0;
-    while (j < #termList) do (                
-        tempStr = toString(termList#j);
-        if (tempStr#0 === "-") then (
-            tempTerm = (-1)*(termList#j);
-            if (j > 0) then myStr = myStr | net(" - ");
-            if (j == 0) then myStr = net("-");
-        )
-        else (
-            if (j > 0) then myStr = myStr | net(" + ");
-            tempTerm = termList#j;
+    valueList := L.cache.valueList;
+    termList :=(apply(valueList, i-> i#0));
+    coefficientList :=(apply(valueList, i-> i#1));
+
+    j :=0;
+    while (j< #termList) do (
+        tempCoefficient= toString(coefficientList#j);
+        if(tempCoefficient != "0") then(
+            
+            tempStr = toString(termList#j);
+            if (tempStr#0 === "-") then (
+                tempTerm = (-1)*(termList#j);
+                if (j > 0) then myStr = myStr | net(" - ");
+                if (j == 0) then myStr = net("-");
+            )
+            else (
+                if (j > 0) then myStr = myStr | net(" + ");
+                tempTerm = termList#j;
+
+
+            );
+        myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);       
         );
-        myStr = myStr | net (tempTerm);                
+
         j = j+1;        
     );    
-    net(myStr | net(" + ... "))
-);
-*-
 
-toString Padics := L -> (
-    myStr := toString("");
-    local tempStr;
-    local tempTerm;
-    termList := reverse terms (L#cache#displayedPolynomial);
-    j := 0;
-    while (j < #termList) do (                
-        tempStr = toString(termList#j);
-        if (tempStr#0 === "-") then (
-            tempTerm = (-1)*(termList#j);
-            if (j > 0) then myStr = myStr | toString(" - ");
-            if (j == 0) then myStr = toString("-");
-        )
-        else (
-            if (j > 0) then myStr = myStr | toString(" + ");
-            tempTerm = termList#j;
-        );
-        myStr = myStr | toString (tempTerm);                
-        j = j+1;        
-    );    
     toString(myStr | toString(" + ... "))
 );
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
@@ -459,9 +444,9 @@ padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> (
     new Padics from {
         coefficientFunction => f,
         seriesRing => R,
+        primeNumber => p,
 
         cache => new CacheTable from { -- contains everything mutable
-            primeNumber => p,
             DisplayedDegree => opts.DisplayedDegree,
             displayedPolynomial => displayedPoly,
             ComputedDegree => opts.ComputedDegree,
