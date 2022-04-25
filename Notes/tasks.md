@@ -132,7 +132,7 @@
 2. Implement Ring structure for formal power series
 
 
-## If you want to be extra
+## Extra
 - [ ] Make github pages and organize notes
 - [ ] Make it possible to enter functions for LazySeries creation that doesn't have the exact same amount of inputs as the ring generators. So basically, if my ring is `QQ[x,y,z]` and someone enters a function for a LazySeries which is `(i,j)-> 7`, how do you expand it so that it corresponds with `(i,j,k)->???` form.
 - [ ] MULTITHREADING 

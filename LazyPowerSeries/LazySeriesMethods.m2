@@ -55,11 +55,12 @@ toString LazySeries := L -> (
     toString(myStr | toString(" + ... "))
 )
 
----------------------------------------------------------------------------------------
+----------------------LAZYSERIES CONSTRUCTORS-----------------------------------------------------------------
 
 lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3})
 
-lazySeries(Ring, Function) := opts -> (R, f) -> ( 
+-- Constructs LazySeries over the given ring R using inputted coefficient function f 
+lazySeries(Ring, Function) := LazySeries => opts -> (R, f) -> ( 
     if(opts.DisplayedDegree > opts.ComputedDegree) then error "Displayed degree cannot be more than computed degree.";
 
     computedPoly := calculatePolynomial(opts.ComputedDegree, R, f);
@@ -79,7 +80,7 @@ lazySeries(Ring, Function) := opts -> (R, f) -> (
 )
 
 -- Making a LazySeries without the added computation of polynomial construction
-lazySeries(Ring, Function, RingElement, RingElement) := opts -> (R, f, displayedPoly, computedPoly) -> ( 
+lazySeries(Ring, Function, RingElement, RingElement) := LazySeries => opts -> (R, f, displayedPoly, computedPoly) -> ( 
     -- Why is there a ...,RingElement, Ringelement) in there?
 
     new LazySeries from {
@@ -353,3 +354,119 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
 --Implementation of P-ADICS
 --*******************************************************
 
+
+Padics = new Type of LazySeries;
+
+net Padics := L -> (
+    myStr := net("");
+    local tempStr;
+    local tempTerm;
+    local tempCoefficient;
+
+    valueList := L.cache.valueList;
+    termList :=(apply(valueList, i-> i#0));
+    coefficientList :=(apply(valueList, i-> i#1));
+    print coefficientList;
+
+    j :=0;
+    while (j< #termList) do (
+        tempCoefficient= toString(coefficientList#j);
+        if(tempCoefficient != "0") then(
+            
+            tempStr = toString(termList#j);
+            if (tempStr#0 === "-") then (
+                tempTerm = (-1)*(termList#j);
+                if (j > 0) then myStr = myStr | net(" - ");
+                if (j == 0) then myStr = net("-");
+            )
+            else (
+                if (j > 0) then myStr = myStr | net(" + ");
+                tempTerm = termList#j;
+
+
+            );
+        myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);       
+        );
+
+        j = j+1;        
+    );    
+
+    net(myStr | net(" + ... "))
+
+    );
+
+
+-*net Padics := L -> (
+    myStr := net("");
+    local tempStr;
+    local tempTerm;
+
+    termList := reverse terms (L#cache#displayedPolynomial);
+    print termList;
+    j := 0;
+    while (j < #termList) do (                
+        tempStr = toString(termList#j);
+        if (tempStr#0 === "-") then (
+            tempTerm = (-1)*(termList#j);
+            if (j > 0) then myStr = myStr | net(" - ");
+            if (j == 0) then myStr = net("-");
+        )
+        else (
+            if (j > 0) then myStr = myStr | net(" + ");
+            tempTerm = termList#j;
+        );
+        myStr = myStr | net (tempTerm);                
+        j = j+1;        
+    );    
+    net(myStr | net(" + ... "))
+);
+*-
+
+toString Padics := L -> (
+    myStr := toString("");
+    local tempStr;
+    local tempTerm;
+    termList := reverse terms (L#cache#displayedPolynomial);
+    j := 0;
+    while (j < #termList) do (                
+        tempStr = toString(termList#j);
+        if (tempStr#0 === "-") then (
+            tempTerm = (-1)*(termList#j);
+            if (j > 0) then myStr = myStr | toString(" - ");
+            if (j == 0) then myStr = toString("-");
+        )
+        else (
+            if (j > 0) then myStr = myStr | toString(" + ");
+            tempTerm = termList#j;
+        );
+        myStr = myStr | toString (tempTerm);                
+        j = j+1;        
+    );    
+    toString(myStr | toString(" + ... "))
+);
+----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
+
+padics = method(Options => {Degree => 6, DisplayedDegree => 6, ComputedDegree => 6})
+
+-- Constructs Padics over the given ring R using inputted coefficient function f 
+padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
+    if(opts.DisplayedDegree > opts.ComputedDegree) then error "Displayed degree cannot be more than computed degree.";
+
+    computedPoly := constructAdicsPoly(R, p, f);
+
+    displayedPoly := truncat(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+
+    new Padics from {
+        coefficientFunction => f,
+        seriesRing => R,
+
+        cache => new CacheTable from { -- contains everything mutable
+            primeNumber => p,
+            DisplayedDegree => opts.DisplayedDegree,
+            displayedPolynomial => displayedPoly,
+            ComputedDegree => opts.ComputedDegree,
+            computedPolynomial => computedPoly,
+            valueList => toAdics(p, computedPoly)
+        }
+    }
+);

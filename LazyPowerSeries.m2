@@ -41,6 +41,9 @@ export{
     "calculatePolynomial",
     "trunc",
     "calculatePartialSeries",
+    "toAdics",
+    "constructAdicsPoly",
+    "inputFunctionCheck",
 
     -- LazySeries
     "LazySeries",
@@ -63,7 +66,10 @@ export{
     "oneSeries",
 
     -- P-adics
-    "toAdics"
+    "Padics",
+    "padics",
+    "primeNumber",
+    "valueList"
 
 }
 

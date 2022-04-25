@@ -1,5 +1,5 @@
 # M2PowerSeries
-Power series rings implementation in Macaulay2
+Power series rings implementation in Macaulay2.
 
 # Notes
 
@@ -124,3 +124,8 @@ This command will download new versions of everything
 ```
 sudo apt upgrade
 ```
+
+## On Debugging
+Whenever you enter the debugger in case of encountering an error in your code ( which you might know if you see "ii" at the input), you can use it to figure out what is causing the error. If you want to exit out of it, you should type  `break`. 
+
+If you were debugging by printing out useful information that is not needed for the final output of a method, but do not want to discard it completely, you can type `If debugLevel > 1 then ` before the prints so that if a user wishes to see that extra information such as values of internal variables, they have the option to. 

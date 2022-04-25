@@ -266,3 +266,8 @@ to check if a user has inputted a function with the corect amount of variables t
 
 [SimpleDoc](https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.16/share/doc/Macaulay2/SimpleDoc/html/index.html)
 []
+
+## `listUserSymbols`
+This seems to be helpful if you want to get information on your local variables:
+[`listUserSmybols`](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_list__User__Symbols.html)
+[`userSymbols`](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_user__Symbols.html)
