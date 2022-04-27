@@ -1,5 +1,6 @@
 
 ------------------------------------------- BASIC OPERATIONS -----------------------------------------------------------
+
 --*************************************************
 --Basic operations outputting Power Series
 --*************************************************
@@ -281,7 +282,7 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     R := A#seriesRing;
     ringZeroes := numgens R:0;
 
-    --Karl:  I changed this to min, feel free to remove comment if you don't object
+
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
@@ -413,3 +414,54 @@ LazySeries / LazySeries := LazySeries => (A, B)->(
 Number / LazySeries := LazySeries => (n, B)->(
     n * inverse(B)
 )
+
+
+--*************************************************
+--Basic operations outputting Padics
+--*************************************************
+--=================================================
+
+--Addition and substraction of two LazySeries
+Padics + Padics := Padics => (A,B) -> (
+    if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match"; -- checks if using same ring
+
+    f := A.coefficientFunction;
+    g := B.coefficientFunction;
+    R := A#seriesRing;
+
+    newFunction:= v -> f v + g v;
+    newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
+
+    a := truncat(newDispDegree, A.cache.displayedPolynomial); -- truncat TO PART
+
+    b := truncat(newDispDegree, B.cache.displayedPolynomial); -- truncat TO PART
+    newDispPoly :=  a + b; -- not using it right now because for some reason I can't make a method with more than 4 parameters
+
+    a2 := truncat(newCompDegree, A.cache.computedPolynomial); -- truncat TO PART
+    b2 := truncat(newCompDegree, B.cache.computedPolynomial); -- truncat TO PART
+    newCompPoly := a2 + b2; 
+    
+    padics(
+        A.seriesRing,
+        A.primeNumber,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => newDispDegree,
+        ComputedDegree => newCompDegree
+        )
+);
+
+
+Padics * Padics := Padics => (A,B)->(
+
+
+
+);
+
+Number * Padics := Padics => (n, L) -> (
+    N := padics(n);
+    N*L
+);
+
+Padics * Number := Padics => (L, n) -> n * L;

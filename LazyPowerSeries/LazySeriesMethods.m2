@@ -106,7 +106,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
     --deg:= infinity; -- default degree, it should be infinite unless the user says
     --if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
 
-    displayedPoly := truncate(opts.DisplayedDegree, P);
+    displayedPoly := truncat(opts.DisplayedDegree, P);
       
     lazySeries(
         R,
@@ -117,7 +117,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
         ComputedDegree => infinity
         ) 
 );
-
+--
 lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (    
     local tempLPower;
     R := L#seriesRing;
@@ -283,14 +283,18 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
     val
     --checks cache of LazySeries first and grabs the coefficients if available
 );
+
 coefficient(VisibleList, RingElement) := (L, P) -> coefficient(toMonomial(L, ring P), P); -- USE THIS FOR RINGELEMENT TO LAZYSERIES CONSTRUCTOR
+
 coefficient(ZZ, RingElement) := (n, P) -> coefficient(toMonomial({n}, ring P), P); -- for one 
 
+-*
 coefficient(RingElement, LazySeries) := (M, L) ->(
-    print ;
+    
     -- check if monomial
     -- see existing coefficient function
 );
+*-
 
 --returns the ring of a LazySeries
 ring(LazySeries) := L -> L#seriesRing;
@@ -312,7 +316,6 @@ getFunction = method()
 getFunction(LazySeries) := Function => S -> (
     S#coefficientFunction
 );
-
 
 -- Overloading of sub; Promotes LazySeries defined over a ring to the specified new ring
 sub(LazySeries, Ring) := LazySeries => (L, R) -> (
@@ -350,6 +353,7 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
     );
 *-
 
+
 --*******************************************************
 --Implementation of P-ADICS
 --*******************************************************
@@ -368,6 +372,7 @@ net Padics := L -> (
     coefficientList :=(apply(valueList, i-> i#1));
 
     j :=0;
+
     while (j< #termList) do (
         tempCoefficient= toString(coefficientList#j);
         if(tempCoefficient != "0") then(
@@ -431,14 +436,12 @@ toString Padics := L -> (
 );
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
-padics = method(Options => {Degree => 6, DisplayedDegree => 6, ComputedDegree => 6})
+padics = method(Options => {Degree => 6, DisplayedDegree => 10, ComputedDegree => 10})
 
 -- Constructs Padics over the given ring R using inputted coefficient function f 
 padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
-    if(opts.DisplayedDegree > opts.ComputedDegree) then error "Displayed degree cannot be more than computed degree.";
 
     computedPoly := constructAdicsPoly(R, p, f);
-
     displayedPoly := truncat(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
 
     new Padics from {
@@ -454,4 +457,75 @@ padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> (
             valueList => toAdics(p, computedPoly)
         }
     }
+);
+
+--converts polynomials to Padics
+padics(ZZ, RingElement) := Padics => opts -> (p, g) -> ( 
+    R := ring g; 
+    f := v -> coefficient(v, g);
+
+    --deg:= infinity; -- default degree, it should be infinite unless the user says
+    --if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
+      
+    padics(
+        R,
+        p,
+        f,
+        g,
+        DisplayedDegree => opts.DisplayedDegree,
+        ComputedDegree => infinity
+        ) 
+);
+
+-- Making a Padics without the added computation of polynomial construction
+padics(Ring, ZZ, Function, RingElement) := LazySeries => opts -> (R,p, f, computedPoly) -> ( 
+
+    new Padics from {
+        coefficientFunction => f,
+        seriesRing => R,
+        primeNumber => p,
+
+        cache => new CacheTable from { -- contains everything mutable
+            DisplayedDegree => opts.DisplayedDegree,
+            displayedPolynomial => truncat(opts.DisplayedDegree, computedPoly),
+            ComputedDegree => opts.ComputedDegree,
+            computedPolynomial => computedPoly,
+            valueList => toAdics(p, computedPoly)
+        }
+    }
+);
+
+-*
+padics(Ring, ZZ, List) := Padics => opts -> (R, p, L) -> (
+    variables := vars(gens R +1);
+    f := variables -> coefficient()
+
+
+    new Padics from {
+        coefficientFunction => f,
+        seriesRing => R,
+        primeNumber => p,
+
+        cache => new CacheTable from { -- contains everything mutable
+            DisplayedDegree => opts.DisplayedDegree,
+            displayedPolynomial => displayedPoly,
+            ComputedDegree => opts.ComputedDegree,
+            computedPolynomial => computedPoly,
+            valueList => L
+        }
+    }
+
+)
+*-
+
+
+-- Coefficient function overload for p-adics
+coefficient(VisibleList, Padics) := (L, M) -> (
+    R := M.seriesRing;
+    p := M.primeNumber;
+    variables := {sub(p, R)} | toList gens R;
+    monomial := product(apply(#variables, i->(variables#i)^(L#i)));
+    H := new HashTable from M.cache.valueList;
+
+    H#monomial
 );

@@ -132,6 +132,15 @@ calculatePartialSeries(ZZ, Ring, Function) := RingElement => (deg, R, f) ->(  --
 
 );
 
+-- Converts a negative number to a positive representation in mod p. Ex: converts -1 in mod 7 to ((-1 % 7) + 7) % 7 =6
+toPositiveRep =  method()
+toPositiveRep(ZZ,ZZ) := ZZ => (p,n) -> (
+    ((n % p) + p) % p
+    );
+
+
+
+
 -- Extracts information about the appropariate coefficients of a polynomial in p-adics form
 toAdics = method()
 toAdics(ZZ, RingElement) := List => (p, poly) -> (
@@ -170,7 +179,8 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
             workingIdeal2 = trim(ideal(workingList) + workingIdeal);-- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
             workingf2 = workingf % workingIdeal2;      
             tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0;
-            workingCoefficient = ceiling(coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial));
+            workingCoefficient = toPositiveRep(p,ceiling(coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)));
+
             outputList = append(outputList, currentMonomial => workingCoefficient);
             workingf = workingf - workingf2;
 
@@ -186,9 +196,8 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
                 );
             );
         );
-
-        outputList
-        
+    outputList
+           
 );
 
 

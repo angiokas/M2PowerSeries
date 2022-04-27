@@ -44,6 +44,7 @@ export{
     "toAdics",
     "constructAdicsPoly",
     "inputFunctionCheck",
+    "toPositiveRep",
 
     -- LazySeries
     "LazySeries",

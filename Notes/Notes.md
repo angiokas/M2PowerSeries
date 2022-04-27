@@ -81,6 +81,12 @@ sudo apt-get install texlive-xetex texlive-fonts-recommended texlive-plain-gener
 Here is the website:
 https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
 
+You might also need pandoc:
+```
+sudo apt install pandoc
+```
+
+
 ## Problems with overloading
 
 
