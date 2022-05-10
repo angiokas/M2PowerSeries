@@ -31,7 +31,9 @@
 
 - [ ] Implementation of p-adics
   - [ ] base p conversion
-  - [ ] 
+  - [X] `toAdics` function that gives us information about the proper coefficients to assemble the p-adics form
+  - [ ] change how the p-th index looksl ike in the terms i.e change "121" to "11^2".
+
 
 - [ ] Helper/Utility methods
   - [X] `zeroSeries`
@@ -58,7 +60,7 @@
 - [X] make sure ^p powers are actually faster than S*S...S p times because right now it isn't
 - [X] Displaying lazySeries using pretty by defining a new pretty function
   - [ ] Need to fix the ```i -> part_i(select(s#displayedPolynomial, i -> degree i >= {s#displayedDegree})) ``` line because displayedDegree in graded rings will be a list and not an integer and `{s#displayedDegree}` will not give us what we want. 
-  - [ ] `pretty` doesn't work properly because it went out of bounds on a specific LazySeries.
+  - [ ] `pretty` doesn't work properly because it went out of bounds on a specific LazySeries. -> Made a custom display function
   - [ ] `toLazySeries` isn't outputting the correct degree
   - [X] Update `lazySeries` method to work with any ring, i.e no matter the function, the values all get converted to the corresponding value in the given ring. (Solved using `sub`)
 
@@ -104,7 +106,8 @@
     - exercises
   - [ ] Atiyah Macdonald chapter 8
   - [ ] Atiyah Macdonald chapter 10
-  - [ ] Read about the **Cohen Structure Theorem**
+  - [X] Read about the **Cohen Structure Theorem**
+  - [X] Present on the Cohen Structure Theorem at CARES seminar
   - [ ] 
   
 - [ ] For REU Symposium **August 20th** 

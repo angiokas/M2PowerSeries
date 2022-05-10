@@ -30,7 +30,7 @@ net LazySeries := L -> (
         j = j+1;        
     );    
     net(myStr | net(" + ... "))
-)
+);
 
 toString LazySeries := L -> (
     myStr := toString("");
@@ -53,7 +53,7 @@ toString LazySeries := L -> (
         j = j+1;        
     );    
     toString(myStr | toString(" + ... "))
-)
+);
 
 ----------------------LAZYSERIES CONSTRUCTORS-----------------------------------------------------------------
 
@@ -358,6 +358,21 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
 --Implementation of P-ADICS
 --*******************************************************
 
+padicOrder = method()
+padicOrder(ZZ, RingElement) := ZZ => (p, f) ->(
+    if (f==0) then return -infinity;
+    p = sub(p,ring f);
+    i := 0;
+    tempf := sub(0,ring f);
+    while(tempf == 0) do (
+        i = i+1;
+        tempf = f % ideal (p^i);
+    );
+    return i-1;
+
+);
+
+
 
 Padics = new Type of LazySeries; -- Could potentially change it to HashTable since so far have not used inheritence
 
@@ -366,10 +381,12 @@ net Padics := L -> (
     local tempStr;
     local tempTerm;
     local tempCoefficient;
+    local k;
+    p := L.primeNumber;
 
     valueList := L.cache.valueList;
-    termList :=(apply(valueList, i-> i#0));
-    coefficientList :=(apply(valueList, i-> i#1));
+    termList := keys valueList;
+    coefficientList := values valueList;
 
     j :=0;
 
@@ -384,16 +401,29 @@ net Padics := L -> (
                 if (j == 0) then myStr = net("-");
             )
             else (
-                if (j > 0) then myStr = myStr | net(" + ");
+                if (j > 0 and myStr != "") then myStr = myStr | net(" + ");
                 tempTerm = termList#j;
-
-
             );
-        myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);       
+
+            k = padicOrder(p,sub(tempTerm,L.seriesRing)); -- add if else so that removes when k =0
+            
+            if(k == 0) then(
+                tempTerm = net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
+                )
+            else if(k ==1) then(
+                tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
+
+            )
+            else (
+                tempTerm = net(p) | net("^") | net(k) | net("*") | net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
+            );      
         );
 
         j = j+1;        
-    );    
+    );  
 
     net(myStr | net(" + ... "))
 
@@ -404,10 +434,12 @@ toString Padics := L -> (
     local tempStr;
     local tempTerm;
     local tempCoefficient;
+    local k;
+    p := L.primeNumber;
 
     valueList := L.cache.valueList;
-    termList :=(apply(valueList, i-> i#0));
-    coefficientList :=(apply(valueList, i-> i#1));
+    termList := keys valueList;
+    coefficientList := values valueList;
 
     j :=0;
     while (j< #termList) do (
@@ -421,12 +453,25 @@ toString Padics := L -> (
                 if (j == 0) then myStr = net("-");
             )
             else (
-                if (j > 0) then myStr = myStr | net(" + ");
+                if (j > 0 and myStr != "") then myStr = myStr | net(" + ");
                 tempTerm = termList#j;
-
-
             );
-        myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);       
+
+            k = padicOrder(p,sub(tempTerm,L.seriesRing)); -- add if else so that removes when k =0
+            
+            if(k == 0) then(
+                tempTerm = net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
+                )
+            else if(k ==1) then(
+                tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
+
+            )
+            else (
+                tempTerm = net(p) | net("^") | net(k) | net("*") | net((entries monomials(tempTerm))#0#0);
+                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
+            );      
         );
 
         j = j+1;        
@@ -468,7 +513,6 @@ padics(ZZ, RingElement) := Padics => opts -> (p, g) -> (
     --if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
       
     padics(
-        R,
         p,
         f,
         g,
@@ -478,7 +522,8 @@ padics(ZZ, RingElement) := Padics => opts -> (p, g) -> (
 );
 
 -- Making a Padics without the added computation of polynomial construction
-padics(Ring, ZZ, Function, RingElement) := LazySeries => opts -> (R,p, f, computedPoly) -> ( 
+padics(ZZ, Function, RingElement) := LazySeries => opts -> (p, f, computedPoly) -> ( 
+    R := ring computedPoly;
 
     new Padics from {
         coefficientFunction => f,
@@ -525,7 +570,7 @@ coefficient(VisibleList, Padics) := (L, M) -> (
     p := M.primeNumber;
     variables := {sub(p, R)} | toList gens R;
     monomial := product(apply(#variables, i->(variables#i)^(L#i)));
-    H := new HashTable from M.cache.valueList;
+    H := M.cache.valueList;
 
     H#monomial
 );

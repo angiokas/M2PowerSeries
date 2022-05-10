@@ -196,8 +196,7 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
                 );
             );
         );
-    outputList
-           
+    hashTable outputList
 );
 
 
