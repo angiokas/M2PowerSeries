@@ -90,6 +90,9 @@ sudo apt install pandoc
 ## Problems with overloading
 
 
+
+
+
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 
@@ -106,24 +109,31 @@ $ loadPackage "pkgname", Reload => true
 ## On Documentation
 If you want to generate the html files of the documentation, then use the command `installPackage` and then restart Macaulay2:
 ```
-installPackage NewPowerSeries
+installPackage "LazyPowerSeries"
 ```
 
 Then if you want to view the documentation in a browser, use the command `viewHelp`:
 ```
-viewHelp NewPowerSeries
+viewHelp "LazyPowerSeries"
 ```
 or if you prefer viewing the documentation in the terminal, use the command `help`:
 ```
-help NewPowerSeries
+help "LazyPowerSeries"
 ```
 
 If you want to be safe when trying to update documentation, you can uninstall a package first, then load it and then install it:
 ```
-uninstallPackage NewPowerSeries
-loadPackage NewPowerSeries
-install NewPowerSeries
+uninstallPackage "LazyPowerSeries"
+loadPackage "LazyPowerSeries"
+installPackage "LazyPowerSeries"
 ```
+
+If it gives you an error on using 'viewHelp' like this: 
+error: package LazyPowerSeries is not installed on the prefixPath
+
+Then use this command:
+```makePackageIndex()```
+which creates a file index.html in the ~/.Macaulay2 directory, containing links to the documentation for Macaulay2 and all installed packages. (Make sure to installPackage first before trying to use this command)
 
 ## On Testing
 If you want to check tests, you should type the `check` command in macaulay like so:

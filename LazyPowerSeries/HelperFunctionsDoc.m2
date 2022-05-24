@@ -6,27 +6,32 @@
 beginDocumentation()
 needsPackage "SimpleDoc";
 
+
 doc ///
-Key
-    LazySeries
-    LazySeries
-    
+    Key
+        (calculatePolynomial, ZZ, Ring, Function)
+    Headline
+        Constructs a polynomial using the given ring and constructive function that has the proper amount of arguments corresponding to the dimension of the ring.
+    Usage
+        s = calculatePolynomial(n, R, f)
+    Inputs
+        n: ZZ  
+        R: Ring
+    Outputs
+        s: RingElement
+    Description
+        Text
+            In general, a formal power series is a unit if its constant is a unit. This method checks if the constant term is invertible. 
 
-Headline
-    A package allowing construction and manipulation of formal power series in multi-variable.
-Description
-    Text     
-        Formal power series are an important part of understanding ring completions. This package 
-        allows the implementation of Formal Power Series which offers the usage in multi-variate
-        and multi-graded rings, as well as multiplication and inversion. Of course, it is impossible
-        to make an object that is infinite, however this package offers Power series in a form in which
-        any coefficient can be calculated. The focus is mainly on a specific type of series which we call
-        LazySeries (Credit to Magma) which is a power series where all coefficients are possible to 
-        calculate by a given function, or rather a ring map. Once a coefficient is computed,
-        it is stored in the object cache for fast retrieval.
 
-        For different ways of constructing LazySeries, see @TO "Creating LazySeries"@.
-        As for how to use basic operations involving LazySeries, see @TO"Operations on Series"@.
-        
+        Example
+            R = QQ[x,y]
+            P = lazySeries(R,(i,j) -> i+j)
+            S = ZZ[x,y]
+            sub(P,S)
+            
+    SeeAlso
+        "Creating LazySeries"
+        "Operations on Series"
+
 ///
-
