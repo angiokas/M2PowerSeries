@@ -1,7 +1,6 @@
 # Goals
 
 ## Big goals
-
 - [ ] Implement formal power series as an object
   - [X] `LazySeries` using a ring and function
     - [X] Works for multivariate rings
@@ -10,7 +9,7 @@
     - [X] saves the coefficient function
     - [X] Uses caching for fast retreival
     - [X] Works for single-variable (FIXED)
-  - [ ] `LazySeries` using a ring and a polynomial as a function
+  - [X] `LazySeries` using a ring and a polynomial as a function
   - [X] Polynomial/`RingElement` conversion to `LazySeries`
 
 - [ ] Basic Operations involving series
@@ -32,7 +31,12 @@
 - [ ] Implementation of p-adics
   - [ ] base p conversion
   - [X] `toAdics` function that gives us information about the proper coefficients to assemble the p-adics form
-  - [ ] change how the p-th index looksl ike in the terms i.e change "121" to "11^2".
+  - [X] change how the p-th index looksl ike in the terms i.e change "121" to "11^2".
+  - [ ] Important: implement the correct expanssion form of -1. For p, -1 should look like ... (p-1) (p-1) i.e (p-1) + (p-1)p + (p-1) p^2+ ...
+  - [ ] multiplication by -1
+  - [ ] Using a similar method to lazy series, implement inversion using (1-x)^(-1) = 1+x+x^2+... trick, however -1 representation is key here
+  - [ ] Think about p-adic numbers instead of integers next, so completions over polynomial rings over QQ
+  
 
 
 - [ ] Helper/Utility methods
@@ -52,7 +56,13 @@
   -[ ] Overloaded methods
     - [X] `ring` - Returns 
     - [ ] `coefficient`
-
+  -[ ] maximumsList does not work with sequences even though technically its input should be any VisibleList
+## Documentation 
+- [ ] Make documentation for all the missing nodes and warning methods/symbols
+- [ ] Sweep through all of them again and update "see also" section by searching where the methods are used. 
+- [ ] Make a separate page for helper functions of the package
+- [ ] Make a page for LazySeries object
+- [ ] Make a page for p-adics
 ## Improvements for later
 - [X] make method that spits out coefficient at specific index
   - [ ] Make it so that it takes in a list of coefficients and spits out a list of values.

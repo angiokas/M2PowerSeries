@@ -7,12 +7,13 @@ truncat(InfiniteNumber, RingElement) := RingElement =>(n , P) ->(
      P
     );
 
-truncat(ZZ, RingElement) := (n, p) ->(
+truncat(ZZ, RingElement) := RingElement =>(n, p) ->(
     part(0,n,p)
     );
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
-toMonomial = (L, S) -> ( -- ??????????
+toMonomial = method()
+toMonomial(List, Ring) := RingElement => (L, S) -> ( -- ??????????
      variableList := flatten entries vars S;
      m := 1;
      for i from 0 to (#L-1) do(
@@ -21,7 +22,7 @@ toMonomial = (L, S) -> ( -- ??????????
      m
 );
 
--- Returns an n-tuple with maximum element from each index fromlist of n-tuples
+-- Returns an n-tuple with maximum element from each index from a list of n-tuples
 maximumsList = method() -- WORKS
 maximumsList(VisibleList) := List => l -> (-- ASSUMES THAT THE LIST PROVIDED HAS ELEMEMNTS OF THE SAME LENGTH i.e {{a,b},{c,d},{l,m}} where #{a,b}==#{c,d}==#{l,m}==2
     elementLength := #(l#0);
@@ -137,9 +138,6 @@ toPositiveRep =  method()
 toPositiveRep(ZZ,ZZ) := ZZ => (p,n) -> (
     ((n % p) + p) % p
     );
-
-
-
 
 -- Extracts information about the appropariate coefficients of a polynomial in p-adics form
 toAdics = method()

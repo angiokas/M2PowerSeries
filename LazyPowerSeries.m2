@@ -39,7 +39,7 @@ export{
     "maximumsList",
     "toBinary",
     "calculatePolynomial",
-    "trunc",
+    "truncat",
     "calculatePartialSeries",
     "toAdics",
     "constructAdicsPoly",
@@ -68,7 +68,7 @@ export{
 
     -- P-adics
     "Padics",
-    "padics",
+    "padicOrder",
     "primeNumber",
     "valueList"
 
@@ -76,6 +76,7 @@ export{
 
 
 load "./LazyPowerSeries/LazySeriesMethods.m2"
+load "./LazyPowerSeries/PadicsMethods.m2"
 load "./LazyPowerSeries/BasicOperations.m2"
 
 
@@ -83,6 +84,7 @@ load "./LazyPowerSeries/BasicOperations.m2"
 beginDocumentation()
 load "./LazyPowerSeries/LazySeriesMethodsDoc.m2"
 load "./LazyPowerSeries/BasicOperationsDoc.m2"
+load "./LazyPowerSeries/HelperFunctionsDoc.m2"
 
 
 

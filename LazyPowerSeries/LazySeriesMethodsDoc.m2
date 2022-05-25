@@ -10,8 +10,11 @@ doc ///
 Key
     LazySeries
     displayedPolynomial
+    computedPolynomial
     ComputedDegree
     DisplayedDegree
+    seriesRing
+
 
 
 Headline
@@ -168,7 +171,7 @@ doc ///
         L^2
         L^10
     Text
-        For inversion you can check out @TO2"Inverting LazySeries"@
+        For inversion you can check out @TO"Inverting LazySeries"@
         
   SeeAlso
     LazySeries
@@ -185,7 +188,6 @@ doc ///
     "Number / LazySeries"
     "RingElement / LazySeries"
     "inverse(LazySeries)"
-
   Headline
     An overview of the arithmetic done on formal power series. 
   Description
