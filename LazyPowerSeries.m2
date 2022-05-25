@@ -82,9 +82,10 @@ load "./LazyPowerSeries/BasicOperations.m2"
 
 --DOCUMENTATION
 beginDocumentation()
-load "./LazyPowerSeries/LazySeriesMethodsDoc.m2"
-load "./LazyPowerSeries/BasicOperationsDoc.m2"
-load "./LazyPowerSeries/HelperFunctionsDoc.m2"
+load "./LazyPowerSeries/Documentation/LazySeriesMethodsDoc.m2"
+load "./LazyPowerSeries/Documentation/PadicsMethodsDoc.m2"
+load "./LazyPowerSeries/Documentation/BasicOperationsDoc.m2"
+load "./LazyPowerSeries/Documentation/HelperFunctionsDoc.m2"
 
 
 
