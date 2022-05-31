@@ -218,3 +218,11 @@ coefficient(VisibleList, Padics) := (L, M) -> (
 
     H#monomial
 );
+
+minusOne = method()
+minusOne(ZZ, Ring) := Padics => (p, R) ->(
+    variables := gens R;
+    print variables;
+    padics(R, p, variables-> p-1)
+
+)

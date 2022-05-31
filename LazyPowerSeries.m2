@@ -67,10 +67,12 @@ export{
     "oneSeries",
 
     -- P-adics
+    "padics",
     "Padics",
     "padicOrder",
     "primeNumber",
-    "valueList"
+    "valueList",
+    "minusOne"
 
 }
 

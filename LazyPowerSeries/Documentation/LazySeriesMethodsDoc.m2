@@ -15,8 +15,6 @@ Key
     DisplayedDegree
     seriesRing
 
-
-
 Headline
     A package allowing construction and manipulation of formal power series in multi-variable.
 Description
@@ -50,6 +48,7 @@ doc ///
   
      1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "using a given ring and function")@
      2. Creating LazySeries by the @TO2((RingElement), "using a given ringElement")@
+     3.
   SeeAlso
     "Operations on Series"
     

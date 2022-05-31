@@ -177,7 +177,7 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
             workingIdeal2 = trim(ideal(workingList) + workingIdeal);-- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
             workingf2 = workingf % workingIdeal2;      
             tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0;
-            workingCoefficient = toPositiveRep(p,ceiling(coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)));
+            workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial);
 
             outputList = append(outputList, currentMonomial => workingCoefficient);
             workingf = workingf - workingf2;
