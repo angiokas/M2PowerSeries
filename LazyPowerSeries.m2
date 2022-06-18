@@ -39,7 +39,6 @@ export{
     "maximumsList",
     "toBinary",
     "calculatePolynomial",
-    "truncat",
     "calculatePartialSeries",
     "toAdics",
     "constructAdicsPoly",
@@ -72,14 +71,21 @@ export{
     "padicOrder",
     "primeNumber",
     "valueList",
-    "minusOne"
+    "minusOne",
 
+    -- PowerSeriesRings
+    "PowerSeriesRing",
+    "isPowerSeriesRing",
+    "PowerList",
+    "powerList"
 }
-
-
+print "HELLO1";
+load "./LazyPowerSeries/HelperFunctions.m2"
 load "./LazyPowerSeries/LazySeriesMethods.m2"
+print "HELLO2";
 load "./LazyPowerSeries/PadicsMethods.m2"
 load "./LazyPowerSeries/BasicOperations.m2"
+--load "./LazyPowerSeries/PowerSeriesRings.m2"
 
 
 --DOCUMENTATION
@@ -95,5 +101,6 @@ load "./LazyPowerSeries/Documentation/HelperFunctionsDoc.m2"
 load "./LazyPowerSeries/Tests/ConstructionTests.m2"
 load "./LazyPowerSeries/Tests/HelperFunctionTests.m2"
 load "./LazyPowerSeries/Tests/BasicOperationsTests.m2"
+load "./LazyPowerSeries/Tests/PadicsMethodsTests.m2"
 
 end

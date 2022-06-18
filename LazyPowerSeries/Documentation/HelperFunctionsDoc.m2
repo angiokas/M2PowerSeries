@@ -8,13 +8,13 @@ needsPackage "SimpleDoc";
 
 doc ///
     Key
-        (truncat, ZZ, RingElement)
+        (truncate, ZZ, RingElement)
         
 
     Headline
         Truncates a given RingElement (i.e polynomial).
     Usage
-        s = truncat(n,f)
+        s = truncate(n,f)
     Inputs
         n: ZZ  
         f: RingElement
@@ -24,8 +24,8 @@ doc ///
         Example
             R = ZZ[x,y]
             f = x*y^7+ 4*x^5*y^3+65*y^5+x^3*y^2+ +x^2*y +x*y
-            truncat(4, f)
-            truncat(6, f)
+            truncate(4, f)
+            truncate(6, f)
                      
     SeeAlso
         LazySeries
@@ -36,12 +36,12 @@ doc ///
 
 doc ///
     Key
-        (truncat, InfiniteNumber, RingElement)
+        (truncate, InfiniteNumber, RingElement)
         
     Headline
         Truncating case for infiniteNumber inputs.
     Usage
-        s = truncat(n,f)
+        s = truncate(n,f)
     Inputs
         n: InfiniteNumber  
         f: RingElement
@@ -54,8 +54,8 @@ doc ///
         Example
             R = ZZ[x,y]
             f = x*y^7+ 4*x^5*y^3+65*y^5+x^3*y^2+ +x^2*y +x*y
-            truncat(infinity, f)
-            truncat(-infinity, f)
+            truncate(infinity, f)
+            truncate(-infinity, f)
                      
     SeeAlso
         LazySeries

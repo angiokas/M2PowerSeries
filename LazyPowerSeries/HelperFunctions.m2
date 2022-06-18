@@ -1,15 +1,18 @@
 -- Truncates given polynomial
-truncat = method()
-
-truncat(InfiniteNumber, RingElement) := RingElement =>(n , P) ->(
+truncate(InfiniteNumber, RingElement) := RingElement =>(n , P) ->(
      if n == infinity then return P;
      if n == -infinity then return sub(0, ring P);
      P
     );
 
-truncat(ZZ, RingElement) := RingElement =>(n, p) ->(
+truncate(ZZ, RingElement) := RingElement =>(n, p) ->(
     part(0,n,p)
     );
+
+truncate(ZZ,ZZ, Thing) := ZZ =>(p,d,n)->(
+
+)
+
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
 toMonomial = method()
@@ -24,8 +27,10 @@ toMonomial(List, Ring) := RingElement => (L, S) -> ( -- ??????????
 
 -- Returns an n-tuple with maximum element from each index from a list of n-tuples
 maximumsList = method() -- WORKS
-maximumsList(VisibleList) := List => l -> (-- ASSUMES THAT THE LIST PROVIDED HAS ELEMEMNTS OF THE SAME LENGTH i.e {{a,b},{c,d},{l,m}} where #{a,b}==#{c,d}==#{l,m}==2
-    elementLength := #(l#0);
+maximumsList(VisibleList) := List => l -> (-- ASSUMES THAT THE 
+    
+    try elementLength := #(l#0)
+    else error("LIST PROVIDED HAS ELEMEMNTS OF THE SAME LENGTH i.e {{a,b},{c,d},{l,m}} where #{a,b}==#{c,d}==#{l,m}==2");
     maximums := {};
     maximumValue := 0;
     for j from 0 to (elementLength-1) do(
@@ -141,18 +146,26 @@ toPositiveRep(ZZ,ZZ) := ZZ => (p,n) -> (
 
 -- Extracts information about the appropariate coefficients of a polynomial in p-adics form
 toAdics = method()
-toAdics(ZZ, RingElement) := List => (p, poly) -> (
+toAdics(ZZ, Thing) := List => (p, poly) -> (
     R := ring poly;
-    workingf := poly;
+    local deg;
+
+    try workingf := sub(poly,R)
+    else error("Cannot interpret the second argument as a ring element.");
+
     coefficientslist := {};
-    deg := floor(log_p leadCoefficient poly) + (sum degree poly);
+
+    if(instance (workingf, RingElement)) then deg = floor(log_p leadCoefficient workingf) + (sum degree workingf)
+    else deg= floor(log_p workingf);
+
     m := (ideal p)+(ideal gens R); -- Ex. p = 7 and R = ZZ[x,y,z] then (7)+(x,y,z) = (7,x,y,z)
+
     local workingIdeal;
     local workingList;
     local workingIdeal2;
     local currentMonomial;
     local n;
-    local workingf;
+
     local workingf2;
     local workingCoefficient;
     local tempMonomial; 
@@ -176,8 +189,11 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
             workingList = drop(workingList,{0,0});
             workingIdeal2 = trim(ideal(workingList) + workingIdeal);-- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
             workingf2 = workingf % workingIdeal2;      
-            tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0;
-            workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial);
+            try tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0
+            else tempMonomial = currentMonomial; --in case it is ZZ, BANDAID
+
+            try workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)
+            else workingCoefficient = workingf2 / currentMonomial;
 
             outputList = append(outputList, currentMonomial => workingCoefficient);
             workingf = workingf - workingf2;
@@ -199,60 +215,49 @@ toAdics(ZZ, RingElement) := List => (p, poly) -> (
 
 
 -- Constructs polynomials using functions intended for calculating p-adics coefficients
-constructAdicsPoly = method()
-constructAdicsPoly(Ring, ZZ, Function) := RingElement => (R, p, f) -> ( 
--- the function should be describing the coefficients in terms of i_0, i_1,...,i_n where i_0 corresponds to p as a variable
--- TODO: add a check to make sure p is actually prime!!!
-variables := {sub(p, R)} | toList gens R;
+constructAdicsPoly = method(Options => { DisplayedDegree => 3, ComputedDegree => 5})
+    constructAdicsPoly(Ring, ZZ, Function) := RingElement => opts -> (R, p, f) -> ( 
+    -- the function should be describing the coefficients in terms of i_0, i_1,...,i_n where i_0 corresponds to p as a variable
+    -- TODO: add a check to make sure p is actually prime!!!
+    variables := {sub(p, R)} | toList gens R;
 
-deg := 5;
-combinations := {};
-start := 0;
-s := sub(0, R);
+    deg := opts.ComputedDegree - opts.DisplayedDegree;
+    combinations1 := {};
+    combinations2 := {};
+    start := 0;
+    s := sub(0, R);
 
 
-------- TODO: MAKE INTO SEPARATE HELPER FUNCTION AND USE IT IN POLY CONSTRUCTION METHOD TOO
-dummyConstantVector := apply(#variables, t -> 0);
-
-newFunction := f;
-local newFunction2;
-try sub(f dummyConstantVector, R)
-    else (
-            try sub(f toSequence dummyConstantVector, R) then (
-
-                newFunction = tempList -> (f toSequence tempList)
-            )
-            else(                
-
-                newFunction = tempList -> f (tempList#0); 
+    ------- TODO: MAKE INTO SEPARATE HELPER FUNCTION AND USE IT IN POLY CONSTRUCTION METHOD TOO
+    inputFunctionCheck(R, variables, f);
+    ------
+    for j from start to opts.DisplayedDegree do (
+                combinations1 = append(combinations1, compositions (#variables, j)); 
             );
-    );
-        
-    try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
-    else (
-            error "The lazySeries function should take an exponent vector and output a ringElement.";
-         );
-    
-    try(
-            if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
-            else newFunction2 = v -> sub(newFunction v, R);
-        )
-    else(
-            error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
-        );
-------
-
-for j from start to deg do (
-            combinations = append(combinations, compositions (#variables, j)); 
-        );
         combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
-     -- print combinations;
-     -- TODO: add ops.Degree terms to s.
-
-    for j from 0 to #combinations-1 do (
-        s = s + (newFunction2 (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
+        -- print combinations;
+        -- TODO: add ops.Degree terms to s.
+        n = #combinations1-1;
+        
+    for j from 0 to n do (
+        s = s + (newFunction2 (combinations1#j)) * product(apply(#variables, i -> (variables#i)^((combinations1#j)#i)));
         );   
-    s
+
+    displayedPoly := s;
+    ---
+    for j from opts.DisplayedDegree to opts.ComputedDegree do (
+            combinations2 = append(combinations2, compositions (#variables, j)); 
+        );
+        combinations2 = flatten combinations2;
+
+    combinations := join(combinations1, combinations2);
+
+    for j from n to #combinations-1 do (
+        s = s + (newFunction2 (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
+        );
+    computedPoly :=s;
+
+    (displayedPoly, computedPoly)
 
 );
 
@@ -271,7 +276,7 @@ constructAdicsPoly(List) := Padics => L -> (
 --------------------
 -- Outputs a slightly altered function to accomodate proper input or spits out an error in case of wrong intended argument number
 inputFunctionCheck = method() 
-inputFunctionCheck(Ring, List, Function) := Function => (R, variables, f) -> (
+inputFunctionCheck(Ring, VisibleList, Function) := Function => (R, variables, f) -> (
 
     dummyConstantVector := apply(#variables, t -> 0);
 
@@ -290,17 +295,17 @@ inputFunctionCheck(Ring, List, Function) := Function => (R, variables, f) -> (
                 );
         );
             
-        try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
-        else (
-                error "The lazySeries function should take a exponent vector and output a ringElement.";
-            );
-        
-        try(
-                if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
-                else newFunction2 = v -> sub(newFunction v, R);
-            )
-        else(
-                error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
-            );
+    try newFunction dummyConstantVector --then ( print (newFunction dummyConstantVector) )
+    else (
+            error "The lazySeries function should take a exponent vector and output a ringElement.";
+        );
+    
+    try(
+            if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
+            else newFunction2 = v -> sub(newFunction v, R);
+        )
+    else(
+            error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
+        );
 
 );

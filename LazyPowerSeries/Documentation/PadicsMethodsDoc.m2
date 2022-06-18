@@ -1,7 +1,7 @@
 
 doc ///
     Key
-        (toAdics, ZZ, RingElement)
+        (toAdics, ZZ, Thing)
         
     Headline
         Extracts information about the appropariate coefficients of a polynomial in p-adics form.
@@ -9,7 +9,8 @@ doc ///
         s = toAdics(p, f)
     Inputs
         p: ZZ
-        f: RingElement
+        f: Thing
+            something promotable to a ring.
     Outputs
         s: List
     Description

@@ -1,6 +1,7 @@
 --*******************************************************
 --Implementation of P-ADICS
 --*******************************************************
+print "HELLO";
 
 padicOrder = method()
 padicOrder(ZZ, RingElement) := ZZ => (p, f) ->(
@@ -18,7 +19,7 @@ padicOrder(ZZ, RingElement) := ZZ => (p, f) ->(
 
 
 
-Padics = new Type of LazySeries; -- Could potentially change it to HashTable since so far have not used inheritence
+Padics = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
 
 net Padics := L -> (
     myStr := net("");
@@ -130,8 +131,8 @@ padics = method(Options => {Degree => 6, DisplayedDegree => 10, ComputedDegree =
 -- Constructs Padics over the given ring R using inputted coefficient function f 
 padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
 
-    computedPoly := constructAdicsPoly(R, p, f);
-    displayedPoly := truncat(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+    (displayedPoly, computedPoly,) := constructAdicsPoly(R, p, f, DisplayedDegree => opts.DisplayedDegree, ComputerDegree =>opts.ComputedDegree);
+    --displayedPoly := truncate(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
 
     new Padics from {
         coefficientFunction => f,
@@ -176,7 +177,7 @@ padics(ZZ, Function, RingElement) := LazySeries => opts -> (p, f, computedPoly) 
 
         cache => new CacheTable from { -- contains everything mutable
             DisplayedDegree => opts.DisplayedDegree,
-            displayedPolynomial => truncat(opts.DisplayedDegree, computedPoly),
+            displayedPolynomial => truncate(opts.DisplayedDegree, computedPoly),
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
             valueList => toAdics(p, computedPoly)
@@ -224,5 +225,10 @@ minusOne(ZZ, Ring) := Padics => (p, R) ->(
     variables := gens R;
     print variables;
     padics(R, p, variables-> p-1)
+);
 
-)
+truncate(ZZ, Padics) := Padics => opts ->(n, f) -> ( -- Idea: can generalize ZZ input to Thing
+
+);
+
+print "HELLO";

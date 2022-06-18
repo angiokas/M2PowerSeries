@@ -43,13 +43,13 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := truncat(newDispDegree, A.cache.displayedPolynomial); -- truncat TO PART
+    a := truncate(newDispDegree, A.cache.displayedPolynomial); -- truncate TO PART
 
-    b := truncat(newDispDegree, B.cache.displayedPolynomial); -- truncat TO PART
+    b := truncate(newDispDegree, B.cache.displayedPolynomial); -- truncate TO PART
     newDispPoly :=  a + b;
 
-    a2 := truncat(newCompDegree, A.cache.computedPolynomial); -- truncat TO PART
-    b2 := truncat(newCompDegree, B.cache.computedPolynomial); -- truncat TO PART
+    a2 := truncate(newCompDegree, A.cache.computedPolynomial); -- truncate TO PART
+    b2 := truncate(newCompDegree, B.cache.computedPolynomial); -- truncate TO PART
     newCompPoly := a2 + b2; 
     
 
@@ -74,11 +74,11 @@ LazySeries - LazySeries := LazySeries => (A,B) -> (
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := truncat(newDispDegree, A.cache.displayedPolynomial); -- truncat TO PART
-    b := truncat(newDispDegree, B.cache.displayedPolynomial); -- truncat TO PART
+    a := truncate(newDispDegree, A.cache.displayedPolynomial); -- truncate TO PART
+    b := truncate(newDispDegree, B.cache.displayedPolynomial); -- truncate TO PART
     newDispPoly :=  a - b;
-    a2 := truncat(newCompDegree, A.cache.computedPolynomial); -- truncat TO PART
-    b2 := truncat(newCompDegree, B.cache.computedPolynomial); -- truncat TO PART
+    a2 := truncate(newCompDegree, A.cache.computedPolynomial); -- truncate TO PART
+    b2 := truncate(newCompDegree, B.cache.computedPolynomial); -- truncate TO PART
     newCompPoly := a2 - b2;
     
 
@@ -286,8 +286,8 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
-    newPoly := truncat(newDegree, (truncat(newDegree, A.cache.displayedPolynomial))*(truncat(newDegree, B.cache.displayedPolynomial)));
-    newCompPoly := truncat(newCompDegree, (truncat(newCompDegree, A.cache.computedPolynomial))*(truncat(newCompDegree, B.cache.computedPolynomial)));
+    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
+    newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
 
     myCache := new CacheTable from {computedPolynomial => newCompPoly, ComputedDegree => newCompDegree, displayedPolynomial => newPoly, DisplayedDegree => newPoly};  
 
@@ -303,10 +303,10 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
         changeComputedDegree(A, tempDegree);
         changeComputedDegree(B, tempDegree);
 
-        P1 := truncat(tempDegree, A.cache.computedPolynomial);
-        P2 := truncat(tempDegree, B.cache.computedPolynomial);
+        P1 := truncate(tempDegree, A.cache.computedPolynomial);
+        P2 := truncate(tempDegree, B.cache.computedPolynomial);
 
-        P := truncat(tempDegree, P1*P2);
+        P := truncate(tempDegree, P1*P2);
 
         coefficient(coefficientVector, P)
     );
@@ -326,9 +326,9 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     newFastChangeDegree := i -> (
         changeComputedDegree(A, i);
         changeComputedDegree(B, i);
-        P1 := truncat(i, A.cache.computedPolynomial);
-        P2 := truncat(i, B.cache.computedPolynomial);
-        myPoly := truncat(i, P1*P2);
+        P1 := truncate(i, A.cache.computedPolynomial);
+        P2 := truncate(i, B.cache.computedPolynomial);
+        myPoly := truncate(i, P1*P2);
         myPoly
     );
 
@@ -433,13 +433,13 @@ Padics + Padics := Padics => (A,B) -> (
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := truncat(newDispDegree, A.cache.displayedPolynomial); -- truncat TO PART
+    a := truncate(newDispDegree, A.cache.displayedPolynomial); -- truncate TO PART
 
-    b := truncat(newDispDegree, B.cache.displayedPolynomial); -- truncat TO PART
+    b := truncate(newDispDegree, B.cache.displayedPolynomial); -- truncate TO PART
     newDispPoly :=  a + b; -- not using it right now because for some reason I can't make a method with more than 4 parameters
 
-    a2 := truncat(newCompDegree, A.cache.computedPolynomial); -- truncat TO PART
-    b2 := truncat(newCompDegree, B.cache.computedPolynomial); -- truncat TO PART
+    a2 := truncate(newCompDegree, A.cache.computedPolynomial); -- truncate TO PART
+    b2 := truncate(newCompDegree, B.cache.computedPolynomial); -- truncate TO PART
     newCompPoly := a2 + b2; 
     
     padics(
