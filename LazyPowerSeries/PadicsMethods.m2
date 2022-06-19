@@ -1,10 +1,10 @@
 --*******************************************************
 --Implementation of P-ADICS
 --*******************************************************
-print "HELLO";
 
-padicOrder = method()
-padicOrder(ZZ, RingElement) := ZZ => (p, f) ->(
+
+padicOrder = method() -- Works with ZZ elements and RingElements of polynomial rings
+padicOrder(ZZ, Thing) := ZZ => (p, f) ->(
     if (f==0) then return -infinity;
     p = sub(p,ring f);
     i := 0;
@@ -20,7 +20,7 @@ padicOrder(ZZ, RingElement) := ZZ => (p, f) ->(
 
 
 Padics = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
-
+-*
 net Padics := L -> (
     myStr := net("");
     local tempStr;
@@ -73,7 +73,52 @@ net Padics := L -> (
     net(myStr | net(" + ... "))
 
     );
+    *-
 
+toString Padics := L -> (
+    myStr := net("");
+
+    local tempStr;
+    local k;
+    local monomials;
+
+-- Note: isPolynomialRing checks if we're working with variables x,y,z,... in a ring
+
+    p := L.primeNumber;
+
+    valueList := sort pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
+    print valueList;
+
+    scan(valueList,(key, val)->(
+        if(val != 0) then (
+            k = padicOrder(p, key);
+
+            print("k: " | toString(k));
+
+            if (k == 0) then myStr = myStr | toString(val)
+            else if(k == 1) then (
+                tempStr = toString(val) | net("*") | toString(p);
+
+                if(val > 0) then myStr =  myStr | " + "  | tempStr 
+                else myStr = myStr | " " | tempStr;
+                )
+            else if(k > 1) then (
+                tempStr = toString(val) | net("*") |toString(p) | net("^") | toString(k);
+
+                if(val > 0) then myStr =  myStr | " + "  | tempStr 
+                else myStr = myStr | " " | tempStr;
+                );
+
+            );
+        )
+    );
+    myStr = substring(2, #myStr, toString(myStr));
+    toString(myStr | toString(" + ... "))
+
+    
+
+);
+-*
 toString Padics := L -> (
     myStr := net("");
     local tempStr;
@@ -83,8 +128,13 @@ toString Padics := L -> (
     p := L.primeNumber;
 
     valueList := L.cache.valueList;
-    termList := keys valueList;
-    coefficientList := values valueList;
+    termList := sort(keys valueList);
+    coefficientList := sort(values valueList;
+
+    print(valueList);
+    print(termList);
+    print(coefficientList);
+    
 
     j :=0;
     while (j< #termList) do (
@@ -103,13 +153,15 @@ toString Padics := L -> (
             );
 
             k = padicOrder(p,sub(tempTerm,L.seriesRing)); -- add if else so that removes when k =0
+            print("padicOrder: "|toString(k));
             
             if(k == 0) then(
                 tempTerm = net((entries monomials(tempTerm))#0#0);
                 myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
                 )
             else if(k ==1) then(
-                tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0);
+                try tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0)
+                else tempTerm = "hello";
                 myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
 
             )
@@ -123,7 +175,7 @@ toString Padics := L -> (
     );    
 
     toString(myStr | toString(" + ... "))
-);
+);*-
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
 padics = method(Options => {Degree => 6, DisplayedDegree => 10, ComputedDegree => 10})
@@ -230,5 +282,3 @@ minusOne(ZZ, Ring) := Padics => (p, R) ->(
 truncate(ZZ, Padics) := Padics => opts ->(n, f) -> ( -- Idea: can generalize ZZ input to Thing
 
 );
-
-print "HELLO";
