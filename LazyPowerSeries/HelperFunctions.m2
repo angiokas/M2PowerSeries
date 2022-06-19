@@ -229,18 +229,18 @@ constructAdicsPoly = method(Options => { DisplayedDegree => 3, ComputedDegree =>
 
 
     ------- TODO: MAKE INTO SEPARATE HELPER FUNCTION AND USE IT IN POLY CONSTRUCTION METHOD TOO
-    inputFunctionCheck(R, variables, f);
+    newFunction:= inputFunctionCheck(R, variables, f);
     ------
     for j from start to opts.DisplayedDegree do (
                 combinations1 = append(combinations1, compositions (#variables, j)); 
             );
-        combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
+        combinations1 = flatten combinations1; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
         -- print combinations;
         -- TODO: add ops.Degree terms to s.
-        n = #combinations1-1;
+        n := #combinations1-1;
         
     for j from 0 to n do (
-        s = s + (newFunction2 (combinations1#j)) * product(apply(#variables, i -> (variables#i)^((combinations1#j)#i)));
+        s = s + (newFunction (combinations1#j)) * product(apply(#variables, i -> (variables#i)^((combinations1#j)#i)));
         );   
 
     displayedPoly := s;
@@ -253,7 +253,7 @@ constructAdicsPoly = method(Options => { DisplayedDegree => 3, ComputedDegree =>
     combinations := join(combinations1, combinations2);
 
     for j from n to #combinations-1 do (
-        s = s + (newFunction2 (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
+        s = s + (newFunction (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
         );
     computedPoly :=s;
 
@@ -281,7 +281,7 @@ inputFunctionCheck(Ring, VisibleList, Function) := Function => (R, variables, f)
     dummyConstantVector := apply(#variables, t -> 0);
 
     newFunction := f;
-    local newFunction2;
+    local newf;
 
     try sub(f dummyConstantVector, R)
         else (
@@ -301,11 +301,12 @@ inputFunctionCheck(Ring, VisibleList, Function) := Function => (R, variables, f)
         );
     
     try(
-            if instance(newFunction(dummyConstantVector), R) then newFunction2 = newFunction
-            else newFunction2 = v -> sub(newFunction v, R);
+            if instance(newFunction(dummyConstantVector), R) then newf = newFunction
+            else newf = v -> sub(newFunction v, R);
         )
     else(
             error "The lazySeries function needs to output something that can be interpretted as a ringElement.";
         );
+    newf
 
 );

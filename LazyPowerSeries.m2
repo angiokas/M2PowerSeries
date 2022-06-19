@@ -79,13 +79,12 @@ export{
     "PowerList",
     "powerList"
 }
-print "HELLO1";
+
 load "./LazyPowerSeries/HelperFunctions.m2"
 load "./LazyPowerSeries/LazySeriesMethods.m2"
-print "HELLO2";
 load "./LazyPowerSeries/PadicsMethods.m2"
 load "./LazyPowerSeries/BasicOperations.m2"
---load "./LazyPowerSeries/PowerSeriesRings.m2"
+load "./LazyPowerSeries/PowerSeriesRings.m2"
 
 
 --DOCUMENTATION

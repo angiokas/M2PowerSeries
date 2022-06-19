@@ -131,7 +131,7 @@ padics = method(Options => {Degree => 6, DisplayedDegree => 10, ComputedDegree =
 -- Constructs Padics over the given ring R using inputted coefficient function f 
 padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
 
-    (displayedPoly, computedPoly,) := constructAdicsPoly(R, p, f, DisplayedDegree => opts.DisplayedDegree, ComputerDegree =>opts.ComputedDegree);
+    (displayedPoly, computedPoly) := constructAdicsPoly(R, p, f, DisplayedDegree => opts.DisplayedDegree, ComputedDegree => opts.ComputedDegree);
     --displayedPoly := truncate(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
 
     new Padics from {
