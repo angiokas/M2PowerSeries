@@ -32,7 +32,7 @@
   - [ ] base p conversion
   - [X] `toAdics` function that gives us information about the proper coefficients to assemble the p-adics form
   - [X] change how the p-th index looksl ike in the terms i.e change "121" to "11^2".
-  - [ ] Important: implement the correct expanssion form of -1. For p, -1 should look like ... (p-1) (p-1) i.e (p-1) + (p-1)p + (p-1) p^2+ ...
+  - [ ] Important: ~~implement the correct expanssion form of -1. For p, -1 should look like ... (p-1) (p-1) i.e (p-1) + (p-1)p + (p-1) p^2+ ...~~ Actually, it is better to use the built in preference of macaulay2 to present roughly half of the integers positive and the other half negative so that it uses minimum representation. It's faster that way. 
   - [ ] multiplication by -1
   - [ ] Using a similar method to lazy series, implement inversion using (1-x)^(-1) = 1+x+x^2+... trick, however -1 representation is key here
   - [ ] Think about p-adic numbers instead of integers next, so completions over polynomial rings over QQ
@@ -47,6 +47,7 @@
   - [X] `maclaurinSeries`
   - [X] `changeDegree` - make sure computed and displayed degree are properly sorted. if wanting higher degree, make sure to change both, if less then change only displayed.
     - [ ] Need to fix
+    - [ ] for padics
   - [ ] Returns the polynomial of a lazySeries up to a specific degree
   - [ ] overload `sub` so that it takes a lazySeries and a ring and tries to convert the series into an a lazySeries over that ring by changing the function of the lazySeries.
   - [ ] Also make another overload of `sub` so that you can input values and a lazySeries that (NEVER MIND IT DOESNT MAKE SENSEBECAUSE IF I EVALUATE MY POWERSERIES IT WONT CONVERGE)
@@ -73,6 +74,7 @@
   - [ ] `pretty` doesn't work properly because it went out of bounds on a specific LazySeries. -> Made a custom display function
   - [ ] `toLazySeries` isn't outputting the correct degree
   - [X] Update `lazySeries` method to work with any ring, i.e no matter the function, the values all get converted to the corresponding value in the given ring. (Solved using `sub`)
+
 
 
 ## Meeting notes 

@@ -20,165 +20,56 @@ padicOrder(ZZ, Thing) := ZZ => (p, f) ->(
 
 
 Padics = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
--*
-net Padics := L -> (
-    myStr := net("");
-    local tempStr;
-    local tempTerm;
-    local tempCoefficient;
-    local k;
-    p := L.primeNumber;
-
-    valueList := L.cache.valueList;
-    termList := keys valueList;
-    coefficientList := values valueList;
-
-    j :=0;
-
-    while (j< #termList) do (
-        tempCoefficient= toString(coefficientList#j);
-        if(tempCoefficient != "0") then(
-            
-            tempStr = toString(termList#j);
-            if (tempStr#0 === "-") then (
-                tempTerm = (-1)*(termList#j);
-                if (j > 0) then myStr = myStr | net(" - ");
-                if (j == 0) then myStr = net("-");
-            )
-            else (
-                if (j > 0 and myStr != "") then myStr = myStr | net(" + ");
-                tempTerm = termList#j;
-            );
-
-            k = padicOrder(p,sub(tempTerm,L.seriesRing)); -- add if else so that removes when k =0
-            
-            if(k == 0) then(
-                tempTerm = net((entries monomials(tempTerm))#0#0);
-                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
-                )
-            else if(k ==1) then(
-                tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0);
-                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
-
-            )
-            else (
-                tempTerm = net(p) | net("^") | net(k) | net("*") | net((entries monomials(tempTerm))#0#0);
-                myStr = myStr |net (tempCoefficient)| net("*") | net (tempTerm);
-            );      
-        );
-
-        j = j+1;        
-    );  
-
-    net(myStr | net(" + ... "))
-
-    );
-    *-
 
 toString Padics := L -> (
     myStr := net("");
 
     local tempStr;
     local k;
-    local monomials;
-
--- Note: isPolynomialRing checks if we're working with variables x,y,z,... in a ring
+    local tempTerm;
+    local stringList; 
 
     p := L.primeNumber;
 
     valueList := sort pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
-    print valueList;
 
-    scan(valueList,(key, val)->(
+    scan(valueList, (key, val)->(
         if(val != 0) then (
             k = padicOrder(p, key);
 
-            print("k: " | toString(k));
+            try tempTerm = toString((entries monomials(key))#0#0)
+                else tempTerm = "";
+            if(tempTerm == "1" ) then tempTerm = "";
 
-            if (k == 0) then myStr = myStr | toString(val)
+            if (val < 0) then val = " - " | toString(abs(val))
+            else val = " + " | toString(val);
+
+            if (k == 0) then (
+                if (tempTerm != "") then tempStr = val | "*" | tempTerm
+                else tempStr = toString(val)
+            )
             else if(k == 1) then (
-                tempStr = toString(val) | net("*") | toString(p);
-
-                if(val > 0) then myStr =  myStr | " + "  | tempStr 
-                else myStr = myStr | " " | tempStr;
+                tempStr = val | "*" | toString(p) | tempTerm
                 )
             else if(k > 1) then (
-                tempStr = toString(val) | net("*") |toString(p) | net("^") | toString(k);
-
-                if(val > 0) then myStr =  myStr | " + "  | tempStr 
-                else myStr = myStr | " " | tempStr;
+                tempStr = val | "*" |toString(p) | "^" | toString(k) | tempTerm;
                 );
-
+            myStr = myStr | tempStr
             );
+        
         )
     );
-    myStr = substring(2, #myStr, toString(myStr));
+    myStr = toString(myStr);
+    if (myStr#1 == "+") then myStr = substring(3, myStr);
     toString(myStr | toString(" + ... "))
 
-    
+); 
 
-);
--*
-toString Padics := L -> (
-    myStr := net("");
-    local tempStr;
-    local tempTerm;
-    local tempCoefficient;
-    local k;
-    p := L.primeNumber;
+net Padics := L -> ( net(toString L));
 
-    valueList := L.cache.valueList;
-    termList := sort(keys valueList);
-    coefficientList := sort(values valueList;
-
-    print(valueList);
-    print(termList);
-    print(coefficientList);
-    
-
-    j :=0;
-    while (j< #termList) do (
-        tempCoefficient= toString(coefficientList#j);
-        if(tempCoefficient != "0") then(
-            
-            tempStr = toString(termList#j);
-            if (tempStr#0 === "-") then (
-                tempTerm = (-1)*(termList#j);
-                if (j > 0) then myStr = myStr | net(" - ");
-                if (j == 0) then myStr = net("-");
-            )
-            else (
-                if (j > 0 and myStr != "") then myStr = myStr | net(" + ");
-                tempTerm = termList#j;
-            );
-
-            k = padicOrder(p,sub(tempTerm,L.seriesRing)); -- add if else so that removes when k =0
-            print("padicOrder: "|toString(k));
-            
-            if(k == 0) then(
-                tempTerm = net((entries monomials(tempTerm))#0#0);
-                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
-                )
-            else if(k ==1) then(
-                try tempTerm = net(p) | net("*") | net((entries monomials(tempTerm))#0#0)
-                else tempTerm = "hello";
-                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
-
-            )
-            else (
-                tempTerm = net(p) | net("^") | net(k) | net("*") | net((entries monomials(tempTerm))#0#0);
-                myStr = myStr |toString (tempCoefficient)| net("*") | net (tempTerm);
-            );      
-        );
-
-        j = j+1;        
-    );    
-
-    toString(myStr | toString(" + ... "))
-);*-
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
-padics = method(Options => {Degree => 6, DisplayedDegree => 10, ComputedDegree => 10})
+padics = method(Options => {Degree => 6, DisplayedDegree => 3, ComputedDegree => 3})
 
 -- Constructs Padics over the given ring R using inputted coefficient function f 
 padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
