@@ -31,11 +31,17 @@ toString Padics := L -> (
 
     p := L.primeNumber;
 
-    valueList := pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
+    --valueList := pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
+    myRing := L.seriesRing;
+    varList := first entries vars myRing;
+    degToDisp := L.cache.DisplayedDegree;
+    exponentList := reverse sort compositions(2+#varList, degToDisp);
+    extendedVarList := {sub(1, myRing), sub(p, myRing)} | varList;
+    valueList := apply(exponentList, myExp -> (tempKey := product(apply(#myExp, i -> (extendedVarList#i)^(myExp#i) ));  (myExp, tempKey, if (L.cache.valueList)#?tempKey then (L.cache.valueList)#tempKey else sub(0, myRing) )));
 
-    scan(valueList, (key, val)->(
+    scan(valueList, (expKey, key, val)->(
         if(val != 0) then (
-            k = padicOrder(p, key);
+            k = expKey#1;
 
             try tempTerm = toString((entries monomials(key))#0#0)
                 else tempTerm = "";
