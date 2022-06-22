@@ -55,7 +55,7 @@ toString LazySeries := L -> (
 
 ----------------------LAZYSERIES CONSTRUCTORS-----------------------------------------------------------------
 
-lazySeries = method(Options => {Degree => 3, DisplayedDegree => 3, ComputedDegree => 3})
+lazySeries = method(Options => {Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5})
 
 -- Constructs LazySeries over the given ring R using inputted coefficient function f 
 lazySeries(Ring, Function) := LazySeries => opts -> (R, f) -> ( 

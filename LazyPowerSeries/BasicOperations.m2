@@ -11,7 +11,7 @@ zeroSeries = method(Options=>{DisplayedDegree => 3}) -- maybe we can just change
 zeroSeries(Ring) := LazySeries => opts -> R -> (
     f := variables -> 0;
     P := sub(0, R);    
-    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>infinity)
+    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree => opts.ComputedDegree)
 );
 
 -- One series
@@ -21,13 +21,13 @@ oneSeries(Ring) := LazySeries => opts -> R -> (
     if (numgens R == 1) then ringZeroes = 0;
     
     f := v -> (
-        if (v == ringZeroes) then 1
-        else 0
+        if (v == ringZeroes) then sub(1, R)
+        else sub(0, R)
         );
 
     P := sub(1, R);
 
-    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>infinity)
+    lazySeries(R, f, P, P, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>opts.ComputedDegree)
 );
 ------------------------ BASIC OPERATIONS----------------------------------------------------------
 
@@ -157,7 +157,7 @@ LazySeries - Number := LazySeries => (L, n) -> L + (-n);
 -- Multilplying LazySeries by a scalar
 Number * LazySeries := LazySeries => (n, L) -> (
     --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring\
-    f := L#coefficientFunction;
+    f := L.coefficientFunction;
     R := ring L;
 
     try sub(n, R) then n = sub(n, R) 
@@ -185,6 +185,7 @@ Number * LazySeries := LazySeries => (n, L) -> (
 
 LazySeries * Number := LazySeries => (L, n) -> n * L;
 
+- LazySeries := L -> (-1)*L;
 -- Exact division by scalar (the `/` binary operator)
 LazySeries / Number := LazySeries => (L, n) -> (
     if n == 0 then error "Cannot divide by 0";
@@ -415,70 +416,39 @@ Number / LazySeries := LazySeries => (n, B)->(
     n * inverse(B)
 )
 
-
---*************************************************
---Basic operations outputting Padics
---*************************************************
---=================================================
-
---Addition and substraction of two LazySeries
-Padics + Padics := Padics => (A,B) -> (
-    if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match"; -- checks if using same ring
-
-    f := A.coefficientFunction;
-    g := B.coefficientFunction;
-    R := A#seriesRing;
-
-    newFunction:= v -> f v + g v;
-    newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
-    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
-
-    a := truncate(newDispDegree, A.cache.displayedPolynomial); -- truncate TO PART
-
-    b := truncate(newDispDegree, B.cache.displayedPolynomial); -- truncate TO PART
-    newDispPoly :=  a + b; -- not using it right now because for some reason I can't make a method with more than 4 parameters
-
-    a2 := truncate(newCompDegree, A.cache.computedPolynomial); -- truncate TO PART
-    b2 := truncate(newCompDegree, B.cache.computedPolynomial); -- truncate TO PART
-    newCompPoly := a2 + b2; 
-    
-    padics(
-        A.seriesRing,
-        A.primeNumber,
-        newFunction,
-        newCompPoly,
-        DisplayedDegree => newDispDegree,
-        ComputedDegree => newCompDegree
-        )
-);
-
-
-Padics * Padics := Padics => (A,B)->(
-
-
-
-);
-
-Number * Padics := Padics => (n, L) -> (
-    N := padics(n);
-    N*L
-);
-
-Padics * Number := Padics => (L, n) -> n * L;
-
 --*************************************************
 --Basic operations outputting Padics
 --*************************************************
 --===================================================================================
+-- The zero
+zeroPadics = method(Options=>{DisplayedDegree => 5}) -- maybe we can just change it to a variable instead??
+zeroPadics(ZZ, Ring) := Padics => opts -> (p, R) -> (
+    f := sub(0, R);    
+    padics(p, f, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>opts.DisplayedDegree)
+);
 
-Padics + Padics := Padics => (A,B) -> (
-    if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match";
-    if (A#primeNumber != B#primeNumber) then error "prime number of adic completion do not match";
+-- The identity
+onePadics = method(Options=>{DisplayedDegree => 5})
+onePadics(Ring) := Padics => opts -> (p, R) -> (
+    ringZeroes := (((numgens R)+1):0);
+    if (numgens R == 1) then ringZeroes = 0;
+    
+    f := v -> (
+        if (v == ringZeroes) then sub(1, R)
+        else sub(0, R)
+        );
+
+    padics(p, R, f, DisplayedDegree=> opts.DisplayedDegree, ComputedDegree => opts.DisplayedDegree)
+);
+
+-- ADDITION------------------------------------------------------------------
+Padics + Padics := Padics => (A, B) -> (
+    if (A.seriesRing === B.seriesRing) == false then error "Rings of series do not match";
+    if (A.primeNumber != B.primeNumber) then error "prime number of adic completion do not match";
 
     f := A.coefficientFunction;
     g := B.coefficientFunction;
-    R := A#seriesRing;
-    p := A#primeNumber;
+    p := A.primeNumber;
 
     newFunction:= v -> f v + g v;
 
@@ -497,6 +467,97 @@ Padics + Padics := Padics => (A,B) -> (
         DisplayedDegree => newDispDegree,
         ComputedDegree => newCompDegree
         )
+
+);
+
+Number + Padics := Padics => (n, L) -> (
+    f := L#coefficientFunction;
+    R := ring L;
+    p := L.primeNumber;
+
+    try sub(n, R) then n = sub(n, R)
+    else error("Cannot promote number to Padics Series ring");
+
+    --ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring    
+    if(n == 0) then L;
+
+    newFunction := v -> (if all(v, t->t==0) then n + (f v)
+                               else (f v)
+                               );
+
+    newCompPoly := n + L.cache.computedPolynomial;
+
+    padics(
+        p,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.ComputedDegree
+        )
+);
+
+Padics + Number := Padics => (L, n) -> n + L;
+
+----------------------------------- MULIPLICATION BY PADICS--------------------------------------------------------
+
+Number * Padics := Padics => (n, L) -> (
+    f := L.coefficientFunction;
+    R := ring L;
+    p := L.primeNumber;
+
+    try sub(n, R) then n = sub(n, R) 
+    else error("Cannot promote number to given Padic series ring");
+
+    if n == 1 then L;
+    if n == 0 then zeroPadics(R);
+
+    newFunction:= v -> (n * (f v));
+    newPoly := n * (L.cache.displayedPolynomial);
+    newCompPoly := n * (L.cache.computedPolynomial);
+
+    padics(
+        p,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree => L.cache.ComputedDegree
+        )
+);
+
+
+Padics * Number := Padics => (L, n) -> n * L;
+
+- Padics := L -> (-1)*L;
+
+Padics - Padics := Padics => (A,B) -> (B = (-1)*B; A + B);
+
+Padics - Number := Padics => (L, n) -> L + (-n);
+Number - Padics := (n, L) -> (
+    L = (-1)*L;
+    n + L
+);
+
+LazySeries / Number := LazySeries => (L, n) -> (
+    if n == 0 then error "Cannot divide by 0";
+    if n == 1 then L;
+
+    f := L#coefficientFunction;
+    R := L#seriesRing;
+
+    try sub(n, R) then n = sub(n, R) 
+    else error("Cannot promote number to Series ring");
+
+    if (n == 0) then error "cannot divide by zero";
+
+    if not isUnit(n) then error "argument to divide by is not a unit in this ring";
+    oneOverN := sub(1/n, R);
+
+    oneOverN * L
+);
+
+Padics * Padics := Padics => (A,B)->(
+
+
 
 );
 

@@ -213,7 +213,7 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
                 );
             );
         );
-    hashTable outputList
+    hashTable (sort(outputList))
 );
 
 

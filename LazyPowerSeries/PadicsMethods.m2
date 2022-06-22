@@ -31,7 +31,7 @@ toString Padics := L -> (
 
     p := L.primeNumber;
 
-    valueList := sort pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
+    valueList := pairs L.cache.valueList; -- turns the hashtable into a list of pairs (key, value) and then sortrs by key
 
     scan(valueList, (key, val)->(
         if(val != 0) then (
@@ -72,7 +72,7 @@ net Padics := L -> ( net(toString L));
 padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5})
 
 -- Constructs Padics over the given ring R using inputted coefficient function f 
-padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> (
+padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
 
     computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
     displayedPoly := truncatePadics(p, opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
@@ -173,6 +173,4 @@ minusOne(ZZ, Ring) := Padics => (p, R) ->(
     padics(R, p, variables-> p-1)
 );
 
-truncate(ZZ, Padics) := Padics => opts ->(n, f) -> ( -- Idea: can generalize ZZ input to Thing
-
-);
+ring(Padics) := L -> L.seriesRing; 
