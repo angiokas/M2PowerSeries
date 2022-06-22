@@ -1,17 +1,20 @@
 -- Truncates given polynomial
-truncate(InfiniteNumber, RingElement) := RingElement =>(n , P) ->(
-     if n == infinity then return P;
-     if n == -infinity then return sub(0, ring P);
-     P
+truncate(InfiniteNumber, RingElement) := RingElement =>(n , f) ->(
+     if n == infinity then return f;
+     if n == -infinity then return sub(0, ring f);
+     f
     );
 
-truncate(ZZ, RingElement) := RingElement =>(n, p) ->(
-    part(0,n,p)
+truncate(ZZ, RingElement) := RingElement =>(n, f) ->(
+    part(0,n,f)
     );
-
-truncate(ZZ,ZZ, Thing) := ZZ =>(p,d,n)->(
-
-)
+truncatePadics = method()
+truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
+    R := ring f;
+    I := ideal(gens R | {p});
+    displayedPoly := f % I^(d);
+    displayedPoly
+);
 
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
@@ -215,50 +218,27 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
 
 
 -- Constructs polynomials using functions intended for calculating p-adics coefficients
-constructAdicsPoly = method(Options => { DisplayedDegree => 3, ComputedDegree => 5})
+constructAdicsPoly = method(Options => { Degree => 3})
     constructAdicsPoly(Ring, ZZ, Function) := RingElement => opts -> (R, p, f) -> ( 
     -- the function should be describing the coefficients in terms of i_0, i_1,...,i_n where i_0 corresponds to p as a variable
-    -- TODO: add a check to make sure p is actually prime!!!
-    variables := {sub(p, R)} | toList gens R;
+    if (not isPrime(p)) then error( toString(p) | " is not prime.");
 
-    deg := opts.ComputedDegree - opts.DisplayedDegree;
-    combinations1 := {};
-    combinations2 := {};
+    variables := {sub(p, R)} | toList gens R;
+    combinations := {};
     start := 0;
     s := sub(0, R);
 
-
-    ------- TODO: MAKE INTO SEPARATE HELPER FUNCTION AND USE IT IN POLY CONSTRUCTION METHOD TOO
     newFunction:= inputFunctionCheck(R, variables, f);
     ------
-    for j from start to opts.DisplayedDegree do (
-                combinations1 = append(combinations1, compositions (#variables, j)); 
+    for j from start to opts.Degree do (
+                combinations = append(combinations, compositions (#variables, j)); 
             );
-        combinations1 = flatten combinations1; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left
-        -- print combinations;
-        -- TODO: add ops.Degree terms to s.
-        n := #combinations1-1;
+        combinations = flatten combinations; -- flattens the the nested list, so that only {i_1,i_2,...,i_n} types are left       
         
-    for j from 0 to n do (
-        s = s + (newFunction (combinations1#j)) * product(apply(#variables, i -> (variables#i)^((combinations1#j)#i)));
-        );   
-
-    displayedPoly := s;
-    ---
-    for j from opts.DisplayedDegree to opts.ComputedDegree do (
-            combinations2 = append(combinations2, compositions (#variables, j)); 
-        );
-        combinations2 = flatten combinations2;
-
-    combinations := join(combinations1, combinations2);
-
-    for j from n to #combinations-1 do (
+    for j from 0 to #combinations-1 do (
         s = s + (newFunction (combinations#j)) * product(apply(#variables, i -> (variables#i)^((combinations#j)#i)));
-        );
-    computedPoly :=s;
-
-    (displayedPoly, computedPoly)
-
+        );   
+    s
 );
 
 constructAdicsPoly(List) := Padics => L -> (

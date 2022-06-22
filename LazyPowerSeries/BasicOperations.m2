@@ -38,7 +38,7 @@ LazySeries + LazySeries := LazySeries => (A,B) -> (
     f := A.coefficientFunction;
     g := B.coefficientFunction;
     R := A#seriesRing;
-
+    
     newFunction:= v -> f v + g v;
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
@@ -465,3 +465,38 @@ Number * Padics := Padics => (n, L) -> (
 );
 
 Padics * Number := Padics => (L, n) -> n * L;
+
+--*************************************************
+--Basic operations outputting Padics
+--*************************************************
+--===================================================================================
+
+Padics + Padics := Padics => (A,B) -> (
+    if (A#seriesRing === B#seriesRing) == false then error "Rings of series do not match";
+    if (A#primeNumber != B#primeNumber) then error "prime number of adic completion do not match";
+
+    f := A.coefficientFunction;
+    g := B.coefficientFunction;
+    R := A#seriesRing;
+    p := A#primeNumber;
+
+    newFunction:= v -> f v + g v;
+
+    newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
+
+    a2 := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
+    b2 := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
+
+    newCompPoly := a2 + b2;
+
+    padics(
+        p,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => newDispDegree,
+        ComputedDegree => newCompDegree
+        )
+
+);
+

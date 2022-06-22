@@ -3,12 +3,12 @@
 TEST ///
 R = ZZ
 p = 5
-f = i-> i
+f = i-> -1
 padics(R, p, f)
 ///
 
 TEST ///
-R = QQ
+R = ZZ[x,y,z]
 p = 5
 f = i-> i
 padics(R, p, f)

@@ -69,13 +69,13 @@ net Padics := L -> ( net(toString L));
 
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
-padics = method(Options => {Degree => 6, DisplayedDegree => 3, ComputedDegree => 3})
+padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5})
 
 -- Constructs Padics over the given ring R using inputted coefficient function f 
-padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> ( 
+padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> (
 
-    (displayedPoly, computedPoly) := constructAdicsPoly(R, p, f, DisplayedDegree => opts.DisplayedDegree, ComputedDegree => opts.ComputedDegree);
-    --displayedPoly := truncate(opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+    computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
+    displayedPoly := truncatePadics(p, opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
 
     new Padics from {
         coefficientFunction => f,
@@ -87,6 +87,7 @@ padics(Ring, ZZ, Function) := Padics => opts -> (R, p, f) -> (
             displayedPolynomial => displayedPoly,
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
+            Degree => infinity,
             valueList => toAdics(p, computedPoly)
         }
     }
@@ -105,13 +106,14 @@ padics(ZZ, RingElement) := Padics => opts -> (p, g) -> (
         f,
         g,
         DisplayedDegree => opts.DisplayedDegree,
-        ComputedDegree => infinity
+        ComputedDegree => opts.ComputedDegree
         ) 
 );
 
 -- Making a Padics without the added computation of polynomial construction
-padics(ZZ, Function, RingElement) := LazySeries => opts -> (p, f, computedPoly) -> ( 
+padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> ( 
     R := ring computedPoly;
+    newComputedPoly := truncatePadics(p, opts.ComputedDegree, computedPoly);
 
     new Padics from {
         coefficientFunction => f,
@@ -120,9 +122,10 @@ padics(ZZ, Function, RingElement) := LazySeries => opts -> (p, f, computedPoly) 
 
         cache => new CacheTable from { -- contains everything mutable
             DisplayedDegree => opts.DisplayedDegree,
-            displayedPolynomial => truncate(opts.DisplayedDegree, computedPoly),
+            displayedPolynomial => truncatePadics(p, opts.DisplayedDegree, newComputedPoly),
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
+            Degree => infinity,
             valueList => toAdics(p, computedPoly)
         }
     }

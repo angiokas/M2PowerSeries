@@ -44,6 +44,7 @@ export{
     "constructAdicsPoly",
     "inputFunctionCheck",
     "toPositiveRep",
+    "truncatePadics",
 
     -- LazySeries
     "LazySeries",
