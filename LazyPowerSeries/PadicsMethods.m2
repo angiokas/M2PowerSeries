@@ -154,6 +154,37 @@ padics(Ring, ZZ, List) := Padics => opts -> (R, p, L) -> (
 )
 *-
 
+padics(Padics, Function) := Padics => opts -> (L, function) -> (    
+    local tempLPower;
+    R := L.seriesRing;
+    p := L.primeNumber;
+    f := x -> sub(function x, R);
+
+    s := 0;
+    oldDeg := L.cache.ComputedDegree;
+    origComputed := L.cache.computedPolynomial;
+    
+    --first we compute the new computed polynomial
+    newCompPoly := sum( apply(oldDeg+1, i -> truncatePadics(p, oldDeg, (f i)*origComputed^i))); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
+
+    newFunction := v -> (
+        sumV := sum v;
+
+        tempOrigComputed := L.cache.computedPolynomial;
+
+        tempComputed := sub(sum( apply(sumV+1, i -> truncate(sumV, (f i)*tempOrigComputed^i)) ), L.seriesRing);
+        coefficient(v, tempComputed)
+    );
+
+    padics(
+        p,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => L#cache.DisplayedDegree,
+        ComputedDegree=> L#cache.ComputedDegree
+        )
+
+);
 
 -- Coefficient function overload for p-adics
 coefficient(VisibleList, Padics) := (L, M) -> (
@@ -166,11 +197,10 @@ coefficient(VisibleList, Padics) := (L, M) -> (
     H#monomial
 );
 
-minusOne = method()
-minusOne(ZZ, Ring) := Padics => (p, R) ->(
-    variables := gens R;
-    print variables;
-    padics(R, p, variables-> p-1)
-);
-
 ring(Padics) := L -> L.seriesRing; 
+
+isUnit(Padics) := Boolean => L -> (
+    constantTerm := L.cache.valueList#(sub(1,L.seriesRing));
+    if(constantTerm == 0) then false
+    else true
+);

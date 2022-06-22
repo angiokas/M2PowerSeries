@@ -118,7 +118,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
 --
 lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (    
     local tempLPower;
-    R := L#seriesRing;
+    R := L.seriesRing;
     f := x -> sub(function x, R);
 
     s := 0;
@@ -126,8 +126,8 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
     origComputed := L.cache.computedPolynomial;
     
     --first we compute the new computed polynomial
-    newComputed := sum( apply(oldDeg+1, i -> truncate(oldDeg, (f i)*origComputed^i)) ); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
-    newDisplayed := truncate(L#cache.DisplayedDegree, newComputed);
+    newCompPoly := sum( apply(oldDeg+1, i -> truncate(oldDeg, (f i)*origComputed^i)) ); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
+    newDisplayed := truncate(L#cache.DisplayedDegree, newCompPoly);
 
     newFunction := v -> (
         sumV := sum v;
@@ -164,7 +164,7 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
         R,
         newFunction,
         newDisplayed,
-        newComputed,
+        newCompPoly,
         DisplayedDegree => L#cache.DisplayedDegree,
         ComputedDegree=> L#cache.ComputedDegree
         );
@@ -319,13 +319,13 @@ getFunction(LazySeries) := Function => S -> (
 sub(LazySeries, Ring) := LazySeries => (L, R) -> (
     f := getFunction(L);
     newDisplayedPoly := sub(L.cache.displayedPolynomial, R);
-    newComputedPoly := sub(L.cache.computedPolynomial, R);
+    newCompPoly := sub(L.cache.computedPolynomial, R);
 
     lazySeries(
         R,
         f,
         newDisplayedPoly,
-        newComputedPoly,
+        newCompPoly,
         DisplayedDegree => L.cache.DisplayedDegree,
         ComputedDegree => L.cache.ComputedDegree
         )
@@ -335,7 +335,6 @@ sub(LazySeries, Ring) := LazySeries => (L, R) -> (
 isUnit(LazySeries) := Boolean => L -> (
     constantTerm := part(0, L.cache.displayedPolynomial);
     isUnit(constantTerm)
-    
 );
 
 -- Questionable....

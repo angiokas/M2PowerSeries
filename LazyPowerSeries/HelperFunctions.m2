@@ -12,7 +12,7 @@ truncatePadics = method()
 truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
     R := ring f;
     I := ideal(gens R | {p});
-    displayedPoly := f % I^(d);
+    displayedPoly := f % I^(d+1);
     displayedPoly
 );
 
@@ -198,7 +198,7 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
             try workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)
             else workingCoefficient = workingf2 / currentMonomial;
 
-            outputList = append(outputList, currentMonomial => workingCoefficient);
+            outputList = append(outputList, currentMonomial => sub(workingCoefficient,ZZ)); -- Was returning class QQ without this
             workingf = workingf - workingf2;
 
             if debugLevel > 1 then (
@@ -213,6 +213,7 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
                 );
             );
         );
+    
     hashTable (sort(outputList))
 );
 

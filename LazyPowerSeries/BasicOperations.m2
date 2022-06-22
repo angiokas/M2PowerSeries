@@ -281,13 +281,13 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     f := A#coefficientFunction;
     g := B#coefficientFunction;
     R := A#seriesRing;
-    ringZeroes := numgens R:0;
-
 
     newDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    a := truncate(newDegree, A.cache.displayedPolynomial);
+    b := truncate(newDegree, B.cache.displayedPolynomial);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);    
 
-    newPoly := truncate(newDegree, (truncate(newDegree, A.cache.displayedPolynomial))*(truncate(newDegree, B.cache.displayedPolynomial)));
+    newPoly := truncate(newDegree, a*b);
     newCompPoly := truncate(newCompDegree, (truncate(newCompDegree, A.cache.computedPolynomial))*(truncate(newCompDegree, B.cache.computedPolynomial)));
 
     myCache := new CacheTable from {computedPolynomial => newCompPoly, ComputedDegree => newCompDegree, displayedPolynomial => newPoly, DisplayedDegree => newPoly};  
@@ -295,11 +295,11 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
     --myCache should be used as the new cache object, and use an internal-only constructor, or manually create the object
 
     newFunction := coefficientVector -> (
-        tempDegree := coefficientVector; -- bandaid!!!!!
+        tempDegree := coefficientVector;
         
         if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then tempDegree = sum coefficientVector;
 
-        if (myCache#ComputedDegree >= tempDegree) then return (coefficient(coefficientVector, myCache#computedPolynomial));
+        if (myCache#ComputedDegree >= tempDegree) then return (coefficient(coefficientVector, myCache#computedPolynomial)); -- ???
                 
         changeComputedDegree(A, tempDegree);
         changeComputedDegree(B, tempDegree);
@@ -455,10 +455,10 @@ Padics + Padics := Padics => (A, B) -> (
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a2 := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
-    b2 := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
+    a := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
+    b := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
 
-    newCompPoly := a2 + b2;
+    newCompPoly := a + b;
 
     padics(
         p,
@@ -529,7 +529,10 @@ Padics * Number := Padics => (L, n) -> n * L;
 
 - Padics := L -> (-1)*L;
 
-Padics - Padics := Padics => (A,B) -> (B = (-1)*B; A + B);
+Padics - Padics := Padics => (A,B) -> (
+    B = (-1)*B;
+    A + B
+);
 
 Padics - Number := Padics => (L, n) -> L + (-n);
 Number - Padics := (n, L) -> (
@@ -547,7 +550,7 @@ LazySeries / Number := LazySeries => (L, n) -> (
     try sub(n, R) then n = sub(n, R) 
     else error("Cannot promote number to Series ring");
 
-    if (n == 0) then error "cannot divide by zero";
+    if (n == sub(0,R)) then error "cannot divide by zero";
 
     if not isUnit(n) then error "argument to divide by is not a unit in this ring";
     oneOverN := sub(1/n, R);
@@ -556,8 +559,100 @@ LazySeries / Number := LazySeries => (L, n) -> (
 );
 
 Padics * Padics := Padics => (A,B)->(
+    f := A.coefficientFunction;
+    g := B.coefficientFunction;
+    p := A.primeNumber;
 
+    if (A.seriesRing === B.seriesRing) == false then error "Rings of series do not match";
+    if (A.primeNumber != B.primeNumber) then error "prime number of adic completion do not match";
 
+    newDispDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
+    newCompDegree := max(A.cache.ComputedDegree, B.cache.ComputedDegree); 
+
+    a := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
+    b := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
+
+    newCompPoly := truncatePadics(p, newCompDegree, a*b);
+
+    newFunction := coefficientVector -> (
+            deg := coefficientVector;
+            if instance(coefficientVector, List) or instance(coefficientVector, Sequence) then deg = sum coefficientVector;
+
+            if (newCompDegree >= deg) then return (coefficient(coefficientVector,newCompPoly));
+                    
+            --changeComputedDegree(A, tempDegree); !!!!!!!!!
+            --changeComputedDegree(B, tempDegree);
+
+            P1 := truncatePadics(p, deg, A.cache.computedPolynomial);
+            P2 := truncatePadics(p, deg, B.cache.computedPolynomial);
+
+            P := truncatePadics(p,deg, P1*P2);
+
+            coefficient(coefficientVector, P)
+        );
+
+    padics(
+        p,
+        newFunction,
+        newCompPoly,
+        DisplayedDegree => newCompDegree,
+        ComputedDegree => newDispDegree
+        )
+
+        -- Add a fast change degree function to it
 
 );
+-- Raising LazySeries by nth power
+Padics ^ ZZ := Padics => (S,n) -> (
+    R := S.seriesRing;
+    p := S.primeNumber;
+    if n == 0 then return onePadics(p, R);
+    if n == 1 then  return S;
 
+    if n < 0 then (
+        return inverse(S^(-n));
+    );
+
+    bin := toBinary(n);
+    finalResult := 1;
+    tempCalculation:= S;
+    j := 1;
+
+    while (true) do (     
+        if(bin#(#bin-j) == 1) then (
+            finalResult = tempCalculation;
+            break;
+        );        
+        tempCalculation = tempCalculation * tempCalculation;
+        j = j+1;
+    );
+
+    for i from 0 to #bin-j-1 when i >= 0 do(
+        tempCalculation = tempCalculation * tempCalculation; 
+
+        if bin#(#bin-j-1-i) == 1 then (
+            finalResult = finalResult * tempCalculation;
+        );
+    );
+    finalResult
+
+);
+------
+
+inverse(Padics) := Padics => (L) -> (
+    -- first check if it is a unit in the ring
+    R := L.seriesRing;
+    p := L.primeNumber;
+    if isUnit(L) == false then error "Cannot invert Padic series because it is not a unit";
+
+    c := L.cache.valueList#(sub(1,R));
+    c = sub(c, ZZ);
+    d := lift (c_(ZZ/p)^-1, ZZ);    
+
+    g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...    
+    tempSeries := padics(g, i->1);
+    h := d * (tempSeries); 
+    --h#cache#"FastChangeComputedDegree" = i -> d*(tempSeries#cache#"FastChangeComputedDegree")(i);
+    h
+    --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
+);
