@@ -73,6 +73,7 @@ export{
     "primeNumber",
     "valueList",
     "minusOne",
+    "PositiveCoefficients",
 
     -- PowerSeriesRings
     "PowerSeriesRing",

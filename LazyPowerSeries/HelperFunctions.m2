@@ -148,8 +148,8 @@ toPositiveRep(ZZ,ZZ) := ZZ => (p,n) -> (
     );
 
 -- Extracts information about the appropariate coefficients of a polynomial in p-adics form
-toAdics = method()
-toAdics(ZZ, Thing) := List => (p, poly) -> (
+toAdics = method(Options=>{PositiveCoefficients=>false})
+toAdics(ZZ, Thing) := List => opts -> (p, poly) -> (
     R := ring poly;
     local deg;
 
@@ -172,6 +172,7 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
     local workingf2;
     local workingCoefficient;
     local tempMonomial; 
+    local j;
 
     outputList := {}; 
 
@@ -186,20 +187,29 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
             print ("workingIdeal: " | toString(workingIdeal));
             print("workingList: " | toString(workingList));
         );
-
-        for j from 0 to n-1 do(
+        j = 0;
+        while (j < n) and not(workingf == 0) do(
+--        for j from 0 to n-1 do(
             currentMonomial = sub(workingList#0, R);
             workingList = drop(workingList,{0,0});
             workingIdeal2 = trim(ideal(workingList) + workingIdeal);-- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
-            workingf2 = workingf % workingIdeal2;      
+
+            workingf2 = workingf % workingIdeal2;  
             try tempMonomial = sub((entries((coefficients(currentMonomial))#0))#0#0, R)
             else tempMonomial = sub(currentMonomial, R); --in case it is ZZ, BANDAID
 
             try workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)
             else workingCoefficient = workingf2 / currentMonomial;
 
+            if  opts.PositiveCoefficients and (workingCoefficient < 0) then
+            (   
+                workingCoefficient = workingCoefficient+p;
+                workingf2 = workingf2+p*currentMonomial;
+            );
+
             outputList = append(outputList, currentMonomial => sub(workingCoefficient,ZZ)); -- Was returning class QQ without this
             workingf = workingf - workingf2;
+            
 
             if debugLevel > 1 then (
                 print ("j = "| toString(j));
@@ -210,10 +220,10 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
                 print ("workingf2: " | toString(workingf2));
                 print ("tempMonomial: " | toString(tempMonomial));
                 print ("WorkingCoefficient: " | toString(workingCoefficient));
-                );
             );
+            j = j+1;
         );
-    
+    ); 
     hashTable (sort(outputList))
 );
 
