@@ -11,7 +11,7 @@ truncate(ZZ, RingElement) := RingElement =>(n, f) ->(
 truncatePadics = method()
 truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
     R := ring f;
-    I := ideal(gens R | {p});
+    I := sub(ideal(gens R | {p}), R);
     displayedPoly := f % I^(d+1);
     displayedPoly
 );
@@ -158,8 +158,8 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
 
     coefficientslist := {};
 
-    if(instance (workingf, RingElement)) then deg = floor(log_p leadCoefficient workingf) + (sum degree workingf)
-    else deg= floor(log_p workingf);
+    if(instance (workingf, RingElement)) then deg = ceiling(log_p leadCoefficient workingf) + (sum degree workingf)
+    else deg= ceiling(log_p workingf);
 
     m := (ideal p)+(ideal gens R); -- Ex. p = 7 and R = ZZ[x,y,z] then (7)+(x,y,z) = (7,x,y,z)
 
@@ -177,7 +177,7 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
 
 
     for i from 0 to deg do(
-        workingIdeal = m^(i+1);
+        workingIdeal =sub( m^(i+1), R);
         workingList = first entries gens (m^i); -- list of generators of the ideal m^i for ex. m^2 = (49,7x,x^2) then working_list is {49,7x,x^2}
         n = #workingList;
 
@@ -188,12 +188,12 @@ toAdics(ZZ, Thing) := List => (p, poly) -> (
         );
 
         for j from 0 to n-1 do(
-            currentMonomial = workingList#0;
+            currentMonomial = sub(workingList#0, R);
             workingList = drop(workingList,{0,0});
             workingIdeal2 = trim(ideal(workingList) + workingIdeal);-- ex. trim(ideal (x)+ideal(49,7*x, x^2)) = trim(ideal(x,49,7*x, x^2))= ideal(49, x)
             workingf2 = workingf % workingIdeal2;      
-            try tempMonomial = (entries((coefficients(currentMonomial))#0))#0#0
-            else tempMonomial = currentMonomial; --in case it is ZZ, BANDAID
+            try tempMonomial = sub((entries((coefficients(currentMonomial))#0))#0#0, R)
+            else tempMonomial = sub(currentMonomial, R); --in case it is ZZ, BANDAID
 
             try workingCoefficient = coefficient(tempMonomial, workingf2)/ coefficient(tempMonomial, currentMonomial)
             else workingCoefficient = workingf2 / currentMonomial;

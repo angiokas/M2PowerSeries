@@ -31,9 +31,18 @@ generators PowerSeriesRing := opts -> R -> R
 ---
 --Ring [Array] := PowerSeriesRing => (R, variables) -> use R monoid variables
 
-Ring Array := Ring => (R, variables) -> (
-    if(toString(class(variables#0)) == toString(Array)) then print "HELLO"--use R powerList(variables#0)
-    else use R monoid variables)
+--Ring Array := Ring => (R, variables) -> (
+  --  if(toString(class(variables#0)) == toString(Array)) then print "HELLO"--use R powerList(variables#0)
+    --else use R monoid variables)
+    --**************************************
+    --**************************************
+    --**************************************
+    --**************************************
+    --Annie, I commented out your Ring Array thing, it was causing errors for me.
+    --**************************************
+    --**************************************
+    --**************************************
+    --**************************************
 
 Ring PowerList := PowerSeriesRing =>(R, M)->(
 
