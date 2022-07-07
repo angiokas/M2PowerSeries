@@ -7,7 +7,7 @@
 --===================================================================================
 
 -- Zero series
-zeroSeries = method(Options=>{DisplayedDegree => 3}) -- maybe we can just change it to a variable instead??
+zeroSeries = method(Options=>{DisplayedDegree => 3, ComputedDegree => 3}) -- maybe we can just change it to a variable instead??
 zeroSeries(Ring) := LazySeries => opts -> R -> (
     f := variables -> 0;
     P := sub(0, R);    
@@ -15,7 +15,7 @@ zeroSeries(Ring) := LazySeries => opts -> R -> (
 );
 
 -- One series
-oneSeries = method(Options=>{DisplayedDegree => 3})
+oneSeries = method(Options=>{DisplayedDegree => 3, ComputedDegree => 3})
 oneSeries(Ring) := LazySeries => opts -> R -> (
     ringZeroes := (numgens R:0);
     if (numgens R == 1) then ringZeroes = 0;

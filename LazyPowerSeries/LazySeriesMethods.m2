@@ -213,7 +213,7 @@ changeDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
             --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
         );
     )
-    else (
+    else(
         L.cache.DisplayedDegree = newDeg;
         L.cache.displayedPolynomial = part(0, newDeg, L.cache.displayedPolynomial);
     );

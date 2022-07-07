@@ -1,4 +1,13 @@
 
+-- truncate
+TEST ///
+R = ZZ[x]
+f = i->7
+deg = 5
+
+P = calculatePolynomial(deg,R,f)
+truncate(5, P)
+///
 -- testing maximumsList
 TEST ///
 k = {{1,3},{2,5},{3,4},{-6,8}}

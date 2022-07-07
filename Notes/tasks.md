@@ -4,7 +4,6 @@
 - [ ] Implement formal power series as an object
   - [X] `LazySeries` using a ring and function
     - [X] Works for multivariate rings
-    - [ ] Works for multi-graded rings
       - [X] Using the sum of the list of degrees
     - [X] saves the coefficient function
     - [X] Uses caching for fast retreival
@@ -33,14 +32,14 @@
   - [X] `toAdics` function that gives us information about the proper coefficients to assemble the p-adics form
   - [X] change how the p-th index looksl ike in the terms i.e change "121" to "11^2".
   - [ ] Important: ~~implement the correct expanssion form of -1. For p, -1 should look like ... (p-1) (p-1) i.e (p-1) + (p-1)p + (p-1) p^2+ ...~~ Actually, it is better to use the built in preference of macaulay2 to present roughly half of the integers positive and the other half negative so that it uses minimum representation. It's faster that way. 
-  - [ ] multiplication by -1
-  - [ ] Using a similar method to lazy series, implement inversion using (1-x)^(-1) = 1+x+x^2+... trick, however -1 representation is key here
+  - [X] multiplication by -1
+  - [X] Using a similar method to lazy series, implement inversion using (1-x)^(-1) = 1+x+x^2+... trick, however -1 representation is key here
   - [ ] Think about p-adic numbers instead of integers next, so completions over polynomial rings over QQ
   
 
 
 - [ ] Helper/Utility methods
-  - [X] `zeroSeries`
+  - [X] `zeroSeries` -> Display just shows "+ ..." which should look like "0 + ..." instead
   - [X] `oneSeries`
   - [X] `isUnit` -
   - [X] `toBinary` - 

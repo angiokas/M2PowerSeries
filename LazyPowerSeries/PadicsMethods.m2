@@ -66,7 +66,7 @@ toString Padics := L -> (
         )
     );
     myStr = toString(myStr);
-    if (myStr#1 == "+") then myStr = substring(3, myStr);
+    if (#myStr != 0 and myStr#1 == "+") then myStr = substring(3, myStr);
     toString(myStr | toString(" + ... "))
 
 ); 
@@ -75,13 +75,22 @@ net Padics := L -> ( net(toString L));
 
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
-padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5})
+padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5, PositiveCoefficients=>false})
 
 -- Constructs Padics over the given ring R using inputted coefficient function f 
 padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
 
     computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
-    displayedPoly := truncatePadics(p, opts.DisplayedDegree, computedPoly); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+    tempValueList := toAdics(p, computedPoly, PositiveCoefficients=>opts.PositiveCoefficients);
+    displayedPoly := sub(0, R); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+
+    currentDegree := 0;
+    maxIdeal := ideal({p} | gens R);
+
+    while(currentDegree < opts.DisplayedDegree) do (
+        currentDegree = currentDegree + 1;
+        displayedPoly = displayedPoly + sum(apply(first entries gens (maxIdeal^currentDegree),j-> j*(tempValueList#j)))        
+    );
 
     new Padics from {
         coefficientFunction => f,
@@ -94,7 +103,7 @@ padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
             Degree => infinity,
-            valueList => toAdics(p, computedPoly)
+            valueList => tempValueList
         }
     }
 );
@@ -112,7 +121,8 @@ padics(ZZ, RingElement) := Padics => opts -> (p, g) -> (
         f,
         g,
         DisplayedDegree => opts.DisplayedDegree,
-        ComputedDegree => opts.ComputedDegree
+        ComputedDegree => opts.ComputedDegree,
+        PositiveCoefficients=>opts.PositiveCoefficients
         ) 
 );
 
@@ -132,7 +142,7 @@ padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> (
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
             Degree => infinity,
-            valueList => toAdics(p, computedPoly)
+            valueList => toAdics(p, computedPoly, PositiveCoefficients=>opts.PositiveCoefficients)
         }
     }
 );
@@ -187,7 +197,8 @@ padics(Padics, Function) := Padics => opts -> (L, function) -> (
         newFunction,
         newCompPoly,
         DisplayedDegree => L#cache.DisplayedDegree,
-        ComputedDegree=> L#cache.ComputedDegree
+        ComputedDegree=> L#cache.ComputedDegree,
+        PositiveCoefficients=>opts.PositiveCoefficients
         )
 
 );

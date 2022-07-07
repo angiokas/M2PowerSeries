@@ -5,9 +5,12 @@ truncate(InfiniteNumber, RingElement) := RingElement =>(n , f) ->(
      f
     );
 
-truncate(ZZ, RingElement) := RingElement =>(n, f) ->(
+truncate(ZZ, RingElement) := RingElement => (n, f) ->(
+    print n;
+    print f;
     part(0,n,f)
     );
+
 truncatePadics = method()
 truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
     R := ring f;
@@ -15,8 +18,6 @@ truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
     displayedPoly := f % I^(d+1);
     displayedPoly
 );
-
-
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
 toMonomial = method()
 toMonomial(List, Ring) := RingElement => (L, S) -> ( -- ??????????
@@ -157,8 +158,8 @@ toAdics(ZZ, Thing) := List => opts -> (p, poly) -> (
     else error("Cannot interpret the second argument as a ring element.");
 
     coefficientslist := {};
-
-    if(instance (workingf, RingElement)) then deg = ceiling(log_p leadCoefficient workingf) + (sum degree workingf)
+    if(workingf == 0) then deg = -1
+    else if (instance (workingf, RingElement)) then deg = ceiling(log_p leadCoefficient workingf) + (sum degree workingf)
     else deg= ceiling(log_p workingf);
 
     m := (ideal p)+(ideal gens R); -- Ex. p = 7 and R = ZZ[x,y,z] then (7)+(x,y,z) = (7,x,y,z)
@@ -259,6 +260,19 @@ constructAdicsPoly(List) := Padics => L -> (
     s := 0;
 
     for j from 0 to #termList-1 do (
+        s = s + (coefficientList#j * termList#j);
+    );
+    s
+);
+
+constructAdicsPoly(ZZ, HashTable) := Padics => (d, H) -> (
+    termList :=(apply(H, i-> i#0));
+    coefficientList :=(apply(H, i-> i#1));
+    deg:= 
+
+    s := 0;
+
+    for j from 0 to deg do (
         s = s + (coefficientList#j * termList#j);
     );
     s
