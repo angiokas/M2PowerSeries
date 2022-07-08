@@ -19,9 +19,9 @@ padicOrder(ZZ, Thing) := ZZ => (p, f) ->(
 
 
 
-Padics = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
+PadicSeries = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
 
-toString Padics := L -> (
+toString PadicSeries := L -> (
     myStr := net("");
 
     local tempStr;
@@ -71,14 +71,14 @@ toString Padics := L -> (
 
 ); 
 
-net Padics := L -> ( net(toString L));
+net PadicSeries := L -> (net(toString L));
 
 ----------------------PADICS CONSTRUCTORS-----------------------------------------------------------------
 
 padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedDegree => 5, PositiveCoefficients=>false})
 
--- Constructs Padics over the given ring R using inputted coefficient function f 
-padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
+-- Constructs PadicSeries over the given ring R using inputted coefficient function f 
+padics(ZZ, Ring, Function) := PadicSeries => opts -> (p, R, f) -> (
 
     computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
     tempValueList := toAdics(p, computedPoly, PositiveCoefficients=>opts.PositiveCoefficients);
@@ -92,7 +92,7 @@ padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
         displayedPoly = displayedPoly + sum(apply(first entries gens (maxIdeal^currentDegree),j-> j*(tempValueList#j)))        
     );
 
-    new Padics from {
+    new PadicSeries from {
         coefficientFunction => f,
         seriesRing => R,
         primeNumber => p,
@@ -108,8 +108,8 @@ padics(ZZ, Ring, Function) := Padics => opts -> (p, R, f) -> (
     }
 );
 
---converts polynomials to Padics
-padics(ZZ, RingElement) := Padics => opts -> (p, g) -> ( 
+--converts polynomials to PadicSeries
+padics(ZZ, RingElement) := PadicSeries => opts -> (p, g) -> ( 
     R := ring g; 
     f := v -> coefficient(v, g);
 
@@ -126,12 +126,12 @@ padics(ZZ, RingElement) := Padics => opts -> (p, g) -> (
         ) 
 );
 
--- Making a Padics without the added computation of polynomial construction
+-- Making a PadicSeries without the added computation of polynomial construction
 padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> ( 
     R := ring computedPoly;
     newComputedPoly := truncatePadics(p, opts.ComputedDegree, computedPoly);
 
-    new Padics from {
+    new PadicSeries from {
         coefficientFunction => f,
         seriesRing => R,
         primeNumber => p,
@@ -148,12 +148,12 @@ padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> (
 );
 
 -*
-padics(Ring, ZZ, List) := Padics => opts -> (R, p, L) -> (
+padics(Ring, ZZ, List) := PadicSeries => opts -> (R, p, L) -> (
     variables := vars(gens R +1);
     f := variables -> coefficient()
 
 
-    new Padics from {
+    new PadicSeries from {
         coefficientFunction => f,
         seriesRing => R,
         primeNumber => p,
@@ -170,7 +170,7 @@ padics(Ring, ZZ, List) := Padics => opts -> (R, p, L) -> (
 )
 *-
 
-padics(Padics, Function) := Padics => opts -> (L, function) -> (    
+padics(PadicSeries, Function) := PadicSeries => opts -> (L, function) -> (    
     local tempLPower;
     R := L.seriesRing;
     p := L.primeNumber;
@@ -202,9 +202,91 @@ padics(Padics, Function) := Padics => opts -> (L, function) -> (
         )
 
 );
+--*******************************************************
+--Methods that use PadicSeries object and its constructors
+--*******************************************************
 
+-- Changing degree of LazySeries
+changeDegree = method()
+changeDegree(PadicSeries, ZZ) := LazySeries => (L, newDeg) -> (
+
+    oldDispDeg := L.cache.DisplayedDegree;
+    oldCompDeg := L.cache.ComputedDegree;
+    f := L#coefficientFunction;
+    R := L#seriesRing;
+    local tempPoly;
+
+    if newDeg == oldDispDeg then (
+        L
+    )    
+    else if newDeg > oldDispDeg then (
+        if oldCompDeg >= newDeg then (--if we've already computed that high, just use it
+            L.cache.DisplayedDegree = newDeg;
+            tempPoly = truncate(newDeg, L.cache.computedPolynomial);
+            L.cache.displayedPolynomial = tempPoly;
+        )
+        else ( --otherwise we have to compute everything
+            L.cache.ComputedDegree = newDeg;
+            L.cache.DisplayedDegree = newDeg;
+            if L#cache#?"FastChangeComputedDegree" then (
+                if (debugLevel > 0) then print "changeDegree: using cached fast degree change function";
+                tempPoly = (L#cache#"FastChangeComputedDegree")(newDeg);                
+            )
+            else( 
+                if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
+                tempPoly = (calculatePolynomial(newDeg, R, f));--we have no choice but to call this
+            );
+            L.cache.computedPolynomial = tempPoly;
+            L.cache.displayedPolynomial = tempPoly;
+            --lazySeries(R, f, DisplayedDegree => newDeg, ComputedDegree => newDeg)
+        );
+    )
+    else (
+        L.cache.DisplayedDegree = newDeg;
+        L.cache.displayedPolynomial = part(0, newDeg, L.cache.displayedPolynomial);
+    );
+
+    L
+);
+-- changes ComputedDegree and computedPolynomial only
+changeComputedDegree = method()
+changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
+    if (debugLevel > 0) then print "changeComputedDegree: starting";
+
+    oldDeg := L.cache.DisplayedDegree;
+    oldPoly := L.cache.displayedPolynomial;
+
+    f := L#coefficientFunction;
+    R := L#seriesRing;
+    local tempPoly;
+
+    if (debugLevel > 0) then print "tried to change computed degree to a lower value, nothing done";
+
+    if newDeg <= oldDeg then L
+    else if newDeg > oldDeg then (
+        
+        L#cache#ComputedDegree = newDeg;
+        if L#cache#?"FastChangeComputedDegree" then (
+            if (debugLevel > 0) then print "channgeComputedDegree: using cached fast degree change function";
+            tempPoly = (L#cache#"FastChangeComputedDegree")(newDeg);
+        )
+        else(
+            if (debugLevel > 0) then print "changeComputeDegree: using slow degree change function";
+            tempPoly = (calculatePolynomial(newDeg, R, f));  
+        );
+        L#cache#computedPolynomial = tempPoly;
+
+        lazySeries(
+            R,
+            f,
+            oldPoly,
+            tempPoly,
+            DisplayedDegree => oldDeg,
+            ComputedDegree => newDeg)
+    )
+);
 -- Coefficient function overload for p-adics
-coefficient(VisibleList, Padics) := (L, M) -> (
+coefficient(VisibleList, PadicSeries) := (L, M) -> (
     R := M.seriesRing;
     p := M.primeNumber;
     variables := {sub(p, R)} | toList gens R;
@@ -214,9 +296,9 @@ coefficient(VisibleList, Padics) := (L, M) -> (
     H#monomial
 );
 
-ring(Padics) := L -> L.seriesRing; 
+ring(PadicSeries) := L -> L.seriesRing; 
 
-isUnit(Padics) := Boolean => L -> (
+isUnit(PadicSeries) := Boolean => L -> (
     constantTerm := L.cache.valueList#(sub(1,L.seriesRing));
     if(constantTerm == 0) then false
     else true

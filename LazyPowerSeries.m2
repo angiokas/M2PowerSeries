@@ -29,6 +29,7 @@ newPackage(
 
         Headline => "A package for implementing power series and its calculations",
         DebuggingMode => true,
+        PackageImports => {"Truncations"},
         Reload => true,
         AuxiliaryFiles=>true        
         )
@@ -45,6 +46,7 @@ export{
     "inputFunctionCheck",
     "toPositiveRep",
     "truncatePadics",
+    "Prime",
 
     -- LazySeries
     "LazySeries",
@@ -68,12 +70,13 @@ export{
 
     -- P-adics
     "padics",
-    "Padics",
+    "PadicSeries",
     "padicOrder",
     "primeNumber",
     "valueList",
     "minusOne",
     "PositiveCoefficients",
+    
 
     -- PowerSeriesRings
     "PowerSeriesRing",

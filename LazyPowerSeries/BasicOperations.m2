@@ -417,19 +417,19 @@ Number / LazySeries := LazySeries => (n, B)->(
 )
 
 --*************************************************
---Basic operations outputting Padics
+--Basic operations outputting PadicSeries
 --*************************************************
 --===================================================================================
 -- The zero
 zeroPadics = method(Options=>{DisplayedDegree => 5}) -- maybe we can just change it to a variable instead??
-zeroPadics(ZZ, Ring) := Padics => opts -> (p, R) -> (
+zeroPadics(ZZ, Ring) := PadicSeries => opts -> (p, R) -> (
     f := sub(0, R);    
     padics(p, f, DisplayedDegree=>opts.DisplayedDegree, ComputedDegree =>opts.DisplayedDegree)
 );
 
 -- The identity
 onePadics = method(Options=>{DisplayedDegree => 5})
-onePadics(Ring) := Padics => opts -> (p, R) -> (
+onePadics(Ring) := PadicSeries => opts -> (p, R) -> (
     ringZeroes := (((numgens R)+1):0);
     if (numgens R == 1) then ringZeroes = 0;
     
@@ -442,7 +442,7 @@ onePadics(Ring) := Padics => opts -> (p, R) -> (
 );
 
 -- ADDITION------------------------------------------------------------------
-Padics + Padics := Padics => (A, B) -> (
+PadicSeries + PadicSeries := PadicSeries => (A, B) -> (
     if (A.seriesRing === B.seriesRing) == false then error "Rings of series do not match";
     if (A.primeNumber != B.primeNumber) then error "prime number of adic completion do not match";
 
@@ -470,13 +470,13 @@ Padics + Padics := Padics => (A, B) -> (
 
 );
 
-Number + Padics := Padics => (n, L) -> (
+Number + PadicSeries := PadicSeries => (n, L) -> (
     f := L#coefficientFunction;
     R := ring L;
     p := L.primeNumber;
 
     try sub(n, R) then n = sub(n, R)
-    else error("Cannot promote number to Padics Series ring");
+    else error("Cannot promote number to PadicSeries Series ring");
 
     --ringZeroes := numgens R:0; -- sequence of 0s the amount of the ring generators, not the zero of the ring    
     if(n == 0) then L;
@@ -496,11 +496,11 @@ Number + Padics := Padics => (n, L) -> (
         )
 );
 
-Padics + Number := Padics => (L, n) -> n + L;
+PadicSeries + Number := PadicSeries => (L, n) -> n + L;
 
 ----------------------------------- MULIPLICATION BY PADICS--------------------------------------------------------
 
-Number * Padics := Padics => (n, L) -> (
+Number * PadicSeries := PadicSeries => (n, L) -> (
     f := L.coefficientFunction;
     R := ring L;
     p := L.primeNumber;
@@ -525,17 +525,17 @@ Number * Padics := Padics => (n, L) -> (
 );
 
 
-Padics * Number := Padics => (L, n) -> n * L;
+PadicSeries * Number := PadicSeries => (L, n) -> n * L;
 
-- Padics := L -> (-1)*L;
+- PadicSeries := L -> (-1)*L;
 
-Padics - Padics := Padics => (A,B) -> (
+PadicSeries - PadicSeries := PadicSeries => (A,B) -> (
     B = (-1)*B;
     A + B
 );
 
-Padics - Number := Padics => (L, n) -> L + (-n);
-Number - Padics := (n, L) -> (
+PadicSeries - Number := PadicSeries => (L, n) -> L + (-n);
+Number - PadicSeries := (n, L) -> (
     L = (-1)*L;
     n + L
 );
@@ -558,7 +558,7 @@ LazySeries / Number := LazySeries => (L, n) -> (
     oneOverN * L
 );
 
-Padics * Padics := Padics => (A,B)->(
+PadicSeries * PadicSeries := PadicSeries => (A,B)->(
     f := A.coefficientFunction;
     g := B.coefficientFunction;
     p := A.primeNumber;
@@ -603,7 +603,7 @@ Padics * Padics := Padics => (A,B)->(
 
 );
 -- Raising LazySeries by nth power
-Padics ^ ZZ := Padics => (S,n) -> (
+PadicSeries ^ ZZ := PadicSeries => (S,n) -> (
     R := S.seriesRing;
     p := S.primeNumber;
     if n == 0 then return onePadics(p, R);
@@ -639,7 +639,7 @@ Padics ^ ZZ := Padics => (S,n) -> (
 );
 ------
 
-inverse(Padics) := Padics => (L) -> (
+inverse(PadicSeries) := PadicSeries => (L) -> (
     -- first check if it is a unit in the ring
     R := L.seriesRing;
     p := L.primeNumber;

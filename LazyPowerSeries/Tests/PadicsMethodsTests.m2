@@ -1,4 +1,4 @@
--- Testing Padics constructors
+-- Testing PadicSeries constructors
 --USING BASIC RINGS
 TEST ///
 R = ZZ

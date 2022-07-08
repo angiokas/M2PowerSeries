@@ -1,23 +1,50 @@
 -- Truncates given polynomial
-truncate(InfiniteNumber, RingElement) := RingElement =>(n , f) ->(
+
+truncate(InfiniteNumber, RingElement) := {Prime => 0} >> opts -> (n, f) ->(
      if n == infinity then return f;
      if n == -infinity then return sub(0, ring f);
      f
     );
 
-truncate(ZZ, RingElement) := RingElement => (n, f) ->(
-    print n;
-    print f;
-    part(0,n,f)
+truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
+    if(opts.Prime == 0) then part(0,n,f)
+    else (
+        R := ring f;
+        p := opts.Prime;
+        I := sub(ideal(gens R | {p}), R);
+        displayedPoly := f % I^(n+1);
+        displayedPoly
+    )
+    
+    
     );
 
-truncatePadics = method()
-truncatePadics(ZZ, ZZ, Thing) := Thing => (p,d,f)->(
-    R := ring f;
-    I := sub(ideal(gens R | {p}), R);
-    displayedPoly := f % I^(d+1);
-    displayedPoly
-);
+truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
+    if(opts.Prime == 0) then f
+    else (
+        R := ZZ;
+        p := opts.Prime;
+        I := sub(ideal(p), R);
+        displayedPoly := f % I^(n+1);
+        displayedPoly
+    )
+    
+    );
+
+truncate(ZZ, PadicSeries) := {} >> opts -> (n, L) -> (
+    p := L.primeNumber;
+    f := L.cache.DisplayedPolynomial;
+    truncate(n,f, Prime => p)
+
+)
+
+truncate(ZZ, LazySeries) := {} >> opts -> (n, L) -> (
+    p := L.primeNumber;
+    f := L.cache.DisplayedPolynomial;
+    truncate(n,f, Prime => p)
+
+)
+
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
 toMonomial = method()
 toMonomial(List, Ring) := RingElement => (L, S) -> ( -- ??????????
@@ -253,7 +280,7 @@ constructAdicsPoly = method(Options => { Degree => 3})
     s
 );
 
-constructAdicsPoly(List) := Padics => L -> (
+constructAdicsPoly(List) := PadicSeries => L -> (
     termList :=(apply(L, i-> i#0));
     coefficientList :=(apply(L, i-> i#1));
 
@@ -265,7 +292,7 @@ constructAdicsPoly(List) := Padics => L -> (
     s
 );
 
-constructAdicsPoly(ZZ, HashTable) := Padics => (d, H) -> (
+constructAdicsPoly(ZZ, HashTable) := PadicSeries => (d, H) -> (
     termList :=(apply(H, i-> i#0));
     coefficientList :=(apply(H, i-> i#1));
     deg:= 
