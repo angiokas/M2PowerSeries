@@ -92,7 +92,6 @@ sudo apt install pandoc
 
 
 
-
 ## loading Packages
 If you want to load a package, type this where "pkgname" is your package name (make sure you type it without the .m2 extension at the end!):
 

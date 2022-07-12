@@ -207,7 +207,7 @@ padics(PadicSeries, Function) := PadicSeries => opts -> (L, function) -> (
 --*******************************************************
 
 -- Changing degree of LazySeries
-changeDegree = method()
+
 changeDegree(PadicSeries, ZZ) := LazySeries => (L, newDeg) -> (
 
     oldDispDeg := L.cache.DisplayedDegree;
@@ -249,7 +249,6 @@ changeDegree(PadicSeries, ZZ) := LazySeries => (L, newDeg) -> (
     L
 );
 -- changes ComputedDegree and computedPolynomial only
-changeComputedDegree = method()
 changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
     if (debugLevel > 0) then print "changeComputedDegree: starting";
 

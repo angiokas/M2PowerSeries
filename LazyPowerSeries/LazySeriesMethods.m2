@@ -165,8 +165,8 @@ lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (
         newFunction,
         newDisplayed,
         newCompPoly,
-        DisplayedDegree => L#cache.DisplayedDegree,
-        ComputedDegree=> L#cache.ComputedDegree
+        DisplayedDegree => L.cache.DisplayedDegree,
+        ComputedDegree=> L.cache.ComputedDegree
         );
     newL#cache#"FastChangeComputedDegree" = newChangeDegFunction;
 

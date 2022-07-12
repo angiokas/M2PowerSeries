@@ -14,10 +14,10 @@ truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
         I := sub(ideal(gens R | {p}), R);
         displayedPoly := f % I^(n+1);
         displayedPoly
-    )
-    
-    
     );
+    
+    
+);
 
 truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
     if(opts.Prime == 0) then f
@@ -27,23 +27,25 @@ truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
         I := sub(ideal(p), R);
         displayedPoly := f % I^(n+1);
         displayedPoly
-    )
-    
     );
+    
+);
 
 truncate(ZZ, PadicSeries) := {} >> opts -> (n, L) -> (
+    -*
     p := L.primeNumber;
     f := L.cache.DisplayedPolynomial;
     truncate(n,f, Prime => p)
+    *-
 
-)
+);
 
 truncate(ZZ, LazySeries) := {} >> opts -> (n, L) -> (
-    p := L.primeNumber;
     f := L.cache.DisplayedPolynomial;
-    truncate(n,f, Prime => p)
+    truncate(n,f)
 
-)
+);
+
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
 toMonomial = method()
