@@ -63,6 +63,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, f) -> (
 
     computedPoly := calculatePolynomial(opts.ComputedDegree, R, f);
     displayedPoly := truncate(opts.DisplayedDegree, computedPoly);
+    print displayedPoly;
 
     new LazySeries from {
         coefficientFunction => f,

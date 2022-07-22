@@ -7,16 +7,16 @@ truncate(InfiniteNumber, RingElement) := {Prime => 0} >> opts -> (n, f) ->(
     );
 
 truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
-    if(opts.Prime == 0) then part(0,n,f)
+    if(opts.Prime == 0) then (
+        return part(0,n,f);
+        )
     else (
         R := ring f;
         p := opts.Prime;
         I := sub(ideal(gens R | {p}), R);
-        displayedPoly := f % I^(n+1);
-        displayedPoly
-    );
-    
-    
+        dispPoly := f % I^(n+1);
+        dispPoly
+    )
 );
 
 truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
@@ -27,11 +27,9 @@ truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
         I := sub(ideal(p), R);
         displayedPoly := f % I^(n+1);
         displayedPoly
-    );
+    )
     
 );
-
-
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
 toMonomial = method()
