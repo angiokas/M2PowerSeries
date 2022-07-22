@@ -302,3 +302,11 @@ isUnit(PadicSeries) := Boolean => L -> (
     if(constantTerm == 0) then false
     else true
 );
+
+truncate(ZZ, PadicSeries) := {} >> opts -> (n, L) -> (
+    p := L.primeNumber;
+    f := L.cache.displayedPolynomial;
+    truncate(n,f, Prime => p)
+    
+
+);

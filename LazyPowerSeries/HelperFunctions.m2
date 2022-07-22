@@ -31,20 +31,6 @@ truncate(ZZ, ZZ) := {Prime => 0} >> opts -> (n, f) -> (
     
 );
 
-truncate(ZZ, PadicSeries) := {} >> opts -> (n, L) -> (
-    -*
-    p := L.primeNumber;
-    f := L.cache.DisplayedPolynomial;
-    truncate(n,f, Prime => p)
-    *-
-
-);
-
-truncate(ZZ, LazySeries) := {} >> opts -> (n, L) -> (
-    f := L.cache.DisplayedPolynomial;
-    truncate(n,f)
-
-);
 
 
 --toMonomial is a function that takes an exponent vector in the form of a list L and a polynomial ring S. Returns 
