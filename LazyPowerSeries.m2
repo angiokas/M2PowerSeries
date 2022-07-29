@@ -45,7 +45,6 @@ export{
     "constructAdicsPoly",
     "inputFunctionCheck",
     "toPositiveRep",
-    "truncatePadics",
     "Prime",
 
     -- LazySeries
@@ -96,8 +95,8 @@ load "./LazyPowerSeries/PowerSeriesRings.m2"
 beginDocumentation()
 load "./LazyPowerSeries/Documentation/LazySeriesMethodsDoc.m2"
 load "./LazyPowerSeries/Documentation/PadicsMethodsDoc.m2"
-load "./LazyPowerSeries/Documentation/BasicOperationsDoc.m2"
-load "./LazyPowerSeries/Documentation/HelperFunctionsDoc.m2"
+--load "./LazyPowerSeries/Documentation/BasicOperationsDoc.m2"
+--load "./LazyPowerSeries/Documentation/HelperFunctionsDoc.m2"
 
 
 

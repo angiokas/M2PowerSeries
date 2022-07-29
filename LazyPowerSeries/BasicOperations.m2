@@ -455,8 +455,8 @@ PadicSeries + PadicSeries := PadicSeries => (A, B) -> (
     newDispDegree := min(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := min(A.cache.ComputedDegree, B.cache.ComputedDegree);
 
-    a := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
-    b := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
+    a := truncate(newCompDegree, A.cache.computedPolynomial, Prime => p);
+    b := truncate(newCompDegree, B.cache.computedPolynomial, Prime => p); 
 
     newCompPoly := a + b;
 
@@ -569,10 +569,10 @@ PadicSeries * PadicSeries := PadicSeries => (A,B)->(
     newDispDegree := max(A.cache.DisplayedDegree, B.cache.DisplayedDegree);
     newCompDegree := max(A.cache.ComputedDegree, B.cache.ComputedDegree); 
 
-    a := truncatePadics(p,newCompDegree, A.cache.computedPolynomial);
-    b := truncatePadics(p,newCompDegree, B.cache.computedPolynomial); 
+    a := truncate(newCompDegree, A.cache.computedPolynomial, Prime => p);
+    b := truncate(newCompDegree, B.cache.computedPolynomial, Prime => p); 
 
-    newCompPoly := truncatePadics(p, newCompDegree, a*b);
+    newCompPoly := truncate( newCompDegree, a*b, Prime => p);
 
     newFunction := coefficientVector -> (
             deg := coefficientVector;
@@ -583,23 +583,34 @@ PadicSeries * PadicSeries := PadicSeries => (A,B)->(
             --changeComputedDegree(A, tempDegree); !!!!!!!!!
             --changeComputedDegree(B, tempDegree);
 
-            P1 := truncatePadics(p, deg, A.cache.computedPolynomial);
-            P2 := truncatePadics(p, deg, B.cache.computedPolynomial);
+            P1 := truncate( deg, A.cache.computedPolynomial, Prime=> p);
+            P2 := truncate( deg, B.cache.computedPolynomial, Prime => p);
 
-            P := truncatePadics(p,deg, P1*P2);
+            P := truncate(deg, P1*P2, Prime => p);
 
             coefficient(coefficientVector, P)
         );
 
-    padics(
+    finalSeries:= padics(
         p,
         newFunction,
         newCompPoly,
         DisplayedDegree => newCompDegree,
         ComputedDegree => newDispDegree
-        )
+        );
 
         -- Add a fast change degree function to it
+        newFastChangeDegree := i -> (
+        changeComputedDegree(A, i);
+        changeComputedDegree(B, i);
+        P1 := truncate(i, A.cache.computedPolynomial);
+        P2 := truncate(i, B.cache.computedPolynomial);
+        myPoly := truncate(i, P1*P2);
+        myPoly
+    );
+
+    (finalSeries.cache)#"FastChangeComputedDegree" = newFastChangeDegree;
+    finalSeries
 
 );
 -- Raising LazySeries by nth power

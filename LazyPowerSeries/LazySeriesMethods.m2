@@ -6,6 +6,7 @@
 
 LazySeries = new Type of HashTable;
 
+------------
 
 net LazySeries := L -> (
     myStr := net("");

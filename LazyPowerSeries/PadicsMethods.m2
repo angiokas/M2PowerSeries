@@ -129,7 +129,7 @@ padics(ZZ, RingElement) := PadicSeries => opts -> (p, g) -> (
 -- Making a PadicSeries without the added computation of polynomial construction
 padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> ( 
     R := ring computedPoly;
-    newComputedPoly := truncatePadics(p, opts.ComputedDegree, computedPoly);
+    newComputedPoly := truncate(opts.ComputedDegree, computedPoly, Prime => p);
 
     new PadicSeries from {
         coefficientFunction => f,
@@ -138,7 +138,7 @@ padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> (
 
         cache => new CacheTable from { -- contains everything mutable
             DisplayedDegree => opts.DisplayedDegree,
-            displayedPolynomial => truncatePadics(p, opts.DisplayedDegree, newComputedPoly),
+            displayedPolynomial => truncate( opts.DisplayedDegree, newComputedPoly, Prime => p),
             ComputedDegree => opts.ComputedDegree,
             computedPolynomial => computedPoly,
             Degree => infinity,
@@ -181,7 +181,7 @@ padics(PadicSeries, Function) := PadicSeries => opts -> (L, function) -> (
     origComputed := L.cache.computedPolynomial;
     
     --first we compute the new computed polynomial
-    newCompPoly := sum( apply(oldDeg+1, i -> truncatePadics(p, oldDeg, (f i)*origComputed^i))); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
+    newCompPoly := sum( apply(oldDeg+1, i -> truncate(oldDeg, (f i)*origComputed^i, Prime => p))); --maybe instead we should do L^i, and store that in the cache, that would probably be better, instead of taking the polynomial to the i.
 
     newFunction := v -> (
         sumV := sum v;

@@ -49,6 +49,7 @@ doc ///
      1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "using a given ring and function")@
      2. Creating LazySeries by the @TO2((RingElement), "using a given ringElement")@
      3.
+     
   SeeAlso
     "Operations on Series"
     
@@ -134,6 +135,7 @@ doc ///
     "Number + LazySeries"
     "Number - Lazyseries"
     "Number * LazySeries"
+    " - LazySeries"
 
   Headline
     An overview of the arithmetic done on formal power series. 
