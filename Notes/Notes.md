@@ -137,7 +137,7 @@ which creates a file index.html in the ~/.Macaulay2 directory, containing links 
 ## On Testing
 If you want to check tests, you should type the `check` command in macaulay like so:
 ```
-check NewPowerSeries
+check "LazyPowerSeries"
 ```
 
 ## Checking for updates periodically

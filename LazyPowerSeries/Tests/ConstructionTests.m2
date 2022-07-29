@@ -95,7 +95,7 @@ lazySeries(R,h)
 ///
 
 TEST ///
-R = ZZ/5[x,y,z] -- 3-variable
+R = ZZ/5[x,y,z]
 
 s0 = zeroSeries(R);
 s1 = oneSeries(R);
@@ -122,8 +122,8 @@ lazySeries(R,h)
 ///
 
 -- check 8
-TEST /// --Multi-graded ring test
-R = ZZ/101[a,b,c,Degrees=>{{1,2},{2,1},{1,0}}]
+TEST ///
+R = ZZ/101[a,b,c]
 
 s0 = zeroSeries(R);
 s1 = oneSeries(R);

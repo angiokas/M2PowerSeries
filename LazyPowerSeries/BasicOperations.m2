@@ -272,6 +272,7 @@ LazySeries // Number := LazySeries => (L, n) -> (
         ComputedDegree => L.cache.ComputedDegree
         )
 );
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Multiplication of two LazySeries
@@ -407,13 +408,45 @@ inverse(LazySeries) := LazySeries => (L) -> (
     --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
 
--- Division of two LazySeries
+--Division of two LazySeries--
 LazySeries / LazySeries := LazySeries => (A, B)->(
     A * inverse(B)
 )
 -- Dividing a number by LazySeries
 Number / LazySeries := LazySeries => (n, B)->(
     n * inverse(B)
+)
+
+----------------------------------- Operations using polynomials and LazySeries-------------------------------
+LazySeries + RingElement := LazySeries => (L,f) -> (
+    M := lazySeries(f);
+    L+M
+)
+RingElement + LazySeries := LazySeries => (f,L) -> (L+f)
+
+LazySeries - RingElement := LazySeries => (L,f) -> (
+    M := lazySeries(f);
+    L - M
+)
+RingElement - LazySeries := LazySeries => (f,L) -> (
+    M := lazySeries(f);
+    M-L
+)
+
+LazySeries* RingElement := LazySeries => (L,f) -> (
+    M := lazySeries(f);
+    L*M
+)
+RingElement*LazySeries := LazySeries => (f,L) -> (L*f)
+
+LazySeries / RingElement := LazySeries => (L,f) -> (
+    M := lazySeries(f);
+    L/M
+)
+
+RingElement /LazySeries := LazySeries => (L,f) -> (
+    M := lazySeries(f);
+    M/L
 )
 
 --*************************************************
@@ -667,3 +700,41 @@ inverse(PadicSeries) := PadicSeries => (L) -> (
     h
     --changeDegree(h, L.cache.DisplayedDegree) -- degree must be the same to get 1 from multiplying later!!
 );
+
+----------------------------------- Operations using polynomials and PadicSeries-------------------------------
+PadicSeries + RingElement := PadicSeries => (L,f) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    L+M
+)
+RingElement + LazySeries := PadicSeries => (f,L) -> (L+f)
+
+PadicSeries - RingElement := PadicSeries => (L,f) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    L - M
+)
+RingElement - PadicSeries := PadicSeries => (f,L) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    M-L
+)
+
+PadicSeries* RingElement := PadicSeries => (L,f) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    L*M
+)
+RingElement*PadicSeries := PadicSeries => (f,L) -> (L*f)
+
+PadicSeries / RingElement := PadicSeries => (L,f) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    L/M
+)
+
+RingElement /PadicSeries := PadicSeries => (L,f) -> (
+    p := L.primeNumber;
+    M := padics(p, f);
+    M/L
+)

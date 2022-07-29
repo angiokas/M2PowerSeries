@@ -28,7 +28,6 @@ assert(toMonomial({3}, R) == x^3)
 --
 TEST ///
 n = 1+4*5+3*5^2+4*5^3
+p = 5
 toAdics(p, n)
-
-
 ///
