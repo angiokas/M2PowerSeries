@@ -51,10 +51,15 @@ To check if it installed correctly, type in:
 ```
 $ M2
 ```
-You need to do the initial setup after running M2 on the virtual machine for the first time:
+You will need to do some initial setups after running M2 on the virtual machine for the first time:
 ```
 $ setup()
 ```
+and make sure to add the directory you cloned this repository into to the `PATH`. [Here is the link to the documentation.](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_path.html) For example, if you clone it into your home directory, in my case `~/git`
+```
+path = append(path, "~/git/M2PowerSeries/"); stack path
+```
+
 You find information on this here: [setup (macaulay2.com)](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.17/share/doc/Macaulay2/Macaulay2Doc/html/_setup.html)
 
 In case you are using Visual Studio Code, I recommend installing this extension for Macaulay 2: https://github.com/coreysharris/vscode-macaulay2
