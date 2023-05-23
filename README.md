@@ -104,6 +104,10 @@ or save it for future sessions by running (basically go to `.bashrc` file and co
 ```
 $ echo "export WWWBROWSER=wslview" >> ~/.bashrc
 ```
+We set both the WWWBROWSER and BROWSER variables to wslview so that it works with both emacs and Jupyter
+```
+$ echo "export BROWSER=wslview" >> ~/.bashrc
+```
 
 Now if you go to the terminal or emacs, the Macualy2 command `viewHelp` should open a browser in your Windows parent operating system.
 
