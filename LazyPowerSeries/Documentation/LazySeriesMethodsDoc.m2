@@ -9,11 +9,6 @@ needsPackage "SimpleDoc";
 doc ///
 Key
     LazySeries
-    displayedPolynomial
-    computedPolynomial
-    ComputedDegree
-    DisplayedDegree
-    seriesRing
 
 Headline
     A package allowing construction and manipulation of formal power series in multi-variable.
@@ -37,6 +32,11 @@ doc ///
   Key
     "Creating LazySeries"
     lazySeries
+    displayedPolynomial
+    computedPolynomial
+    ComputedDegree
+    DisplayedDegree
+    seriesRing
   Headline
     An overview of the various ways to create LazySeries.
   Description
@@ -47,11 +47,11 @@ doc ///
      any time. The easiest examples of such series are:
   
      1. Creating LazySeries by the @TO2((lazySeries, Ring, Function), "using a given ring and function")@
-     2. Creating LazySeries by the @TO2((RingElement), "using a given ringElement")@
-     3.
-     
-  SeeAlso
-    "Operations on Series"
+     2. Creating LazySeries by the @TO2((lazySeries, RingElement), "using a given RingElement")@
+     3. Creating LazySeries by the @TO2((lazySeries, LazySeries, Function), "using a given LazySeries")@
+    
+    SeeAlso
+        "Operations on Series"
     
 ///    
 
@@ -110,14 +110,38 @@ doc ///
             f = 8*x^7+5*x^3-95*x^2+78*x+73
             lazySeries(f)
 
-        Text
-            [Additional information I want to add]
     SeeAlso
         LazySeries
         "Creating LazySeries"
         "Operations on Series"
 
 ///
+---
+doc ///
+    Key
+        (lazySeries, LazySeries, Function)
+    Headline
+        Makes LazySeries out of existing LazySeries
+    Usage
+        s = lazySeries(P,f)
+    Inputs
+        P: LazySeries
+        f: Function
+        
+    Outputs
+        s: LazySeries
+    Description
+        Example
+            R = ZZ[x];
+            A = lazySeries(R,i->2)
+            B = lazySeries(A, j-> j+1)
+    SeeAlso
+        LazySeries
+        "Creating LazySeries"
+        "Operations on Series"
+
+///
+
 ---
 doc ///
   Key
@@ -129,13 +153,16 @@ doc ///
     "LazySeries + Number"
     "LazySeries - Number"
     "LazySeries * Number"
-    "Lazyseries * Ringelement"
     "LazySeries / Number"
     "LazySeries // Number"
     "Number + LazySeries"
     "Number - Lazyseries"
     "Number * LazySeries"
-    " - LazySeries"
+    "LazySeries + RingElement"
+    "LazySeries - RingElement"
+    "Lazyseries * Ringelement"
+    "LazySeries / RingElement"
+
 
   Headline
     An overview of the arithmetic done on formal power series. 
@@ -149,8 +176,8 @@ doc ///
         A+B
         A-B
         A*B
-        A^(-1)
-        B^(-1)
+        A^2
+
     Text
         One can also interact Number type type objects with LazySeries like in the below examples.
     Example
@@ -189,6 +216,7 @@ doc ///
     "Number / LazySeries"
     "RingElement / LazySeries"
     "inverse(LazySeries)"
+    
   Headline
     An overview of the arithmetic done on formal power series. 
   Description
@@ -208,6 +236,15 @@ doc ///
         have \[a_0(1-g) \] If we invert it, then
         \[(a_0(1-g))^{-1} = \frac{1}{a_0}(1+g+g^2+g^3+\cdots) \]
     Example
+        R = QQ[x,y]
+        A = lazySeries(R,(i,j) -> i+j)
+        B = lazySeries(R,(i,j)->3+i*j)
+        inverse(A)
+        B^(-1)
+        A/B
+        4/A
+        (x+5)/B
+
 
         
         
@@ -281,5 +318,40 @@ doc ///
         "Operations on Series"
 
 ///
+
+doc ///
+    Key
+        (changeDegree, LazySeries, ZZ)
+    Headline
+        Changes the degree of the calculated terms that is shown.
+    Usage
+        s = changeDegree(L, n)
+    Inputs
+        L: LazySeries
+            
+        n: ZZ
+    Outputs
+        s: LazySeries
+    Description
+        Text
+            If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
+            When LazySeries object is created, the default degree is set to 6.
+
+
+        Example
+            R = QQ[x,y]
+            L = lazySeries(R,(i,j) -> i+j)
+            peek L.cache
+            changeDegree(L,4)
+            peek L.cache
+            changeDegree(L,8)
+            peek L.cache
+            
+    SeeAlso
+        "Creating LazySeries"
+        "Operations on Series"
+
+///
+
 
 

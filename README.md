@@ -55,7 +55,7 @@ You will need to do some initial setups after running M2 on the virtual machine 
 ```
 $ setup()
 ```
-and make sure to add the directory you cloned this repository into to the `PATH`. [Here is the link to the documentation.](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_path.html) For example, if you clone it into your home directory, in my case `~/git`
+and make sure to add the directory you cloned this repository into to the `PATH`. [Here is the link to the documentation.](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_path.html) For example, if you clone it into your home directory, in my case `~/git`, I ran:
 ```
 path = append(path, "~/git/M2PowerSeries/"); stack path
 ```

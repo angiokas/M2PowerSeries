@@ -14,10 +14,7 @@ padicOrder(ZZ, Thing) := ZZ => (p, f) ->(
         tempf = f % ideal (p^i);
     );
     return i-1;
-
 );
-
-
 
 PadicSeries = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
 

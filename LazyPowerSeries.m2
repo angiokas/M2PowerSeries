@@ -70,11 +70,11 @@ export{
     -- P-adics
     "padics",
     "PadicSeries",
+    "PositiveCoefficients",
     "padicOrder",
     "primeNumber",
     "valueList",
-    "minusOne",
-    "PositiveCoefficients",
+    
     
 
     -- PowerSeriesRings
