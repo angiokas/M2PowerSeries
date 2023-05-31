@@ -124,7 +124,7 @@ padics(ZZ, RingElement) := PadicSeries => opts -> (p, g) -> (
 );
 
 -- Making a PadicSeries without the added computation of polynomial construction
-padics(ZZ, Function, Thing) := LazySeries => opts -> (p, f, computedPoly) -> ( 
+padics(ZZ, Function, Thing) := PadicSeries => opts -> (p, f, computedPoly) -> ( 
     R := ring computedPoly;
     newComputedPoly := truncate(opts.ComputedDegree, computedPoly, Prime => p);
 
@@ -246,7 +246,7 @@ changeDegree(PadicSeries, ZZ) := LazySeries => (L, newDeg) -> (
     L
 );
 -- changes ComputedDegree and computedPolynomial only
-changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
+changeComputedDegree(PadicSeries, ZZ) := PadicSeries => (L, newDeg) -> (
     if (debugLevel > 0) then print "changeComputedDegree: starting";
 
     oldDeg := L.cache.DisplayedDegree;

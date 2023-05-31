@@ -103,7 +103,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
     R := ring P; 
     f := v -> coefficient(v, P);
 
-    --deg:= infinity; -- default degree, it should be infinite unless the user says
+    --deg:= infinity; -- default degree, it should be infinite unless the user says -- UPDATE: disagree with this
     --if not (opts.DisplayedDegree === null) then deg = opts.DisplayedDegree;
 
     displayedPoly := truncate(opts.DisplayedDegree, P);
@@ -114,7 +114,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
         displayedPoly,
         P,
         DisplayedDegree => opts.DisplayedDegree,
-        ComputedDegree => infinity
+        ComputedDegree => opts.DisplayedDegree
         ) 
 );
 --
@@ -264,6 +264,9 @@ changeComputedDegree(LazySeries, ZZ) := LazySeries => (L, newDeg) -> (
 coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
     --need to recalculate computedPolynomial if maximumsList(indexVector) is higher than the highest monomial 
     -- need to do changeDegree(L, maximumsList()); 
+    if (length indexVector != numgens L.seriesRing) then error("Invalid coefficient index inputted");
+
+
     coefficientValues := {};
 
     f := 0;
@@ -271,14 +274,17 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
     local val;
     
     if (sum indexVector <= L#cache#ComputedDegree) then (
-        val = coefficient(indexVector, L#cache#computedPolynomial);                
+        val = coefficient(indexVector, L#cache#computedPolynomial);  
+        print("CASE 1");              
     )
     else if ( (L#cache)#?indexVector ) then (
         val = (L#cache)#indexVector;
+        print("CASE 2");
     )
     else (
         val = (L#coefficientFunction)(indexVector);
         L#cache#indexVector = val;
+        print("CASE 3");
     );
     val
     --checks cache of LazySeries first and grabs the coefficients if available
@@ -286,8 +292,8 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
 
 coefficient(VisibleList, RingElement) := (L, P) -> coefficient(toMonomial(L, ring P), P); -- USE THIS FOR RINGELEMENT TO LAZYSERIES CONSTRUCTOR
 
-coefficient(ZZ, RingElement) := (n, P) -> coefficient(toMonomial({n}, ring P), P); -- for one 
-
+coefficient(ZZ, RingElement) := (n, P) -> coefficient(toMonomial({n}, ring P), P); -- for one variable
+coefficient(ZZ, LazySeries) := (n,L) -> coefficient({n},L);
 -*
 coefficient(RingElement, LazySeries) := (M, L) ->(
     

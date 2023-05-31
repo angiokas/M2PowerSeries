@@ -16,8 +16,6 @@ Description
 doc ///
   Key
     "Creating padic integers"
-    PadicSeries
-    ComputedDegree
     PositiveCoefficients
     primeNumber
 
@@ -25,47 +23,117 @@ doc ///
     An overview of the various ways to create padic integers.
   Description
    Text
-        1. 
-        2. 
-        3. 
+    1. Creating PadicSeries by the @TO2((padics, ZZ, Ring, Function), "using a given prime integers, ring and function")@
+    2. Creating PadicSeries by the @TO2((padics, ZZ, RingElement), "using a given prime integer and RingElement")@
+    3. Creating PAdicSeries by the @TO2((padics, ZZ, Function, Thing), "using a given LazySeries")@
      
      
     SeeAlso
         "Operations on PadicSeries"
+        (padics, ZZ, Ring, Function)
+
+
     
-///   
+/// 
+
+doc ///
+  Key
+     (toString, PadicSeries)
+     (net, PadicSeries)
+
+  Headline
+    Formats PadicSeries for better printing. Works well with LaTeX and Jupyter. 
+
+/// 
+
 
 doc /// 
     Key
         (padics, ZZ, Ring, Function)
     Headline
-        Create a PadicSeries from a specified Ring and a Function.
+        Constructing padics
     Usage
-        s = lazySeries(R, f)
+        s = padics(p, R, f)
     Inputs
+        p: ZZ
+            prime integer
         R: Ring
             specified ring
         f: Function
             is the function which has to have the same amount of inputs as the variables of R
     Outputs
-        s: LazySeries
+        s: PadicSeries
     Description
         Text
-            This is the easiest way to make a formal power series that has coefficients inside a specifief ring.
+            Create a PadicSeries object using the given function to generate the coefficients in the ring completion at the given prime integer.
+            Currently it only works over ring of integers and polynomial rings over integers.
             Make sure the function you are inputting has the same amount of inputs as the amount of variables in
             the specified ring, else it will give an error.
 
         Example
-            R = ZZ/101[x,y];
-            f = (i,j)-> i^2+4;
-            s = lazySeries(R,f)
-        Text
-            [Additional information I want to add]
+            R = ZZ[x,y];
+            f = (i,j,k)-> i+j+k;
+            s = padics(5,R, f)
+        Example
+            R = ZZ[x]
+            f = (i,j)-> i*j;
+            s = padics(5,R, f)
+
     SeeAlso
         "Creating LazySeries"
         "Operations on Series"
 
 ///
+
+doc /// 
+    Key
+        (padics,  ZZ, RingElement)
+    Headline
+        Constructing padics
+    Usage
+        s = padics(p, g)
+    Inputs
+        p: ZZ
+            prime integer
+        g: RingElement
+    Outputs
+        s: PadicSeries
+    Description
+        Text
+            Converts a polynomial into a padicSeries element in the desired adic completetion of the ring at the given prime number. 
+            Currently it only works over ring of integers and polynomial rings over integers.
+            Make sure the function you are inputting has the same amount of inputs as the amount of variables in
+            the specified ring, else it will give an error.
+
+        Example
+            R = ZZ[x]
+            g = 45*x^4+23*x^3+4*x^2+3*x+8
+            s = padics(7, g)
+    SeeAlso
+        "Creating LazySeries"
+        "Operations on Series"
+
+///
+
+doc ///
+    Key
+        (padics, ZZ, Function, Thing)
+    Headline
+        Constructing padics
+    Usage
+        s = padics(p, f, t)
+    Inputs
+        p: ZZ
+            prime integer
+        f: Function
+        t: Thing
+    Outputs
+        s: PadicSeries
+    Description
+        Text
+            Making a PadicSeries without the added computation of polynomial construction
+///
+
 
 doc ///
 Key
@@ -96,11 +164,8 @@ Description
         A+B
         A-B
         A*B
-
         A-1
         A*2
-
-
         
 ///
 

@@ -15,8 +15,8 @@ Headline
 Description
     Text     
         Formal power series are an important part of understanding ring completions. This package 
-        allows the implementation of Formal Power Series which offers the usage in multi-variate
-        and multi-graded rings, as well as multiplication and inversion. Of course, it is impossible
+        allows the implementation of Formal Power Series in multi-variate
+        rings, as well as multiplication and inversion. Of course, it is impossible
         to make an object that is infinite, however this package offers Power series in a form in which
         any coefficient can be calculated. The focus is mainly on a specific type of series which we call
         LazySeries (Credit to Magma) which is a power series where all coefficients are possible to 
@@ -25,6 +25,19 @@ Description
 
         For different ways of constructing LazySeries, see @TO "Creating LazySeries"@.
         As for how to use basic operations involving LazySeries, see @TO"Operations on Series"@.
+
+        Functionality overlap with other packages
+            FormalGroupLaws.m2:  
+                While FormalGroupLaws package offers a similar premise with its introduction of FormalSeries, 
+                it does not offer a generative way and a more general way of generating formal power series like
+                the LazyPowerSeries package does by also offering more functionality regarding the basic operations
+                such as computing inverses.
+
+        Authors
+            HREF{http://www.anniegiokas.com, Annie Giokas}
+            HREF{http://www.math.utah.edu/~schwede/, Karl Schwede}
+
+     
         
 ///
 
@@ -54,6 +67,17 @@ doc ///
         "Operations on Series"
     
 ///    
+
+doc ///
+  Key
+     (toString, LazySeries)
+     (net, LazySeries)
+
+  Headline
+    Formats LazySeries for better printing. Works well with LaTeX and Jupyter. 
+
+
+/// 
 
 doc /// 
     Key
@@ -139,7 +163,6 @@ doc ///
         LazySeries
         "Creating LazySeries"
         "Operations on Series"
-
 ///
 
 ---
@@ -323,7 +346,7 @@ doc ///
     Key
         (changeDegree, LazySeries, ZZ)
     Headline
-        Changes the degree of the calculated terms that is shown.
+        Change Degree of a LazySeries
     Usage
         s = changeDegree(L, n)
     Inputs
@@ -334,7 +357,7 @@ doc ///
         s: LazySeries
     Description
         Text
-            If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
+            Changes the degree of the calculated terms that is shown. If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
             When LazySeries object is created, the default degree is set to 6.
 
 
@@ -350,8 +373,75 @@ doc ///
     SeeAlso
         "Creating LazySeries"
         "Operations on Series"
-
 ///
 
+doc ///
+    Key
+        (changeComputedDegree, LazySeries, ZZ)
+    Headline
+        Change ComputedDegree of a LazySeries
+    Usage
+        s = changeComputedDegree(L, n)
+    Inputs
+        L: LazySeries
+            
+        n: ZZ
+    Outputs
+        s: LazySeries
+    Description
+        Text
+            Changes the computed degree of the calculated terms that is shown. If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
+            When LazySeries object is created, the default degree is set to 6.
 
 
+        Example
+            R = QQ[x,y]
+            L = lazySeries(R,(i,j) -> i+j)
+            peek L.cache
+            changeComputedDegree(L,4)
+            peek L.cache
+            changeComputedDegree(L,8)
+            peek L.cache
+            
+    SeeAlso
+        "Creating LazySeries"
+        "Operations on Series"
+///
+
+doc ///
+    Key
+        (coefficient, VisibleList, LazySeries)
+        (coefficient, ZZ, LazySeries)
+    Headline
+        Change ComputedDegree of a LazySeries
+    Usage
+        s = coefficient(C, L)
+    Inputs
+        C: VisibleList
+            
+        L: LazySeries
+    Outputs
+        s: LazySeries
+    Description
+        Text
+            Changes the computed degree of the calculated terms that is shown. If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
+            When LazySeries object is created, the default degree is set to 6.
+
+
+        Example
+            R = ZZ[x]
+            L = lazySeries(x^5+34*x^4+32*x^3+x+97)
+            coefficient(0,L)
+            coefficient({0},L)
+            coefficient(4,L)
+
+            S = ZZ[x,y,z]
+            L = lazySeries(S, (i,j,k)-> i )
+            coefficient({1,1,1},L)
+            coefficient({2,3,4},L)
+            
+            
+    SeeAlso
+        "Creating LazySeries"
+        "Operations on Series"
+///
