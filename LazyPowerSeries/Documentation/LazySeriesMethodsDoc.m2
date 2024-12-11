@@ -408,12 +408,12 @@ doc ///
         "Operations on Series"
 ///
 
+-*
 doc ///
     Key
-        (coefficient, VisibleList, LazySeries)
-        (coefficient, ZZ, LazySeries)
+        (coefficient, VisibleList, LazySeries)        
     Headline
-        Change ComputedDegree of a LazySeries
+        TBD
     Usage
         s = coefficient(C, L)
     Inputs
@@ -424,10 +424,7 @@ doc ///
         s: LazySeries
     Description
         Text
-            Changes the computed degree of the calculated terms that is shown. If inputted degree is bigger, it will calculate larger termm coefficients, and if smaller will truncate it to already calculated terms.
-            When LazySeries object is created, the default degree is set to 6.
-
-
+            To be done
         Example
             R = ZZ[x]
             L = lazySeries(x^5+34*x^4+32*x^3+x+97)
@@ -445,3 +442,4 @@ doc ///
         "Creating LazySeries"
         "Operations on Series"
 ///
+*-
