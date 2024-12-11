@@ -408,7 +408,7 @@ doc ///
         "Operations on Series"
 ///
 
--*
+
 doc ///
     Key
         (coefficient, VisibleList, LazySeries)        
@@ -421,7 +421,7 @@ doc ///
             
         L: LazySeries
     Outputs
-        s: LazySeries
+        s: RingElement
     Description
         Text
             To be done
@@ -429,17 +429,16 @@ doc ///
             R = ZZ[x]
             L = lazySeries(x^5+34*x^4+32*x^3+x+97)
             coefficient(0,L)
-            coefficient({0},L)
+            coefficient((0),L)
             coefficient(4,L)
 
             S = ZZ[x,y,z]
             L = lazySeries(S, (i,j,k)-> i )
-            coefficient({1,1,1},L)
-            coefficient({2,3,4},L)
+            coefficient((1,1,1),L)
+            coefficient((2,3,4),L)
             
             
     SeeAlso
         "Creating LazySeries"
         "Operations on Series"
 ///
-*-
