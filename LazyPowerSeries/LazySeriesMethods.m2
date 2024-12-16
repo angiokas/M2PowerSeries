@@ -273,7 +273,7 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
     h := 0;
     local val;
     
-    if (sum indexVector <= L#cache#ComputedDegree) then (
+    if (sum toList indexVector <= L#cache#ComputedDegree) then (
         val = coefficient(indexVector, L#cache#computedPolynomial);  
         print("CASE 1");              
     )
@@ -285,12 +285,12 @@ coefficient(VisibleList, LazySeries) := (indexVector, L) ->(
         val = (L#coefficientFunction)(indexVector);
         L#cache#indexVector = val;
         print("CASE 3");
-    );
+    );  
     val
     --checks cache of LazySeries first and grabs the coefficients if available
 );
 
-coefficient(VisibleList, RingElement) := (L, P) -> coefficient(toMonomial(L, ring P), P); -- USE THIS FOR RINGELEMENT TO LAZYSERIES CONSTRUCTOR
+coefficient(VisibleList, RingElement) := (L, P) -> coefficient(toMonomial(toList L, ring P), P); -- USE THIS FOR RINGELEMENT TO LAZYSERIES CONSTRUCTOR
 
 coefficient(ZZ, RingElement) := (n, P) -> coefficient(toMonomial({n}, ring P), P); -- for one variable
 coefficient(ZZ, LazySeries) := (n,L) -> coefficient({n},L);
