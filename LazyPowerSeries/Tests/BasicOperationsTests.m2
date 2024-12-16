@@ -61,12 +61,11 @@ M /L
 ///
 
 TEST ///
-R =  CC[x,y,z]
+R =  QQ[x,y,z]
 
 L = lazySeries(R, (i,j,k)-> i^6+j+k^7)
 M = lazySeries(R, (i,j,k)-> i*j+k)
-a = i
-f = x+i
+f = L + 2/3
 
 L + M
 L - M
@@ -84,16 +83,15 @@ f - L
 L*f
 f*L
 
-L^-1
-assert((L*L^-1).cache.displayedPolynomial == 1)
+assert(((f)*f^-1).cache.displayedPolynomial == 1)
 
-M /L
+M /f
 ///
 
 TEST ///
 R =  ZZ/101[x,y,z]
 
-L = lazySeries(R, (i,j,k)-> 105*i^6+9*j+245*k^7)
+L = lazySeries(R, (i,j,k)-> 105*i^6+9*j+245*k^7+3)
 M = lazySeries(R, (i,j,k)-> i*j+k)
 a = 5
 

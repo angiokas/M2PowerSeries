@@ -7,7 +7,10 @@ truncate(InfiniteNumber, RingElement) := {Prime => 0} >> opts -> (n, f) ->(
     );
 
 truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
-    if(opts.Prime == 0) then (
+    if (# (gens ring f) == 0 ) then (
+        return f;
+    )
+    else if (opts.Prime == 0) then (
         return part(0,n,f);
         )
     else (
