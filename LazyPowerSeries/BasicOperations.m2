@@ -157,6 +157,7 @@ LazySeries - Number := LazySeries => (L, n) -> L + (-n);
 -- Multilplying LazySeries by a scalar
 Number * LazySeries := LazySeries => (n, L) -> (
     --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring\
+    if (debugLevel > 1) then print "multiplying lazy by integer";
     f := L.coefficientFunction;
     R := ring L;
 
@@ -344,14 +345,16 @@ LazySeries * LazySeries := LazySeries => (A,B) -> (
 
 RingElement * LazySeries := LazySeries => (P, L) -> (
     --if (ring n === S#seriesRing) == false then error "Rings of series and number do not match"; -- checks if using same ring\
+    if (debugLevel > 1) then print "Multiplying lazy by RingElement.";
     R := L#seriesRing;
+    local P2;
     -- NEED TO ADD CONDITIONALS OF WHEN P is ring 1 or 0;
-    try P = sub(P, R) then P = sub(P, R)
+    try P2 = sub(P, R) then P2 = sub(P, R)
     else error("Cannot promote RingElement to LazySeries Ring"); -- coul try adding another condition for checking if we can promote series to ringElement ring
-    
-    lazyP := lazySeries(P, DisplayedDegree => L#cache#DisplayedDegree);
-      
-    lazyP * L --THIS HAS A BUG RIGHT NOW - Karl    
+    print "making new ring";
+    lazyP := lazySeries(P2, DisplayedDegree => L#cache#DisplayedDegree);
+    print "still making new ring";
+    lazyP * L 
 );
 
 LazySeries * RingElement := LazySeries => (S,x) -> x * S;
@@ -398,7 +401,7 @@ inverse(LazySeries) := LazySeries => (L) -> (
     if isUnit(L) == false then error "Cannot invert series because it is not a unit";
     c := part(0, L.cache.displayedPolynomial);
     c = sub(c, coeffRing);
-    d := sub(1/c, coeffRing);    
+    d := sub(sub(1/c, coeffRing), L#seriesRing);    
 
     g := ((-1)*((L * d)-1)); -- We want to turn S into a_0(1-g) to then use 1+g+g^2+g^3+...    
     tempSeries := lazySeries(g, i->1);

@@ -66,6 +66,7 @@ R =  QQ[x,y,z]
 L = lazySeries(R, (i,j,k)-> i^6+j+k^7)
 M = lazySeries(R, (i,j,k)-> i*j+k)
 f = L + 2/3
+a = 3/5
 
 L + M
 L - M
@@ -85,7 +86,7 @@ f*L
 
 assert(((f)*f^-1).cache.displayedPolynomial == 1)
 
-M /f
+assert((f*M / f ).cache.displayedPolynomial - M.cache.displayedPolynomial == 0)
 ///
 
 TEST ///
@@ -105,8 +106,8 @@ a - L
 L*a
 a*L
 
-L^-1
-assert((L*L^-1).cache.displayedPolynomial == 1)
+(L+a)^-1
+assert(((L+a)*(L+a)^-1).cache.displayedPolynomial == 1)
 
 M /L
 ///
@@ -116,10 +117,10 @@ M /L
 --
 TEST ///
 R = ZZ[x]
-L = lazySeries(R, i-> 2, DisplayedDegree => 7)
+L = lazySeries(R, i-> 2, DisplayedDegree => 7, ComputedDegree=>7)
 
 changeDegree(L, 10)
-assert(L.cache.displayedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4+2*x^5+2*x^6+2*x^6+2*x^7+2*x^8+2*x^9+2*x^10)
+assert(L.cache.displayedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4+2*x^5+2*x^6+2*x^7+2*x^8+2*x^9+2*x^10)
 
 changeDegree(L, 4)
 assert(L.cache.displayedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4)

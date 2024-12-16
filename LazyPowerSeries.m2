@@ -5,8 +5,8 @@
 --*************************************************
 newPackage(
         "LazyPowerSeries",
-        Version => "2.0", 
-        Date => "5/14/2021",
+        Version => "2.1", 
+        Date => "12/16/2024",
         Authors => {
           {Name => "Chris Cunningham", 
           Email => "cjc258@cornell.edu"},
