@@ -351,7 +351,7 @@ RingElement * LazySeries := LazySeries => (P, L) -> (
     
     lazyP := lazySeries(P, DisplayedDegree => L#cache#DisplayedDegree);
       
-    lazyP * L
+    lazyP * L --THIS HAS A BUG RIGHT NOW - Karl    
 );
 
 LazySeries * RingElement := LazySeries => (S,x) -> x * S;
