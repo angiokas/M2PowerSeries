@@ -14,6 +14,9 @@ truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
         --rewrite this to make it better (12/17/2024 - Karl)
         -- OLD code     
         return part(0,n,f);        
+        -- NEW code
+        --TODO
+        
     else (
         R := ring f;
         p := opts.Prime;
