@@ -14,7 +14,7 @@ truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
         --rewrite this to make it better (12/17/2024 - Karl)
         -- OLD code     
         if #degree(sub(1, ring f)) == 1 then return part(0,n,f);  --singly graded case
-        -- NEW code
+        --now the multigraded case
         wtList := apply(#gens ring f, j -> 1);
         return part(0,n,wtList, f);
     )
