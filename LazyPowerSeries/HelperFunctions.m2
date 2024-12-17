@@ -13,10 +13,11 @@ truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
     else if (opts.Prime == 0) then (        
         --rewrite this to make it better (12/17/2024 - Karl)
         -- OLD code     
-        return part(0,n,f);        
+        if #degree(sub(1, ring f)) == 1 then return part(0,n,f);  --singly graded case
         -- NEW code
-        --TODO
-        
+        wtList := apply(#gens ring f, j -> 1);
+        return part(0,n,wtList, f);
+    )
     else (
         R := ring f;
         p := opts.Prime;
