@@ -10,9 +10,33 @@ truncate(ZZ, RingElement) := {Prime => 0} >> opts -> (n, f) -> (
     if (# (gens ring f) == 0 ) then (
         return f;
     )
-    else if (opts.Prime == 0) then (
-        return part(0,n,f);
+    else if (opts.Prime == 0) then (        
+        --rewrite this to make it better (12/17/2024 - Karl)
+        baseR1 := ring f;
+        baseDeg := degree(sub 1, baseR1);
+        if instance(baseDeg, Number) or (#baseDeg == 1) then (
+            return part(0,n,f);
         )
+        else (
+            nList := apply(#baseDeg, j -> (if j == 0) then n else 0);
+            return part(baseDeg, nList, f)
+        )
+        )
+    else (
+        R := ring f;
+        p := opts.Prime;
+        I := sub(ideal(gens R | {p}), R);
+        dispPoly := f % I^(n+1);
+        dispPoly
+    )
+);
+
+truncate(List, RingElement) := {Prime => 0} >> opts -> (n,f) -> (
+    if (opts.Prime == 0) then (
+        baseR1 := ring f;
+        baseDeg := degree sub(1, baseR1);
+        return part(baseDeg, n, f);
+    )
     else (
         R := ring f;
         p := opts.Prime;

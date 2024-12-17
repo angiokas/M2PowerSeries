@@ -393,6 +393,7 @@ LazySeries ^ ZZ := LazySeries => (S,n) -> (
     finalResult
 
 );
+
 ------------------------------------
 
 inverse(LazySeries) := LazySeries => (L) -> (

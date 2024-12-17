@@ -25,7 +25,7 @@ f*L
 L^-1
 assert((L*L^-1).cache.displayedPolynomial == 1)
 
-M /L
+(M/L)*L
 ///
 
 

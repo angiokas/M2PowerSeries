@@ -16,8 +16,8 @@
   - [X] Multiplying and dividing a `LazySeries` by a scalar (of class `Number`)
   - [X] Adding/substracting a scalar (of class `Number`) to/from a `LazySeries`
   - [X] Multiplying a `LazySeries` by a Polynomial/`RingElement`
-  - [ ] Dividing a `LazySeries` by a Polynomial/`RingElement`
-  - [ ] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
+  - [X] Dividing a `LazySeries` by a Polynomial/`RingElement`
+  - [X] Adding/substracting a Polynomial/`RingElement` to/from a `LazySeries`
 
 - [X] Division of two LazySeries
   - [X] inversion of a lazySeries
@@ -101,6 +101,12 @@
 ## to-do for later
 - [ ] check out http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.14/share/doc/Macaulay2/Divisor/html/index.html for ideas on displaying and constructors and documentation.
 - [ ] 
+
+- [ ] Taking roots of and factoring  power series
+  - [ ] Dealing with field extensions on the fly
+  - [ ] Deciding if a power series is irreducible
+  - [ ] Factoring more generally
+
 ## Other
 - [ ] Other 
   - [ ] Documentation
@@ -129,6 +135,8 @@
   - [ ] Prepare 10 minute presentation 
     - [ ] Prepare demonstrations in Jupyter
     - [ ] Prepare speech
+  
+
 
 ## Some questions
 - When is a lazySeries equal to 0?
