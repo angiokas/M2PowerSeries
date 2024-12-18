@@ -362,7 +362,8 @@ makeSeriesCompatible(LazySeries, LazySeries) := Sequence => (A,B) -> (
 *-
 
 truncate(ZZ, LazySeries) := {} >> opts -> (n, L) -> (
-    f := L.cache.displayedPolynomial;
+    if (n > L.cache.ComputedDegree) then changeDegree(L, n);
+    f := L.cache.computedPolynomial;
     truncate(n,f)
 
 );

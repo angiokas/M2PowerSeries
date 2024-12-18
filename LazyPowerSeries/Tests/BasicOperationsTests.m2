@@ -33,6 +33,7 @@ assert((L*L^-1).cache.displayedPolynomial == 1)
 assert( ((M/L)*L).cache.displayedPolynomial == M.cache.displayedPolynomial )
 
 h = lazySeries(1-x, DisplayedDegree => 5)
+assert(truncate(4, 1/h) == 1 + x + x^2 + x^3 + x^4)
 assert(truncate(6, 1/h) == 1 + x + x^2 + x^3 + x^4 + x^5 + x^6)
 ///
 
