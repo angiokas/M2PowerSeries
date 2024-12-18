@@ -10,6 +10,7 @@
     - [X] Works for single-variable (FIXED)
   - [X] `LazySeries` using a ring and a polynomial as a function
   - [X] Polynomial/`RingElement` conversion to `LazySeries`
+  - [X] LazySeries with polynomial coefficients
 
 - [ ] Basic Operations involving series
   - [X] Addition and substraction of two `LazySeries`
