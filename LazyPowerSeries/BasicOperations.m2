@@ -400,7 +400,7 @@ inverse(LazySeries) := LazySeries => (L) -> (
     -- first check if it is a unit in the ring
     coeffRing := coefficientRing (L#seriesRing);
     if isUnit(L) == false then error "Cannot invert series because it is not a unit";
-    c := part(0, L.cache.displayedPolynomial);
+    c := truncate(0, L); --part(0, L.cache.displayedPolynomial);
     c = sub(c, coeffRing);
     d := sub(sub(1/c, coeffRing), L#seriesRing);    
 

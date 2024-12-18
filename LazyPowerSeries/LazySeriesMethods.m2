@@ -61,10 +61,11 @@ lazySeries = method(Options => {Degree => infinity, DisplayedDegree => 5, Comput
 -- Constructs LazySeries over the given ring R using inputted coefficient function f 
 lazySeries(Ring, Function) := LazySeries => opts -> (R, f) -> ( 
     if(opts.DisplayedDegree > opts.ComputedDegree) then error "Displayed degree cannot be more than computed degree.";
+    if (opts.ComputedDegree <= 0) then error "Expected ComputedDegree to be positive";
 
     computedPoly := calculatePolynomial(opts.ComputedDegree, R, f);
     displayedPoly := truncate(opts.DisplayedDegree, computedPoly);
-    print displayedPoly;
+    if (debugLevel > 1) then print displayedPoly;
 
     new LazySeries from {
         coefficientFunction => f,
@@ -341,7 +342,9 @@ sub(LazySeries, Ring) := LazySeries => (L, R) -> (
 
 -- Overloading of isUnit method; checks if the leading coefficient is a unit in the ring
 isUnit(LazySeries) := Boolean => L -> (
-    constantTerm := part(0, L.cache.displayedPolynomial);
+    --R1 := ring L;
+    constantTerm := truncate(0, L);
+    
     isUnit(constantTerm)
 );
 

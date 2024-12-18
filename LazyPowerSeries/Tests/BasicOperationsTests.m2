@@ -1,95 +1,55 @@
-TEST ///
+TEST /// --power series over ZZ, single variable
 R = ZZ[x]
 
-L = lazySeries(R, i-> 1+i)
-M = lazySeries(R, i-> i+5)
+L = lazySeries(R, i-> 1+i, DisplayedDegree => 5)
+assert(L.cache.displayedPolynomial == 1 + 2*x + 3*x^2 + 4*x^3 + 5*x^4 + 6*x^5)
+M = lazySeries(R, i-> i+5, DisplayedDegree => 5)
 a = 7
 f = x
 
-L + M
-L - M
-K = L*M
+assert( (L*f + a*M + 2).cache.displayedPolynomial == 37 + 43*x + 51*x^2 + 59*x^3 + 67*x^4 + 75*x^5)
+assert( (L*f - a*M - 3).cache.displayedPolynomial == -38 - 41*x - 47*x^2 - 53*x^3 - 59*x^4 - 65*x^5)
 
-L + a
-L - a
-a - L
-L*a
-a*L
-
-L + f
-L - f
-f - L
-L*f
-f*L
-
-L^-1
 assert((L*L^-1).cache.displayedPolynomial == 1)
 
-(M/L)*L
+assert( ((M/L)*L).cache.displayedPolynomial == M.cache.displayedPolynomial )
 ///
 
 
-TEST ///
-R = QQ[x,y]
+TEST ///--power series over QQ, single-variable
+R = QQ[x]
 
-L = lazySeries(R, (i,j)->(5/2))
-M = lazySeries(R,(i,j)-> 7)
-a = 1/2
-f = 1+x+y
+L = lazySeries(R, i-> 1+i, DisplayedDegree => 5)
+assert(L.cache.displayedPolynomial == 1 + 2*x + 3*x^2 + 4*x^3 + 5*x^4 + 6*x^5)
+M = lazySeries(R, i-> i+5, DisplayedDegree => 5)
+a = 3/5
+f = x
 
-L + M
-L - M
-K = L*M
+assert( (L*f + a*M + 2).cache.displayedPolynomial == 5 + (23/5)*x + (31/5)*x^2 + (39/5)*x^3 + (47/5)*x^4 + 11*x^5)
+assert( (L*f - a*M - 3/4).cache.displayedPolynomial == -15/4 - (13/5)*x - (11/5)*x^2 - (9/5)*x^3 - (7/5)*x^4 - x^5)
 
-L + a
-L - a
-a - L
-L*a
-a*L
-
-L + f
-L - f
-f - L
-L*f
-f*L
-
-L^-1
 assert((L*L^-1).cache.displayedPolynomial == 1)
 
-M /L
+assert( ((M/L)*L).cache.displayedPolynomial == M.cache.displayedPolynomial )
 
+h = lazySeries(1-x, DisplayedDegree => 5)
+assert(truncate(6, 1/h) == 1 + x + x^2 + x^3 + x^4 + x^5 + x^6)
 ///
 
-TEST ///
+TEST ///--power series over QQ, multi-variable
 R =  QQ[x,y,z]
 
-L = lazySeries(R, (i,j,k)-> i^6+j+k^7)
-M = lazySeries(R, (i,j,k)-> i*j+k)
-f = L + 2/3
-a = 3/5
-
-L + M
-L - M
-K = L*M
-
-L + a
-L - a
-a - L
-L*a
-a*L
-
-L + f
-L - f
-f - L
-L*f
-f*L
+L = lazySeries(R, (i,j,k)-> i^6+j+k^7, DisplayedDegree => 5)
+assert(truncate(2, L) == 0 + x + y + z + 2*x*y + 2*x*z + 2*y*z + 64*x^2 + 2*y^2 + 128*z^2)
+M = lazySeries(R, (i,j,k)-> i*j+k, DisplayedDegree => 5)
+f = 3/5*L + 2/3
 
 assert(((f)*f^-1).cache.displayedPolynomial == 1)
 
-assert((f*M / f ).cache.displayedPolynomial - M.cache.displayedPolynomial == 0)
+assert((f*M / f ).cache.displayedPolynomial == M.cache.displayedPolynomial)
 ///
 
-TEST ///
+TEST ///--power series of prime field, multi-variable
 R =  ZZ/101[x,y,z]
 
 L = lazySeries(R, (i,j,k)-> 105*i^6+9*j+245*k^7+3)
@@ -106,16 +66,14 @@ a - L
 L*a
 a*L
 
-(L+a)^-1
 assert(((L+a)*(L+a)^-1).cache.displayedPolynomial == 1)
 
-M /L
+assert(truncate(6, L * M * inverse(L)) == truncate(6, M))
 ///
 
 
 
---
-TEST ///
+TEST /// --changing degrees
 R = ZZ[x]
 L = lazySeries(R, i-> 2, DisplayedDegree => 7, ComputedDegree=>7)
 
@@ -124,7 +82,21 @@ assert(L.cache.displayedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4+2*x^5+2*x^6+2*x^7+
 
 changeDegree(L, 4)
 assert(L.cache.displayedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4)
+assert(L.cache.computedPolynomial == 2+2*x+2*x^2+2*x^3+2*x^4+2*x^5+2*x^6+2*x^7+2*x^8+2*x^9+2*x^10)
 ///
+
+TEST /// --power series over a polynomial ring
+A = QQ[a,b]
+R = A[x,y]
+L = lazySeries(R, (i,j) -> i + a^i + b^(i+j+1))
+assert(not isUnit L)
+assert(truncate(2, L) == (0 + 1 + b) + (1 + a + b^2)*x + (0 + 1 + b^2)*y + (2 + a^2 + b^3)*x^2 + (1 + a + b^3)*x*y + (0 + 1 + b^3)*y^2 )
+M = L - sub(b,R)
+assert(isUnit M)
+assert(truncate(5, M*(inverse M)) == 1)
+///
+
+
 
 -- PADICS
 TEST ///
