@@ -16,9 +16,7 @@ doc ///
         Example
             R = ZZ[x];
             oneSeries(R)
-
-        Text
-            [Additional information I want to add]
+            
     SeeAlso
         LazySeries
         "Creating LazySeries"
@@ -43,9 +41,7 @@ doc ///
         Example
             R = ZZ[x];
             zeroSeries(R)
-
-        Text
-            [Additional information I want to add]
+            
     SeeAlso
         LazySeries
         "Creating LazySeries"

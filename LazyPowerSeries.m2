@@ -89,6 +89,7 @@ load "./LazyPowerSeries/HelperFunctions.m2"
 load "./LazyPowerSeries/LazySeriesMethods.m2"
 load "./LazyPowerSeries/PadicsMethods.m2"
 load "./LazyPowerSeries/BasicOperations.m2"
+load "./LazyPowerSeries/PadicsBasicOperations.m2"
 --load "./LazyPowerSeries/PowerSeriesRings.m2"
 
 
@@ -102,9 +103,11 @@ load "./LazyPowerSeries/Documentation/PadicsMethodsDoc.m2"
 
 
 -- TESTS
+--load "./LazyPowerSeries/Tests/BasicOperationsTests.m2"
 load "./LazyPowerSeries/Tests/ConstructionTests.m2"
-load "./LazyPowerSeries/Tests/HelperFunctionTests.m2"
-load "./LazyPowerSeries/Tests/BasicOperationsTests.m2"
-load "./LazyPowerSeries/Tests/PadicsMethodsTests.m2"
+--load "./LazyPowerSeries/Tests/HelperFunctionTests.m2"
+--load "./LazyPowerSeries/Tests/PadicsMethodsTests.m2"
+--load "./LazyPowerSeries/Tests/SeriesFunctionTests.m2"
+
 
 end

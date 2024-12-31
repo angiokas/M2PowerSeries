@@ -16,7 +16,7 @@ padicOrder(ZZ, Thing) := ZZ => (p, f) ->(
     return i-1;
 );
 
-PadicSeries = new Type of HashTable; -- Could potentially change it to HashTable since so far have not used inheritence
+PadicSeries = new Type of HashTable; 
 
 toString PadicSeries := L -> (
     myStr := net("");
@@ -76,19 +76,18 @@ padics = method(Options => { Degree => infinity, DisplayedDegree => 5, ComputedD
 
 -- Constructs PadicSeries over the given ring R using inputted coefficient function f 
 padics(ZZ, Ring, Function) := PadicSeries => opts -> (p, R, f) -> (
+        computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
+        tempValueList := toAdics(p, computedPoly, PositiveCoefficients=>opts.PositiveCoefficients);
+        displayedPoly := sub(0, R); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
 
-    computedPoly := constructAdicsPoly(R, p, f,  Degree => opts.ComputedDegree);
-    tempValueList := toAdics(p, computedPoly, PositiveCoefficients=>opts.PositiveCoefficients);
-    displayedPoly := sub(0, R); -- Truncating could be different since users might want to treat degree with variables p, x_1,...,x_n
+        currentDegree := 0;
+        maxIdeal := ideal({p} | gens R);
 
-    currentDegree := 0;
-    maxIdeal := ideal({p} | gens R);
-
-    while(currentDegree < opts.DisplayedDegree) do (
-        currentDegree = currentDegree + 1;
-        displayedPoly = displayedPoly + sum(apply(first entries gens (maxIdeal^currentDegree),j-> j*(tempValueList#j)))        
-    );
-
+        while(currentDegree < opts.DisplayedDegree) do (
+            currentDegree = currentDegree + 1;
+            displayedPoly = displayedPoly + sum(apply(first entries gens (maxIdeal^currentDegree),j-> j*(tempValueList#j)))        
+        );
+    
     new PadicSeries from {
         coefficientFunction => f,
         seriesRing => R,

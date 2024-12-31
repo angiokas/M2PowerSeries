@@ -48,8 +48,10 @@ doc ///
     ComputedDegree
     DisplayedDegree
     seriesRing
+
   Headline
     An overview of the various ways to create LazySeries.
+
   Description
    Text
      Most series have enough information to extend their polynomial approximation to 
@@ -264,10 +266,7 @@ doc ///
         B^(-1)
         A/B
         4/A
-        (x+5)/B
-
-
-        
+        (x+5)/B     
         
   SeeAlso
     LazySeries
