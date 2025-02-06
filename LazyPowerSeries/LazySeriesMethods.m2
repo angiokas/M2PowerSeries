@@ -78,7 +78,7 @@ lazySeries(Ring, Function) := LazySeries => opts -> (R, f) -> (
             computedPolynomial => computedPoly
         }
     }
-)
+);
 
 -- Making a LazySeries without the added computation of polynomial construction
 lazySeries(Ring, Function, RingElement, RingElement) := LazySeries => opts -> (R, f, displayedPoly, computedPoly) -> ( 
@@ -95,7 +95,7 @@ lazySeries(Ring, Function, RingElement, RingElement) := LazySeries => opts -> (R
             computedPolynomial => computedPoly
         }
     }
-)
+);
 -- f is the function which has to have the same amount of inputs as there are variables
 
 
@@ -118,7 +118,7 @@ lazySeries(RingElement) := LazySeries => opts -> P -> (
         ComputedDegree => opts.DisplayedDegree
         ) 
 );
---
+-- Creating a LazySeries from an existing LazySeries object
 lazySeries(LazySeries, Function) := LazySeries => opts -> (L, function) -> (    
     local tempLPower;
     R := L.seriesRing;

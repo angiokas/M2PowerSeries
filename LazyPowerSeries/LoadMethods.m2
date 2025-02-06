@@ -1,0 +1,5 @@
+load "./HelperFunctions.m2"
+load "./LazySeriesMethods.m2"
+load "./PadicsMethods.m2"
+load "./BasicOperations.m2"
+load "./PadicsBasicOperations.m2"

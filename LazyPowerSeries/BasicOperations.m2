@@ -422,6 +422,7 @@ Number / LazySeries := LazySeries => (n, B)->(
 )
 
 ----------------------------------- Operations using polynomials and LazySeries-------------------------------
+
 LazySeries + RingElement := LazySeries => (L,f) -> (
     M := lazySeries(f);
     L+M

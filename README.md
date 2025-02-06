@@ -88,7 +88,7 @@ $ setup()
 ```
 and make sure to add the directory you cloned this repository into to the `PATH`. [Here is the link to the documentation.](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.18/share/doc/Macaulay2/Macaulay2Doc/html/_path.html) For example, if you clone it into your home directory, in my case `~/git`, I ran:
 ```
-path = append(path, "~/git/M2PowerSeries/"); stack path
+`path = append(path, "~/git/M2PowerSeries/")`; stack path
 ```
 
 You find information on this here: [setup (macaulay2.com)](http://www2.macaulay2.com/Macaulay2/doc/Macaulay2-1.17/share/doc/Macaulay2/Macaulay2Doc/html/_setup.html)
@@ -130,36 +130,24 @@ or here:
 https://docs.anaconda.com/anaconda/install/linux/
 https://jupyter.org/install
 
-After you install anacdonda on wsl server:
+After you install a python virtual environment on wsl:
 
 ```
-conda install -c conda-forge notebook
-```
-
-Update your package manager:
-```
-$ sudo apt update
-```
-
-Then install pip3:
-```
-$ sudo apt install python3-pip
-```
-Install jupyter using apt again:
-
-```
-$ sudo apt install jupyter
+. ./.venv/bin/activate
+pip install 'notebook >= 6.0, < 7'
 ```
 
 Now we need to install the Macaulay2 kernel for jupter to recodnize the Macaulay2 code and make notebooks using that kernel available. Make sure you run this as root (Add sudo at the beginning), because it tries to put files in system diretories:
+
 ```
-$ sudo pip3 install macaulay2-jupyter-kernel
-$ sudo python3 -m m2_kernel.install
+$ pip3 install macaulay2-jupyter-kernel jupyter_contrib_nbextensions
+$ python3 -m m2_kernel.install --sys-prefix
 ```
 
 Then to make a new notebook, type: 
 ```
-$ jupyter notebook
+$ jupyter notebook \
+    --NotebookApp.token=""
 ```
 If you fixed the browser to work on wsl, it should redirect you to your chosen browser in Windows. Then you should be able to make an M2 file in jupyter. 
 

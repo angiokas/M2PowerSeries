@@ -27,7 +27,7 @@ newPackage(
 	     Email => "u1304541@utah.edu",
 	     HomePage => "https://github.com/annie-giokas"} },
 
-        Headline => "A package for implementing power series and its calculations",
+        Headline => "Implementation of formal power series in M2.",
         DebuggingMode => true,
         PackageImports => {"Truncations"},
         Reload => true,
@@ -82,29 +82,36 @@ export{
     "PowerSeriesRing",
     "isPowerSeriesRing",
     "PowerList",
-    "powerList"
+    "powerList",
+
+    -- Testing
+    "checkLazySeriesCache",
+    "testCases"
 }
 
+--load "./LazyPowerSeries/LoadMethods.m2"
+load "./LazyPowerSeries/PowerSeriesRings.m2"
 load "./LazyPowerSeries/HelperFunctions.m2"
 load "./LazyPowerSeries/LazySeriesMethods.m2"
 load "./LazyPowerSeries/PadicsMethods.m2"
 load "./LazyPowerSeries/BasicOperations.m2"
 load "./LazyPowerSeries/PadicsBasicOperations.m2"
---load "./LazyPowerSeries/PowerSeriesRings.m2"
 
 
 --DOCUMENTATION
-beginDocumentation()
-load "./LazyPowerSeries/Documentation/LazySeriesMethodsDoc.m2"
-load "./LazyPowerSeries/Documentation/PadicsMethodsDoc.m2"
+--beginDocumentation()
+--load "./LazyPowerSeries/Documentation/LazySeriesMethodsDoc.m2"
+--load "./LazyPowerSeries/Documentation/PadicsMethodsDoc.m2"
 --load "./LazyPowerSeries/Documentation/BasicOperationsDoc.m2"
 --load "./LazyPowerSeries/Documentation/HelperFunctionsDoc.m2"
 
 
 
 -- TESTS
+load "./LazyPowerSeries/Tests/LoadTests.m2"
+--load "./LazyPowerSeries/Tests/LazySeries/OneVarPolyRings/Construction/ZZTests.m2"
 --load "./LazyPowerSeries/Tests/BasicOperationsTests.m2"
-load "./LazyPowerSeries/Tests/ConstructionTests.m2"
+--load "./LazyPowerSeries/Tests/ConstructionTests.m2"
 --load "./LazyPowerSeries/Tests/HelperFunctionTests.m2"
 --load "./LazyPowerSeries/Tests/PadicsMethodsTests.m2"
 --load "./LazyPowerSeries/Tests/SeriesFunctionTests.m2"
